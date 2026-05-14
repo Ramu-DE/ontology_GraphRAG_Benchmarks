@@ -9,3 +9,33 @@ P007,GIPR,P48546,G-protein coupled receptor,Cell membrane
 P008,Amyloid-beta,P05067,Peptide,Extracellular
 P009,Tau,P10636,Microtubule-associated,Cytoplasm
 P010,AMPK,Q13131,Serine/threonine kinase,Cytoplasm
+P011,CTLA-4,P16410,Immune checkpoint,Cell membrane
+P012,VEGF-A,P15692,Growth factor,Extracellular
+P013,ALK,Q9UM73,Receptor tyrosine kinase,Cell membrane
+P014,ROS1,P08922,Receptor tyrosine kinase,Cell membrane
+P015,MET,P08581,Receptor tyrosine kinase,Cell membrane
+P016,RET,P07949,Receptor tyrosine kinase,Cell membrane
+P017,BRAF,P15056,Serine/threonine kinase,Cytoplasm
+P018,MEK1,Q02750,MAP kinase kinase,Cytoplasm
+P019,BCL-2,P10415,Apoptosis regulator,Mitochondria
+P020,BTK,Q06187,Tyrosine kinase,Cytoplasm
+P021,PARP1,P09874,DNA repair enzyme,Nucleus
+P022,FGFR1,P11362,Receptor tyrosine kinase,Cell membrane
+P023,IDH1,O75874,Isocitrate dehydrogenase,Cytoplasm
+P024,CD20,P11836,B-lymphocyte antigen,Cell membrane
+P025,HER3,P21860,Receptor tyrosine kinase,Cell membrane
+P011,CTLA-4,P16410,Immune checkpoint,Cell membrane
+P012,VEGF-A,P15692,Growth factor,Extracellular
+P013,ALK,Q9UM73,Receptor tyrosine kinase,Cell membrane
+P014,ROS1,P08922,Receptor tyrosine kinase,Cell membrane
+P015,MET,P08581,Receptor tyrosine kinase,Cell membrane
+P016,RET,P07949,Receptor tyrosine kinase,Cell membrane
+P017,BRAF,P15056,Serine/threonine kinase,Cytoplasm
+P018,MEK1,Q02750,MAP kinase kinase,Cytoplasm
+P019,BCL-2,P10415,Apoptosis regulator,Mitochondria
+P020,BTK,Q06187,Tyrosine kinase,Cytoplasm
+P021,PARP1,P09874,DNA repair enzyme,Nucleus
+P022,FGFR1,P11362,Receptor tyrosine kinase,Cell membrane
+P023,IDH1,O75874,Isocitrate dehydrogenase,Cytoplasm
+P024,CD20,P11836,B-lymphocyte antigen,Cell membrane
+P025,HER3,P21860,Receptor tyrosine kinase,Cell membrane

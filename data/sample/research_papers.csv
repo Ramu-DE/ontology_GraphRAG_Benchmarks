@@ -9,3 +9,23 @@ P007,Atezolizumab for Metastatic NSCLC,Lancet,2015-07-14,10.1016/S0140-6736(15)0
 P008,Metformin and Alzheimer's Disease Risk,JAMA Neurology,2020-06-15,10.1001/jamaneurol.2020.1234,432
 P009,PD-1 Blockade in Melanoma,Nature,2014-07-03,10.1038/nature13954,5234
 P010,Amyloid-beta Immunotherapy in Alzheimer's,Science,2021-12-10,10.1126/science.abj3289,789
+PA011,Osimertinib in Untreated EGFR-Mutated Advanced NSCLC,New England Journal of Medicine,2018-01-11,10.1056/NEJMoa1713137,2876
+PA012,Ipilimumab plus Nivolumab versus Ipilimumab in Advanced Melanoma,New England Journal of Medicine,2015-09-28,10.1056/NEJMoa1504030,3241
+PA013,Olaparib for Metastatic BRCA-Mutated Pancreatic Cancer,New England Journal of Medicine,2019-12-26,10.1056/NEJMoa1911139,987
+PA014,Durvalumab after Chemoradiotherapy in Stage III NSCLC,New England Journal of Medicine,2017-11-16,10.1056/NEJMoa1709937,2134
+PA015,Venetoclax in Relapsed or Refractory CLL,New England Journal of Medicine,2016-03-17,10.1056/NEJMoa1513257,1876
+PA016,Ibrutinib versus Ofatumumab in Relapsed CLL,New England Journal of Medicine,2014-07-17,10.1056/NEJMoa1400376,2345
+PA017,Alectinib versus Crizotinib in ALK-Positive NSCLC,New England Journal of Medicine,2017-11-16,10.1056/NEJMoa1704795,1654
+PA018,Selpercatinib in RET Fusion-Positive NSCLC,New England Journal of Medicine,2020-05-29,10.1056/NEJMoa2005653,876
+PA019,Capmatinib in MET Exon 14-Skipping NSCLC,New England Journal of Medicine,2020-05-29,10.1056/NEJMoa2002407,765
+PA020,Lorlatinib in Previously Treated ALK-Positive NSCLC,New England Journal of Medicine,2018-10-31,10.1056/NEJMoa1808134,543
+PA011,Osimertinib in Untreated EGFR-Mutated Advanced NSCLC,New England Journal of Medicine,2018-01-11,10.1056/NEJMoa1713137,2876
+PA012,Ipilimumab plus Nivolumab versus Ipilimumab in Advanced Melanoma,New England Journal of Medicine,2015-09-28,10.1056/NEJMoa1504030,3241
+PA013,Olaparib for Metastatic BRCA-Mutated Pancreatic Cancer,New England Journal of Medicine,2019-12-26,10.1056/NEJMoa1911139,987
+PA014,Durvalumab after Chemoradiotherapy in Stage III NSCLC,New England Journal of Medicine,2017-11-16,10.1056/NEJMoa1709937,2134
+PA015,Venetoclax in Relapsed or Refractory CLL,New England Journal of Medicine,2016-03-17,10.1056/NEJMoa1513257,1876
+PA016,Ibrutinib versus Ofatumumab in Relapsed CLL,New England Journal of Medicine,2014-07-17,10.1056/NEJMoa1400376,2345
+PA017,Alectinib versus Crizotinib in ALK-Positive NSCLC,New England Journal of Medicine,2017-11-16,10.1056/NEJMoa1704795,1654
+PA018,Selpercatinib in RET Fusion-Positive NSCLC,New England Journal of Medicine,2020-05-29,10.1056/NEJMoa2005653,876
+PA019,Capmatinib in MET Exon 14-Skipping NSCLC,New England Journal of Medicine,2020-05-29,10.1056/NEJMoa2002407,765
+PA020,Lorlatinib in Previously Treated ALK-Positive NSCLC,New England Journal of Medicine,2018-10-31,10.1056/NEJMoa1808134,543

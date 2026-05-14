@@ -9,3 +9,23 @@ B004,D007,0.62,<1000 pg/mL
 B004,D008,0.69,<1000 pg/mL
 B006,D005,0.92,BCR-ABL1 >10%
 B007,D004,0.88,IHC 3+
+B011,D011,0.89,Mutation present
+B012,D021,0.85,Rearrangement present
+B012,D022,0.82,Rearrangement present
+B013,D022,0.79,Rearrangement present
+B014,D017,0.87,Mutation present
+B014,D018,0.83,Mutation present
+B015,D013,0.91,Mutation present
+B016,D015,0.74,≥10 ng/mL
+B017,D020,0.82,IHC 2+
+B018,D019,0.88,IHC 2+
+B019,D023,0.86,Mutation present
+B020,D024,0.84,Fusion present
+B020,D025,0.87,Fusion present
+B023,D012,0.71,IHC 1+
+B024,D001,0.82,MSI-H
+B025,D001,0.76,≥10 mut/Mb
+B025,D014,0.74,≥10 mut/Mb
+B002,D011,0.62,EGFR mutation present
+B021,D013,0.78,Mutation present
+B022,D013,0.67,ITD present

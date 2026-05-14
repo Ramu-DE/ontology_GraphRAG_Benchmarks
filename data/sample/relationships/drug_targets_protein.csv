@@ -10,3 +10,22 @@ D008,P008,Very High,Antibody
 D009,P006,Very High,Agonist
 D010,P006,Very High,Agonist
 D010,P007,Very High,Agonist
+D011,P003,Very High,Inhibitor
+D012,P011,Very High,Antagonist
+D013,P021,Very High,Inhibitor
+D014,P002,High,Antagonist
+D015,P012,High,Antagonist
+D016,P003,High,Antagonist
+D017,P017,Very High,Inhibitor
+D018,P018,Very High,Inhibitor
+D019,P019,Very High,Inhibitor
+D020,P020,Very High,Inhibitor
+D021,P013,Very High,Inhibitor
+D022,P013,Very High,Inhibitor
+D022,P014,High,Inhibitor
+D023,P015,Very High,Inhibitor
+D024,P016,Very High,Inhibitor
+D025,P016,Very High,Inhibitor
+D016,P025,Moderate,Antagonist
+D004,P025,High,Antagonist
+D011,P025,Moderate,Inhibitor

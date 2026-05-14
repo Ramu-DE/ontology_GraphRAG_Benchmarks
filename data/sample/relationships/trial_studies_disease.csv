@@ -9,3 +9,33 @@ CT007,DIS004,Newly diagnosed chronic phase CML
 CT008,DIS002,Advanced melanoma
 CT009,DIS002,Unresectable or metastatic melanoma
 CT010,DIS006,Mild cognitive impairment
+CT011,DIS001,EGFR T790M mutation-positive advanced NSCLC
+CT012,DIS002,Previously untreated unresectable stage III–IV melanoma
+CT013,DIS013,BRCA1/2-mutated platinum-sensitive recurrent ovarian cancer
+CT014,DIS001,Unresectable stage III NSCLC after chemoradiotherapy
+CT015,DIS001,Advanced non-squamous NSCLC without EGFR/ALK mutations
+CT016,DIS014,Locoregionally advanced squamous cell head and neck cancer
+CT017,DIS002,BRAF V600E mutation-positive unresectable melanoma
+CT018,DIS002,BRAF V600E/K mutation-positive metastatic melanoma
+CT019,DIS019,Relapsed or refractory CLL with 17p deletion
+CT020,DIS019,Previously treated CLL or small lymphocytic lymphoma
+CT021,DIS001,ALK-positive previously untreated advanced NSCLC
+CT022,DIS001,ALK-positive NSCLC previously treated with ALK inhibitor
+CT023,DIS001,MET exon 14 skipping mutation-positive advanced NSCLC
+CT024,DIS001,RET fusion-positive metastatic NSCLC
+CT025,DIS001,RET fusion-positive advanced solid tumors
+CT026,DIS011,Metastatic urothelial carcinoma after platinum therapy
+CT027,DIS012,Germline BRCA-mutated metastatic pancreatic cancer
+CT028,DIS016,Advanced or metastatic hepatocellular carcinoma
+CT029,DIS015,Previously treated recurrent or metastatic gastric adenocarcinoma
+CT030,DIS018,Relapsed or refractory DLBCL
+CT031,DIS017,Relapsed or refractory multiple myeloma with t(11;14)
+CT032,DIS013,"Stage III/IV ovarian, fallopian tube, or peritoneal cancer"
+CT033,DIS011,Locally advanced or metastatic urothelial carcinoma
+CT034,DIS002,BRAF V600 mutation-positive unresectable melanoma
+CT035,DIS001,RET mutation-positive medullary thyroid cancer
+CT036,DIS009,KRAS wild-type metastatic colorectal cancer
+CT037,DIS001,EGFR mutation-positive previously untreated advanced NSCLC
+CT038,DIS015,MET-amplified advanced gastric cancer
+CT039,DIS001,RET mutation-positive thyroid cancer with NSCLC
+CT040,DIS001,ROS1-rearranged advanced NSCLC

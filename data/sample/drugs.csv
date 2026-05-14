@@ -9,3 +9,33 @@ D007,Aducanumab,aducanumab,Monoclonal Antibody,Approved,2021,Anti-amyloid beta
 D008,Lecanemab,lecanemab,Monoclonal Antibody,Approved,2023,Anti-amyloid beta
 D009,Semaglutide,semaglutide,Peptide,Approved,2017,GLP-1 receptor agonist
 D010,Tirzepatide,tirzepatide,Peptide,Approved,2022,GIP/GLP-1 receptor agonist
+D011,Osimertinib,osimertinib,Small Molecule,Approved,2017,EGFR T790M inhibitor
+D012,Ipilimumab,ipilimumab,Monoclonal Antibody,Approved,2011,CTLA-4 inhibitor
+D013,Olaparib,olaparib,Small Molecule,Approved,2014,PARP inhibitor
+D014,Durvalumab,durvalumab,Monoclonal Antibody,Approved,2017,PD-L1 inhibitor
+D015,Bevacizumab,bevacizumab,Monoclonal Antibody,Approved,2004,VEGF inhibitor
+D016,Cetuximab,cetuximab,Monoclonal Antibody,Approved,2004,EGFR monoclonal antibody
+D017,Dabrafenib,dabrafenib,Small Molecule,Approved,2013,BRAF inhibitor
+D018,Trametinib,trametinib,Small Molecule,Approved,2013,MEK inhibitor
+D019,Venetoclax,venetoclax,Small Molecule,Approved,2016,BCL-2 inhibitor
+D020,Ibrutinib,ibrutinib,Small Molecule,Approved,2013,BTK inhibitor
+D021,Alectinib,alectinib,Small Molecule,Approved,2017,ALK inhibitor
+D022,Lorlatinib,lorlatinib,Small Molecule,Approved,2018,ALK/ROS1 inhibitor
+D023,Capmatinib,capmatinib,Small Molecule,Approved,2020,MET inhibitor
+D024,Pralsetinib,pralsetinib,Small Molecule,Approved,2020,RET inhibitor
+D025,Selpercatinib,selpercatinib,Small Molecule,Approved,2020,RET inhibitor
+D011,Osimertinib,osimertinib,Small Molecule,Approved,2017,EGFR T790M inhibitor
+D012,Ipilimumab,ipilimumab,Monoclonal Antibody,Approved,2011,CTLA-4 inhibitor
+D013,Olaparib,olaparib,Small Molecule,Approved,2014,PARP inhibitor
+D014,Durvalumab,durvalumab,Monoclonal Antibody,Approved,2017,PD-L1 inhibitor
+D015,Bevacizumab,bevacizumab,Monoclonal Antibody,Approved,2004,VEGF inhibitor
+D016,Cetuximab,cetuximab,Monoclonal Antibody,Approved,2004,EGFR monoclonal antibody
+D017,Dabrafenib,dabrafenib,Small Molecule,Approved,2013,BRAF inhibitor
+D018,Trametinib,trametinib,Small Molecule,Approved,2013,MEK inhibitor
+D019,Venetoclax,venetoclax,Small Molecule,Approved,2016,BCL-2 inhibitor
+D020,Ibrutinib,ibrutinib,Small Molecule,Approved,2013,BTK inhibitor
+D021,Alectinib,alectinib,Small Molecule,Approved,2017,ALK inhibitor
+D022,Lorlatinib,lorlatinib,Small Molecule,Approved,2018,ALK/ROS1 inhibitor
+D023,Capmatinib,capmatinib,Small Molecule,Approved,2020,MET inhibitor
+D024,Pralsetinib,pralsetinib,Small Molecule,Approved,2020,RET inhibitor
+D025,Selpercatinib,selpercatinib,Small Molecule,Approved,2020,RET inhibitor

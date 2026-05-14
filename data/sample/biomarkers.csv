@@ -9,3 +9,33 @@ B007,HER2 Status,Protein,IHC Score,Breast cancer prognosis
 B008,KRAS Mutation,Genetic,Mutation Status,Colorectal cancer prognosis
 B009,Fasting Glucose,Metabolic,mg/dL,Diabetes screening
 B010,C-Reactive Protein,Protein,mg/L,Inflammation marker
+B011,EGFR T790M Mutation,Genetic,Mutation Status,Predicts osimertinib response
+B012,ALK Rearrangement,Genetic,FISH/IHC,Predicts ALK inhibitor response
+B013,ROS1 Rearrangement,Genetic,FISH/IHC,Predicts ROS1 inhibitor response
+B014,BRAF V600E Mutation,Genetic,Mutation Status,Predicts BRAF/MEK inhibitor response
+B015,BRCA1/2 Mutation,Genetic,Mutation Status,Predicts PARP inhibitor response
+B016,VEGF-A Expression,Protein,ng/mL,Predicts anti-angiogenic response
+B017,BTK Expression,Protein,IHC Score,Predicts BTK inhibitor response
+B018,BCL-2 Expression,Protein,IHC Score,Predicts venetoclax response
+B019,MET Exon 14 Skipping,Genetic,Mutation Status,Predicts capmatinib response
+B020,RET Fusion,Genetic,FISH/PCR,Predicts RET inhibitor response
+B021,IDH1 R132H Mutation,Genetic,Mutation Status,Predicts IDH1 inhibitor response
+B022,FLT3-ITD Mutation,Genetic,Mutation Status,Predicts FLT3 inhibitor response
+B023,CTLA-4 Expression,Protein,IHC Score,Predicts CTLA-4 blockade response
+B024,MSI-H/dMMR Status,Genetic,PCR/IHC,Predicts immunotherapy response
+B025,TMB High,Genomic,Mutations/Mb,Predicts immunotherapy response
+B011,EGFR T790M Mutation,Genetic,Mutation Status,Predicts osimertinib response
+B012,ALK Rearrangement,Genetic,FISH/IHC,Predicts ALK inhibitor response
+B013,ROS1 Rearrangement,Genetic,FISH/IHC,Predicts ROS1 inhibitor response
+B014,BRAF V600E Mutation,Genetic,Mutation Status,Predicts BRAF/MEK inhibitor response
+B015,BRCA1/2 Mutation,Genetic,Mutation Status,Predicts PARP inhibitor response
+B016,VEGF-A Expression,Protein,ng/mL,Predicts anti-angiogenic response
+B017,BTK Expression,Protein,IHC Score,Predicts BTK inhibitor response
+B018,BCL-2 Expression,Protein,IHC Score,Predicts venetoclax response
+B019,MET Exon 14 Skipping,Genetic,Mutation Status,Predicts capmatinib response
+B020,RET Fusion,Genetic,FISH/PCR,Predicts RET inhibitor response
+B021,IDH1 R132H Mutation,Genetic,Mutation Status,Predicts IDH1 inhibitor response
+B022,FLT3-ITD Mutation,Genetic,Mutation Status,Predicts FLT3 inhibitor response
+B023,CTLA-4 Expression,Protein,IHC Score,Predicts CTLA-4 blockade response
+B024,MSI-H/dMMR Status,Genetic,PCR/IHC,Predicts immunotherapy response
+B025,TMB High,Genomic,Mutations/Mb,Predicts immunotherapy response

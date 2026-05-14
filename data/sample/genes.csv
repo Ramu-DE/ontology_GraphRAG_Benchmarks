@@ -9,3 +9,43 @@ G007,HER2,Human Epidermal Growth Factor Receptor 2,17,Cell growth
 G008,PD-L1,Programmed Death-Ligand 1,9,Immune checkpoint
 G009,APP,Amyloid Precursor Protein,21,Amyloid beta production
 G010,APOE,Apolipoprotein E,19,Lipid metabolism
+G011,ALK,Anaplastic Lymphoma Kinase,2,Cell growth and survival
+G012,ROS1,ROS Proto-Oncogene 1,6,Cell proliferation
+G013,MET,MET Proto-Oncogene,7,Cell motility and invasion
+G014,RET,Ret Proto-Oncogene,10,Cell differentiation
+G015,BRAF,B-Raf Proto-Oncogene,7,MAPK/ERK signaling
+G016,NRAS,Neuroblastoma RAS Viral Oncogene,1,GTPase cell signaling
+G017,PIK3CA,"Phosphatidylinositol-4,5-Bisphosphate 3-Kinase",3,PI3K/AKT signaling
+G018,PTEN,Phosphatase and Tensin Homolog,10,PI3K/AKT negative regulator
+G019,FGFR1,Fibroblast Growth Factor Receptor 1,8,Cell proliferation and survival
+G020,FGFR2,Fibroblast Growth Factor Receptor 2,10,Cell proliferation and differentiation
+G021,FGFR3,Fibroblast Growth Factor Receptor 3,4,Bone and cartilage development
+G022,IDH1,Isocitrate Dehydrogenase 1,2,Citric acid cycle
+G023,IDH2,Isocitrate Dehydrogenase 2,15,Citric acid cycle
+G024,NPM1,Nucleophosmin 1,5,Ribosome assembly
+G025,FLT3,FMS-Like Tyrosine Kinase 3,13,Hematopoietic cell survival
+G026,BTK,Bruton Tyrosine Kinase,X,B-cell receptor signaling
+G027,BCL2,BCL2 Apoptosis Regulator,18,Apoptosis regulation
+G028,VEGFA,Vascular Endothelial Growth Factor A,6,Angiogenesis
+G029,CTLA4,Cytotoxic T-Lymphocyte Associated Protein 4,2,Immune checkpoint
+G030,CD20,MS4A1 B-Lymphocyte Surface Antigen,11,B-cell activation
+G011,ALK,Anaplastic Lymphoma Kinase,2,Cell growth and survival
+G012,ROS1,ROS Proto-Oncogene 1,6,Cell proliferation
+G013,MET,MET Proto-Oncogene,7,Cell motility and invasion
+G014,RET,Ret Proto-Oncogene,10,Cell differentiation
+G015,BRAF,B-Raf Proto-Oncogene,7,MAPK/ERK signaling
+G016,NRAS,Neuroblastoma RAS Viral Oncogene,1,GTPase cell signaling
+G017,PIK3CA,"Phosphatidylinositol-4,5-Bisphosphate 3-Kinase",3,PI3K/AKT signaling
+G018,PTEN,Phosphatase and Tensin Homolog,10,PI3K/AKT negative regulator
+G019,FGFR1,Fibroblast Growth Factor Receptor 1,8,Cell proliferation and survival
+G020,FGFR2,Fibroblast Growth Factor Receptor 2,10,Cell proliferation and differentiation
+G021,FGFR3,Fibroblast Growth Factor Receptor 3,4,Bone and cartilage development
+G022,IDH1,Isocitrate Dehydrogenase 1,2,Citric acid cycle
+G023,IDH2,Isocitrate Dehydrogenase 2,15,Citric acid cycle
+G024,NPM1,Nucleophosmin 1,5,Ribosome assembly
+G025,FLT3,FMS-Like Tyrosine Kinase 3,13,Hematopoietic cell survival
+G026,BTK,Bruton Tyrosine Kinase,X,B-cell receptor signaling
+G027,BCL2,BCL2 Apoptosis Regulator,18,Apoptosis regulation
+G028,VEGFA,Vascular Endothelial Growth Factor A,6,Angiogenesis
+G029,CTLA4,Cytotoxic T-Lymphocyte Associated Protein 4,2,Immune checkpoint
+G030,CD20,MS4A1 B-Lymphocyte Surface Antigen,11,B-cell activation

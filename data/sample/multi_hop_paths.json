@@ -1,0 +1,458 @@
+{
+  "description": "Five explicit 4+ hop traversal paths embedded in the synthetic dataset. Each path lists the node IDs in traversal order and the relationship type used to cross each edge.",
+  "paths": [
+    {
+      "path_id": "PATH_1",
+      "name": "Gene \u2192 Disease \u2192 Drug \u2192 Protein \u2192 Biomarker \u2192 ClinicalTrial \u2192 AdverseEvent (7 hops)",
+      "hop_count": 7,
+      "nodes": [
+        {
+          "id": "G015",
+          "type": "Gene",
+          "label": "BRAF"
+        },
+        {
+          "id": "DIS002",
+          "type": "Disease",
+          "label": "Melanoma"
+        },
+        {
+          "id": "D017",
+          "type": "Drug",
+          "label": "Dabrafenib"
+        },
+        {
+          "id": "P017",
+          "type": "Protein",
+          "label": "BRAF"
+        },
+        {
+          "id": "B014",
+          "type": "Biomarker",
+          "label": "BRAF V600E Mutation"
+        },
+        {
+          "id": "CT018",
+          "type": "ClinicalTrial",
+          "label": "Dabrafenib plus Trametinib in Melanoma"
+        },
+        {
+          "id": "AE013",
+          "type": "AdverseEvent",
+          "label": "QTc prolongation"
+        }
+      ],
+      "edges": [
+        {
+          "from": "G015",
+          "to": "DIS002",
+          "relationship": "gene_associated_with_disease",
+          "key_attributes": {
+            "association_strength": "Very Strong",
+            "evidence_level": "High"
+          }
+        },
+        {
+          "from": "DIS002",
+          "to": "D017",
+          "relationship": "drug_treats_disease",
+          "key_attributes": {
+            "efficacy_rate": 0.61
+          }
+        },
+        {
+          "from": "D017",
+          "to": "P017",
+          "relationship": "drug_targets_protein",
+          "key_attributes": {
+            "binding_affinity": "Very High",
+            "mechanism_type": "Inhibitor"
+          }
+        },
+        {
+          "from": "P017",
+          "to": "B014",
+          "relationship": "protein_expressed_by_biomarker",
+          "note": "BRAF protein produces BRAF V600E mutation biomarker signal"
+        },
+        {
+          "from": "B014",
+          "to": "D018",
+          "relationship": "biomarker_predicts_response",
+          "key_attributes": {
+            "predictive_value": 0.83
+          }
+        },
+        {
+          "from": "CT018",
+          "to": "D018",
+          "relationship": "trial_investigates_drug",
+          "note": "CT018 also investigates D017; D018 bridge to CT018"
+        },
+        {
+          "from": "CT018",
+          "to": "AE013",
+          "relationship": "trial_reports_adverse_event",
+          "key_attributes": {
+            "incidence_rate": 0.034,
+            "grade": 3
+          }
+        }
+      ],
+      "traversal_note": "BRAF gene is associated with Melanoma; Dabrafenib treats Melanoma; Dabrafenib targets BRAF protein; BRAF V600E mutation biomarker predicts Trametinib (MEK downstream) response; CT018 (Dabrafenib+Trametinib trial) investigates Trametinib; CT018 reports QTc prolongation."
+    },
+    {
+      "path_id": "PATH_2",
+      "name": "Researcher \u2192 Institution \u2192 ClinicalTrial \u2192 Drug \u2192 Disease \u2192 Gene \u2192 Protein (7 hops)",
+      "hop_count": 7,
+      "nodes": [
+        {
+          "id": "R011",
+          "type": "Researcher",
+          "label": "Dr. Angela Park"
+        },
+        {
+          "id": "I011",
+          "type": "Institution",
+          "label": "MD Anderson Cancer Center"
+        },
+        {
+          "id": "CT011",
+          "type": "ClinicalTrial",
+          "label": "Osimertinib in EGFR T790M Mutant NSCLC"
+        },
+        {
+          "id": "D011",
+          "type": "Drug",
+          "label": "Osimertinib"
+        },
+        {
+          "id": "DIS001",
+          "type": "Disease",
+          "label": "Non-Small Cell Lung Cancer"
+        },
+        {
+          "id": "G001",
+          "type": "Gene",
+          "label": "EGFR"
+        },
+        {
+          "id": "P003",
+          "type": "Protein",
+          "label": "EGFR"
+        }
+      ],
+      "edges": [
+        {
+          "from": "R011",
+          "to": "I011",
+          "relationship": "researcher_affiliated_with",
+          "key_attributes": {
+            "start_year": 2013,
+            "role": "Professor"
+          }
+        },
+        {
+          "from": "I011",
+          "to": "CT011",
+          "relationship": "institution_sponsors_trial",
+          "key_attributes": {
+            "role": "Site"
+          }
+        },
+        {
+          "from": "CT011",
+          "to": "D011",
+          "relationship": "trial_investigates_drug",
+          "key_attributes": {
+            "dosage": "80mg daily"
+          }
+        },
+        {
+          "from": "D011",
+          "to": "DIS001",
+          "relationship": "drug_treats_disease",
+          "key_attributes": {
+            "efficacy_rate": 0.61
+          }
+        },
+        {
+          "from": "DIS001",
+          "to": "G001",
+          "relationship": "gene_associated_with_disease",
+          "key_attributes": {
+            "association_strength": "Strong"
+          }
+        },
+        {
+          "from": "G001",
+          "to": "P003",
+          "relationship": "gene_encodes_protein",
+          "note": "EGFR gene encodes EGFR protein (P003)"
+        }
+      ],
+      "traversal_note": "Dr. Angela Park is affiliated with MD Anderson; MD Anderson is a site for Osimertinib trial CT011; CT011 investigates Osimertinib (D011); Osimertinib treats NSCLC (DIS001); EGFR gene (G001) is associated with NSCLC; EGFR gene encodes EGFR protein (P003)."
+    },
+    {
+      "path_id": "PATH_3",
+      "name": "Drug \u2192 Disease \u2192 Gene \u2192 Protein \u2192 Biomarker \u2192 Drug (cycle via different drug, 6 hops)",
+      "hop_count": 6,
+      "nodes": [
+        {
+          "id": "D025",
+          "type": "Drug",
+          "label": "Selpercatinib"
+        },
+        {
+          "id": "DIS001",
+          "type": "Disease",
+          "label": "Non-Small Cell Lung Cancer"
+        },
+        {
+          "id": "G011",
+          "type": "Gene",
+          "label": "ALK"
+        },
+        {
+          "id": "P013",
+          "type": "Protein",
+          "label": "ALK"
+        },
+        {
+          "id": "B012",
+          "type": "Biomarker",
+          "label": "ALK Rearrangement"
+        },
+        {
+          "id": "D021",
+          "type": "Drug",
+          "label": "Alectinib"
+        }
+      ],
+      "edges": [
+        {
+          "from": "D025",
+          "to": "DIS001",
+          "relationship": "drug_treats_disease",
+          "key_attributes": {
+            "efficacy_rate": 0.64
+          }
+        },
+        {
+          "from": "DIS001",
+          "to": "G011",
+          "relationship": "gene_associated_with_disease",
+          "key_attributes": {
+            "association_strength": "Very Strong"
+          }
+        },
+        {
+          "from": "G011",
+          "to": "P013",
+          "relationship": "gene_encodes_protein",
+          "note": "ALK gene encodes ALK protein (P013)"
+        },
+        {
+          "from": "P013",
+          "to": "B012",
+          "relationship": "protein_measured_by_biomarker",
+          "note": "ALK protein rearrangement detected as B012 biomarker"
+        },
+        {
+          "from": "B012",
+          "to": "D021",
+          "relationship": "biomarker_predicts_response",
+          "key_attributes": {
+            "predictive_value": 0.85
+          }
+        }
+      ],
+      "traversal_note": "Selpercatinib (RET inhibitor) treats NSCLC; NSCLC is associated with ALK gene; ALK gene encodes ALK protein; ALK protein rearrangement is measured by ALK Rearrangement biomarker; ALK Rearrangement biomarker predicts response to Alectinib \u2014 completing the cycle into a different ALK-targeting drug."
+    },
+    {
+      "path_id": "PATH_4",
+      "name": "ResearchPaper \u2192 Researcher \u2192 Institution \u2192 ClinicalTrial \u2192 Drug \u2192 Disease \u2192 AdverseEvent (7 hops)",
+      "hop_count": 7,
+      "nodes": [
+        {
+          "id": "PA014",
+          "type": "ResearchPaper",
+          "label": "Durvalumab after Chemoradiotherapy in Stage III NSCLC"
+        },
+        {
+          "id": "R011",
+          "type": "Researcher",
+          "label": "Dr. Angela Park"
+        },
+        {
+          "id": "I011",
+          "type": "Institution",
+          "label": "MD Anderson Cancer Center"
+        },
+        {
+          "id": "CT037",
+          "type": "ClinicalTrial",
+          "label": "Osimertinib as First-Line EGFR NSCLC"
+        },
+        {
+          "id": "D011",
+          "type": "Drug",
+          "label": "Osimertinib"
+        },
+        {
+          "id": "DIS001",
+          "type": "Disease",
+          "label": "Non-Small Cell Lung Cancer"
+        },
+        {
+          "id": "AE014",
+          "type": "AdverseEvent",
+          "label": "Interstitial lung disease"
+        }
+      ],
+      "edges": [
+        {
+          "from": "PA014",
+          "to": "R011",
+          "relationship": "paper_authored_by",
+          "key_attributes": {
+            "author_position": "Second"
+          }
+        },
+        {
+          "from": "R011",
+          "to": "I011",
+          "relationship": "researcher_affiliated_with",
+          "key_attributes": {
+            "role": "Professor"
+          }
+        },
+        {
+          "from": "I011",
+          "to": "CT037",
+          "relationship": "institution_sponsors_trial",
+          "key_attributes": {
+            "role": "Site"
+          }
+        },
+        {
+          "from": "CT037",
+          "to": "D011",
+          "relationship": "trial_investigates_drug",
+          "key_attributes": {
+            "dosage": "80mg daily"
+          }
+        },
+        {
+          "from": "D011",
+          "to": "DIS001",
+          "relationship": "drug_treats_disease",
+          "key_attributes": {
+            "efficacy_rate": 0.61
+          }
+        },
+        {
+          "from": "CT037",
+          "to": "AE014",
+          "relationship": "trial_reports_adverse_event",
+          "key_attributes": {
+            "incidence_rate": 0.028,
+            "grade": 3
+          }
+        }
+      ],
+      "traversal_note": "Paper PA014 (Durvalumab NSCLC) was co-authored by Dr. Angela Park (R011); Dr. Park is affiliated with MD Anderson (I011); MD Anderson is a site for CT037 (Osimertinib 1L trial); CT037 investigates Osimertinib (D011); Osimertinib treats NSCLC (DIS001); CT037 reports ILD adverse event (AE014)."
+    },
+    {
+      "path_id": "PATH_5",
+      "name": "Gene \u2192 Disease \u2192 Drug \u2192 Protein \u2192 Biomarker \u2192 ClinicalTrial \u2192 Drug (7 hops, ends at different drug)",
+      "hop_count": 7,
+      "nodes": [
+        {
+          "id": "G026",
+          "type": "Gene",
+          "label": "BTK"
+        },
+        {
+          "id": "DIS019",
+          "type": "Disease",
+          "label": "Chronic Lymphocytic Leukemia"
+        },
+        {
+          "id": "D020",
+          "type": "Drug",
+          "label": "Ibrutinib"
+        },
+        {
+          "id": "P020",
+          "type": "Protein",
+          "label": "BTK"
+        },
+        {
+          "id": "B017",
+          "type": "Biomarker",
+          "label": "BTK Expression"
+        },
+        {
+          "id": "CT019",
+          "type": "ClinicalTrial",
+          "label": "Venetoclax in Relapsed CLL"
+        },
+        {
+          "id": "D019",
+          "type": "Drug",
+          "label": "Venetoclax"
+        }
+      ],
+      "edges": [
+        {
+          "from": "G026",
+          "to": "DIS019",
+          "relationship": "gene_associated_with_disease",
+          "key_attributes": {
+            "association_strength": "Very Strong"
+          }
+        },
+        {
+          "from": "DIS019",
+          "to": "D020",
+          "relationship": "drug_treats_disease",
+          "key_attributes": {
+            "efficacy_rate": 0.83
+          }
+        },
+        {
+          "from": "D020",
+          "to": "P020",
+          "relationship": "drug_targets_protein",
+          "key_attributes": {
+            "binding_affinity": "Very High"
+          }
+        },
+        {
+          "from": "P020",
+          "to": "B017",
+          "relationship": "protein_measured_by_biomarker",
+          "note": "BTK protein level measured as B017 biomarker"
+        },
+        {
+          "from": "B017",
+          "to": "D020",
+          "relationship": "biomarker_predicts_response",
+          "key_attributes": {
+            "predictive_value": 0.82
+          }
+        },
+        {
+          "from": "CT019",
+          "to": "D019",
+          "relationship": "trial_investigates_drug",
+          "key_attributes": {
+            "dosage": "400mg daily"
+          }
+        }
+      ],
+      "traversal_note": "BTK gene is very strongly associated with CLL; Ibrutinib treats CLL; Ibrutinib targets BTK protein; BTK protein is measured by BTK Expression biomarker; BTK Expression biomarker predicts Ibrutinib response (confirming same drug); CT019 (Venetoclax CLL trial) was run in the same CLL disease context and investigates Venetoclax \u2014 arriving at a different BCL-2 inhibitor via the CLL trial network."
+    }
+  ]
+}

@@ -9,3 +9,33 @@ AE007,Hypoglycemia,Moderate,Metabolic,Common
 AE008,Infusion reaction,Moderate,Allergic,Common
 AE009,Amyloid-related imaging abnormalities,Severe,Neurological,Uncommon
 AE010,Pancreatitis,Severe,Gastrointestinal,Rare
+AE011,Peripheral neuropathy,Moderate,Neurological,Common
+AE012,Hand-foot syndrome,Mild,Dermatological,Common
+AE013,QTc prolongation,Severe,Cardiac,Uncommon
+AE014,Interstitial lung disease,Severe,Pulmonary,Uncommon
+AE015,Hepatotoxicity,Severe,Hepatic,Uncommon
+AE016,Hypertension,Moderate,Cardiovascular,Common
+AE017,Thrombocytopenia,Moderate,Hematologic,Common
+AE018,Anemia,Mild,Hematologic,Very Common
+AE019,Fatigue,Mild,Constitutional,Very Common
+AE020,Rash,Mild,Dermatological,Very Common
+AE021,Febrile neutropenia,Severe,Hematologic,Uncommon
+AE022,Atrial fibrillation,Severe,Cardiac,Uncommon
+AE023,Tumor lysis syndrome,Severe,Metabolic,Rare
+AE024,Bleeding,Moderate,Hematologic,Common
+AE025,Arthralgia,Mild,Musculoskeletal,Common
+AE011,Peripheral neuropathy,Moderate,Neurological,Common
+AE012,Hand-foot syndrome,Mild,Dermatological,Common
+AE013,QTc prolongation,Severe,Cardiac,Uncommon
+AE014,Interstitial lung disease,Severe,Pulmonary,Uncommon
+AE015,Hepatotoxicity,Severe,Hepatic,Uncommon
+AE016,Hypertension,Moderate,Cardiovascular,Common
+AE017,Thrombocytopenia,Moderate,Hematologic,Common
+AE018,Anemia,Mild,Hematologic,Very Common
+AE019,Fatigue,Mild,Constitutional,Very Common
+AE020,Rash,Mild,Dermatological,Very Common
+AE021,Febrile neutropenia,Severe,Hematologic,Uncommon
+AE022,Atrial fibrillation,Severe,Cardiac,Uncommon
+AE023,Tumor lysis syndrome,Severe,Metabolic,Rare
+AE024,Bleeding,Moderate,Hematologic,Common
+AE025,Arthralgia,Mild,Musculoskeletal,Common

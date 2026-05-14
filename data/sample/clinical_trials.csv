@@ -9,3 +9,63 @@ CT007,NCT00006150,Imatinib in CML,Phase 3,Completed,2000-08-01,1106,Novartis
 CT008,NCT02425891,Pembrolizumab in Melanoma,Phase 3,Completed,2015-04-20,514,Merck
 CT009,NCT01844505,Nivolumab in Melanoma,Phase 3,Completed,2013-05-15,418,Bristol Myers Squibb
 CT010,NCT03987919,Metformin in Alzheimer's Prevention,Phase 2,Active,2020-01-10,326,NIH
+CT011,NCT02151981,Osimertinib in EGFR T790M Mutant NSCLC,Phase 3,Completed,2014-08-01,411,AstraZeneca
+CT012,NCT00094653,Ipilimumab in Advanced Melanoma,Phase 3,Completed,2004-07-01,676,Bristol Myers Squibb
+CT013,NCT01874353,Olaparib in BRCA-Mutated Ovarian Cancer,Phase 3,Completed,2013-07-01,391,AstraZeneca
+CT014,NCT02639065,Durvalumab after Chemoradiotherapy in NSCLC,Phase 3,Completed,2014-05-01,713,AstraZeneca
+CT015,NCT00112047,Bevacizumab plus Chemotherapy in NSCLC,Phase 3,Completed,2001-07-01,878,Roche
+CT016,NCT00026468,Cetuximab in Head and Neck Cancer,Phase 3,Completed,2001-06-01,424,Merck KGaA
+CT017,NCT01245062,Dabrafenib in BRAF V600E Mutant Melanoma,Phase 3,Completed,2011-09-01,250,GlaxoSmithKline
+CT018,NCT01032122,Dabrafenib plus Trametinib in Melanoma,Phase 3,Completed,2011-05-01,423,GlaxoSmithKline
+CT019,NCT02242813,Venetoclax in Relapsed CLL,Phase 3,Completed,2014-11-01,389,AbbVie
+CT020,NCT01105858,Ibrutinib in Relapsed CLL,Phase 3,Completed,2012-05-01,391,Pharmacyclics
+CT021,NCT02075840,Alectinib versus Crizotinib in ALK-Positive NSCLC,Phase 3,Completed,2014-09-01,303,Roche
+CT022,NCT03052608,Lorlatinib in ALK-Positive NSCLC,Phase 3,Completed,2017-04-01,296,Pfizer
+CT023,NCT02414139,Capmatinib in METex14 Skipping NSCLC,Phase 2,Active,2015-09-01,364,Novartis
+CT024,NCT03037385,Pralsetinib in RET-Positive NSCLC,Phase 2,Active,2017-03-01,220,Blueprint Medicines
+CT025,NCT03157128,Selpercatinib in RET-Fusion Solid Tumors,Phase 2,Active,2017-05-01,253,Eli Lilly
+CT026,NCT02382796,Pembrolizumab in Bladder Cancer,Phase 3,Completed,2015-06-01,542,Merck
+CT027,NCT03461964,Olaparib in Pancreatic Cancer,Phase 3,Active,2018-01-01,154,AstraZeneca
+CT028,NCT02901899,Atezolizumab in Hepatocellular Carcinoma,Phase 3,Completed,2016-10-01,501,Roche
+CT029,NCT02562508,Nivolumab in Gastric Cancer,Phase 3,Completed,2015-10-01,493,Bristol Myers Squibb
+CT030,NCT02589145,Ibrutinib in Diffuse Large B-Cell Lymphoma,Phase 3,Completed,2015-10-01,838,Pharmacyclics
+CT031,NCT02220894,Venetoclax in Multiple Myeloma,Phase 1,Completed,2014-08-01,66,AbbVie
+CT032,NCT01012648,Bevacizumab in Ovarian Cancer,Phase 3,Completed,2007-12-01,1873,Roche
+CT033,NCT02631343,Durvalumab in Bladder Cancer,Phase 3,Active,2016-01-01,422,AstraZeneca
+CT034,NCT01668784,Trametinib in BRAF V600E Melanoma,Phase 3,Completed,2011-10-01,321,GlaxoSmithKline
+CT035,NCT03405766,Selpercatinib in RET-Mutant Thyroid Cancer,Phase 2,Active,2018-02-01,162,Eli Lilly
+CT036,NCT02315066,Cetuximab in KRAS Wild-Type Colorectal Cancer,Phase 3,Completed,2014-10-01,1012,Merck KGaA
+CT037,NCT02857270,Osimertinib as First-Line EGFR NSCLC,Phase 3,Completed,2015-11-01,556,AstraZeneca
+CT038,NCT03568656,Capmatinib in MET-Amplified Gastric Cancer,Phase 2,Active,2018-06-01,150,Novartis
+CT039,NCT02441088,Pralsetinib in RET-Mutant Thyroid Cancer,Phase 2,Active,2015-08-01,190,Blueprint Medicines
+CT040,NCT03891953,Lorlatinib in ROS1-Rearranged NSCLC,Phase 2,Active,2019-03-01,96,Pfizer
+CT011,NCT02151981,Osimertinib in EGFR T790M Mutant NSCLC,Phase 3,Completed,2014-08-01,411,AstraZeneca
+CT012,NCT00094653,Ipilimumab in Advanced Melanoma,Phase 3,Completed,2004-07-01,676,Bristol Myers Squibb
+CT013,NCT01874353,Olaparib in BRCA-Mutated Ovarian Cancer,Phase 3,Completed,2013-07-01,391,AstraZeneca
+CT014,NCT02639065,Durvalumab after Chemoradiotherapy in NSCLC,Phase 3,Completed,2014-05-01,713,AstraZeneca
+CT015,NCT00112047,Bevacizumab plus Chemotherapy in NSCLC,Phase 3,Completed,2001-07-01,878,Roche
+CT016,NCT00026468,Cetuximab in Head and Neck Cancer,Phase 3,Completed,2001-06-01,424,Merck KGaA
+CT017,NCT01245062,Dabrafenib in BRAF V600E Mutant Melanoma,Phase 3,Completed,2011-09-01,250,GlaxoSmithKline
+CT018,NCT01032122,Dabrafenib plus Trametinib in Melanoma,Phase 3,Completed,2011-05-01,423,GlaxoSmithKline
+CT019,NCT02242813,Venetoclax in Relapsed CLL,Phase 3,Completed,2014-11-01,389,AbbVie
+CT020,NCT01105858,Ibrutinib in Relapsed CLL,Phase 3,Completed,2012-05-01,391,Pharmacyclics
+CT021,NCT02075840,Alectinib versus Crizotinib in ALK-Positive NSCLC,Phase 3,Completed,2014-09-01,303,Roche
+CT022,NCT03052608,Lorlatinib in ALK-Positive NSCLC,Phase 3,Completed,2017-04-01,296,Pfizer
+CT023,NCT02414139,Capmatinib in METex14 Skipping NSCLC,Phase 2,Active,2015-09-01,364,Novartis
+CT024,NCT03037385,Pralsetinib in RET-Positive NSCLC,Phase 2,Active,2017-03-01,220,Blueprint Medicines
+CT025,NCT03157128,Selpercatinib in RET-Fusion Solid Tumors,Phase 2,Active,2017-05-01,253,Eli Lilly
+CT026,NCT02382796,Pembrolizumab in Bladder Cancer,Phase 3,Completed,2015-06-01,542,Merck
+CT027,NCT03461964,Olaparib in Pancreatic Cancer,Phase 3,Active,2018-01-01,154,AstraZeneca
+CT028,NCT02901899,Atezolizumab in Hepatocellular Carcinoma,Phase 3,Completed,2016-10-01,501,Roche
+CT029,NCT02562508,Nivolumab in Gastric Cancer,Phase 3,Completed,2015-10-01,493,Bristol Myers Squibb
+CT030,NCT02589145,Ibrutinib in Diffuse Large B-Cell Lymphoma,Phase 3,Completed,2015-10-01,838,Pharmacyclics
+CT031,NCT02220894,Venetoclax in Multiple Myeloma,Phase 1,Completed,2014-08-01,66,AbbVie
+CT032,NCT01012648,Bevacizumab in Ovarian Cancer,Phase 3,Completed,2007-12-01,1873,Roche
+CT033,NCT02631343,Durvalumab in Bladder Cancer,Phase 3,Active,2016-01-01,422,AstraZeneca
+CT034,NCT01668784,Trametinib in BRAF V600E Melanoma,Phase 3,Completed,2011-10-01,321,GlaxoSmithKline
+CT035,NCT03405766,Selpercatinib in RET-Mutant Thyroid Cancer,Phase 2,Active,2018-02-01,162,Eli Lilly
+CT036,NCT02315066,Cetuximab in KRAS Wild-Type Colorectal Cancer,Phase 3,Completed,2014-10-01,1012,Merck KGaA
+CT037,NCT02857270,Osimertinib as First-Line EGFR NSCLC,Phase 3,Completed,2015-11-01,556,AstraZeneca
+CT038,NCT03568656,Capmatinib in MET-Amplified Gastric Cancer,Phase 2,Active,2018-06-01,150,Novartis
+CT039,NCT02441088,Pralsetinib in RET-Mutant Thyroid Cancer,Phase 2,Active,2015-08-01,190,Blueprint Medicines
+CT040,NCT03891953,Lorlatinib in ROS1-Rearranged NSCLC,Phase 2,Active,2019-03-01,96,Pfizer

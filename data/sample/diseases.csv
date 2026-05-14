@@ -9,3 +9,33 @@ DIS007,Obesity,Metabolic,E66,Very High
 DIS008,Renal Cell Carcinoma,Oncology,C64,Medium
 DIS009,Colorectal Cancer,Oncology,C18,High
 DIS010,Parkinson's Disease,Neurology,G20,Medium
+DIS011,Bladder Cancer,Oncology,C67.9,Medium
+DIS012,Pancreatic Cancer,Oncology,C25.9,Low
+DIS013,Ovarian Cancer,Oncology,C56,Medium
+DIS014,Head and Neck Squamous Cell Carcinoma,Oncology,C14.8,Medium
+DIS015,Gastric Cancer,Oncology,C16.9,Medium
+DIS016,Hepatocellular Carcinoma,Oncology,C22.0,Medium
+DIS017,Multiple Myeloma,Oncology,C90.0,Low
+DIS018,Diffuse Large B-Cell Lymphoma,Oncology,C83.3,Low
+DIS019,Chronic Lymphocytic Leukemia,Oncology,C91.1,Low
+DIS020,Myelodysplastic Syndrome,Oncology,D46.9,Low
+DIS021,Chronic Obstructive Pulmonary Disease,Pulmonology,J44.1,High
+DIS022,Heart Failure,Cardiology,I50.9,High
+DIS023,Atrial Fibrillation,Cardiology,I48.91,High
+DIS024,Rheumatoid Arthritis,Rheumatology,M05.9,High
+DIS025,Psoriasis,Dermatology,L40.0,High
+DIS011,Bladder Cancer,Oncology,C67.9,Medium
+DIS012,Pancreatic Cancer,Oncology,C25.9,Low
+DIS013,Ovarian Cancer,Oncology,C56,Medium
+DIS014,Head and Neck Squamous Cell Carcinoma,Oncology,C14.8,Medium
+DIS015,Gastric Cancer,Oncology,C16.9,Medium
+DIS016,Hepatocellular Carcinoma,Oncology,C22.0,Medium
+DIS017,Multiple Myeloma,Oncology,C90.0,Low
+DIS018,Diffuse Large B-Cell Lymphoma,Oncology,C83.3,Low
+DIS019,Chronic Lymphocytic Leukemia,Oncology,C91.1,Low
+DIS020,Myelodysplastic Syndrome,Oncology,D46.9,Low
+DIS021,Chronic Obstructive Pulmonary Disease,Pulmonology,J44.1,High
+DIS022,Heart Failure,Cardiology,I50.9,High
+DIS023,Atrial Fibrillation,Cardiology,I48.91,High
+DIS024,Rheumatoid Arthritis,Rheumatology,M05.9,High
+DIS025,Psoriasis,Dermatology,L40.0,High
