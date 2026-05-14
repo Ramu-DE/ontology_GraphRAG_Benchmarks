@@ -1,0 +1,18 @@
+# Neo4j and AWS Integration Requirements
+
+# Neo4j Driver
+neo4j==5.15.0
+
+# AWS SDK
+boto3==1.34.21
+botocore==1.34.21
+
+# Data processing
+pandas==2.1.4
+python-dotenv==1.0.0
+
+# Optional: AWS Bedrock Agent SDK (if available)
+# aws-bedrock-agents==1.0.0
+
+# Utilities
+tqdm==4.66.1

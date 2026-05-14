@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-05-12T19:41:01",
+  "architecture": "Neptune Analytics - Unified (Full Dataset)",
+  "dataset": {
+    "drugs": 10,
+    "diseases": 10,
+    "relationships": 10
+  },
+  "measurements": [
+    {
+      "query": "Find Pembrolizumab treatments",
+      "latency_ms": 117.66,
+      "result_count": 2
+    },
+    {
+      "query": "Find all drug-disease pairs",
+      "latency_ms": 62.12,
+      "result_count": 10
+    },
+    {
+      "query": "Count drugs per disease",
+      "latency_ms": 42.22,
+      "result_count": 6
+    }
+  ],
+  "average_query_ms": 74.0,
+  "friction_ms": 0,
+  "comparison": {
+    "neo4j_unified_ms": 195.2,
+    "neptune_analytics_ms": 74.0,
+    "performance_ratio": 0.38
+  }
+}

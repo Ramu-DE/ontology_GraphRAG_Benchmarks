@@ -1,0 +1,395 @@
+{
+  "config": {
+    "scales": [
+      1000,
+      10000,
+      100000,
+      1000000,
+      10000000,
+      100000000,
+      1000000000
+    ],
+    "iterations": 5,
+    "vector_dim": 384,
+    "k": 10,
+    "avg_degree": 5
+  },
+  "results": [
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 1000,
+      "vector_search_ms": 11.573865078676532,
+      "graph_traversal_ms": 5.227596804333738,
+      "serialization_ms": 2.193932100274609,
+      "network_ms": 2.064121441330289,
+      "total_ms": 21.090030670166016,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 1000,
+      "vector_search_ms": 13.543910701712452,
+      "graph_traversal_ms": 5.573961847018587,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 19.90036964416504,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 1000,
+      "vector_search_ms": 5.996870559840566,
+      "graph_traversal_ms": 4.999423929778424,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 12.544393539428711,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 10000,
+      "vector_search_ms": 13.624512309685201,
+      "graph_traversal_ms": 4.380183728514704,
+      "serialization_ms": 1.8296728838984473,
+      "network_ms": 2.1537194836005087,
+      "total_ms": 22.438716888427734,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 10000,
+      "vector_search_ms": 18.387424861012466,
+      "graph_traversal_ms": 6.646329134412231,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 22.306442260742188,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 10000,
+      "vector_search_ms": 11.776553863504374,
+      "graph_traversal_ms": 3.6632488597738937,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 15.246295928955078,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 100000,
+      "vector_search_ms": 11.724621682987095,
+      "graph_traversal_ms": 6.682313632566979,
+      "serialization_ms": 2.343062960136664,
+      "network_ms": 2.3558183565587267,
+      "total_ms": 25.271129608154297,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 100000,
+      "vector_search_ms": 17.627164271872385,
+      "graph_traversal_ms": 6.200128998689161,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 24.663829803466797,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 100000,
+      "vector_search_ms": 7.539081213266603,
+      "graph_traversal_ms": 4.610886017013976,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 16.29776954650879,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 1000000,
+      "vector_search_ms": 12.491764185615075,
+      "graph_traversal_ms": 5.185351614597043,
+      "serialization_ms": 2.7795795934519405,
+      "network_ms": 2.2577779292565436,
+      "total_ms": 26.996135711669922,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 1000000,
+      "vector_search_ms": 17.554271903629925,
+      "graph_traversal_ms": 7.16490958029819,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 24.731874465942383,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 1000000,
+      "vector_search_ms": 11.558318924357755,
+      "graph_traversal_ms": 5.7984260376315415,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 17.3398494720459,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 10000000,
+      "vector_search_ms": 17.24815284526993,
+      "graph_traversal_ms": 6.497242728657387,
+      "serialization_ms": 1.3311231347170787,
+      "network_ms": 2.3957044218531167,
+      "total_ms": 28.80697250366211,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 10000000,
+      "vector_search_ms": 22.906462111357875,
+      "graph_traversal_ms": 7.8729627256047126,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 28.788232803344727,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 10000000,
+      "vector_search_ms": 14.083037129409279,
+      "graph_traversal_ms": 4.1793734982027635,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 18.596172332763672,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 100000000,
+      "vector_search_ms": 20.428089137381203,
+      "graph_traversal_ms": 6.393078420009488,
+      "serialization_ms": 1.252162054655971,
+      "network_ms": 2.5865500644010258,
+      "total_ms": 29.372167587280273,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 100000000,
+      "vector_search_ms": 22.370266352339197,
+      "graph_traversal_ms": 4.933851995479166,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 27.642297744750977,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 100000000,
+      "vector_search_ms": 18.307121612774942,
+      "graph_traversal_ms": 4.342227606962488,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 21.11191749572754,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune DB + OpenSearch",
+      "scale": 1000000000,
+      "vector_search_ms": 17.788803086481828,
+      "graph_traversal_ms": 5.565692514616805,
+      "serialization_ms": 1.529324757484396,
+      "network_ms": 2.2227377027728785,
+      "total_ms": 31.542444229125977,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neptune Analytics",
+      "scale": 1000000000,
+      "vector_search_ms": 25.402375226287678,
+      "graph_traversal_ms": 5.399550865003897,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 31.868505477905273,
+      "iterations": 5
+    },
+    {
+      "architecture": "Neo4j/FalkorDB",
+      "scale": 1000000000,
+      "vector_search_ms": 17.60984210503484,
+      "graph_traversal_ms": 5.191129447296175,
+      "serialization_ms": 0.0,
+      "network_ms": 0.0,
+      "total_ms": 23.592472076416016,
+      "iterations": 5
+    }
+  ],
+  "visualization": {
+    "scales": [
+      1000,
+      10000,
+      100000,
+      1000000,
+      10000000,
+      100000000,
+      1000000000
+    ],
+    "architectures": {
+      "Neptune DB + OpenSearch": [
+        {
+          "scale": 1000,
+          "latency": 21.090030670166016,
+          "vector_ms": 11.573865078676532,
+          "graph_ms": 5.227596804333738,
+          "overhead_ms": 4.258053541604898
+        },
+        {
+          "scale": 10000,
+          "latency": 22.438716888427734,
+          "vector_ms": 13.624512309685201,
+          "graph_ms": 4.380183728514704,
+          "overhead_ms": 3.983392367498956
+        },
+        {
+          "scale": 100000,
+          "latency": 25.271129608154297,
+          "vector_ms": 11.724621682987095,
+          "graph_ms": 6.682313632566979,
+          "overhead_ms": 4.698881316695391
+        },
+        {
+          "scale": 1000000,
+          "latency": 26.996135711669922,
+          "vector_ms": 12.491764185615075,
+          "graph_ms": 5.185351614597043,
+          "overhead_ms": 5.037357522708485
+        },
+        {
+          "scale": 10000000,
+          "latency": 28.80697250366211,
+          "vector_ms": 17.24815284526993,
+          "graph_ms": 6.497242728657387,
+          "overhead_ms": 3.7268275565701954
+        },
+        {
+          "scale": 100000000,
+          "latency": 29.372167587280273,
+          "vector_ms": 20.428089137381203,
+          "graph_ms": 6.393078420009488,
+          "overhead_ms": 3.838712119056997
+        },
+        {
+          "scale": 1000000000,
+          "latency": 31.542444229125977,
+          "vector_ms": 17.788803086481828,
+          "graph_ms": 5.565692514616805,
+          "overhead_ms": 3.7520624602572745
+        }
+      ],
+      "Neo4j/FalkorDB": [
+        {
+          "scale": 1000,
+          "latency": 12.544393539428711,
+          "vector_ms": 5.996870559840566,
+          "graph_ms": 4.999423929778424,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 10000,
+          "latency": 15.246295928955078,
+          "vector_ms": 11.776553863504374,
+          "graph_ms": 3.6632488597738937,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 100000,
+          "latency": 16.29776954650879,
+          "vector_ms": 7.539081213266603,
+          "graph_ms": 4.610886017013976,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 1000000,
+          "latency": 17.3398494720459,
+          "vector_ms": 11.558318924357755,
+          "graph_ms": 5.7984260376315415,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 10000000,
+          "latency": 18.596172332763672,
+          "vector_ms": 14.083037129409279,
+          "graph_ms": 4.1793734982027635,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 100000000,
+          "latency": 21.11191749572754,
+          "vector_ms": 18.307121612774942,
+          "graph_ms": 4.342227606962488,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 1000000000,
+          "latency": 23.592472076416016,
+          "vector_ms": 17.60984210503484,
+          "graph_ms": 5.191129447296175,
+          "overhead_ms": 0.0
+        }
+      ],
+      "Neptune Analytics": [
+        {
+          "scale": 1000,
+          "latency": 19.90036964416504,
+          "vector_ms": 13.543910701712452,
+          "graph_ms": 5.573961847018587,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 10000,
+          "latency": 22.306442260742188,
+          "vector_ms": 18.387424861012466,
+          "graph_ms": 6.646329134412231,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 100000,
+          "latency": 24.663829803466797,
+          "vector_ms": 17.627164271872385,
+          "graph_ms": 6.200128998689161,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 1000000,
+          "latency": 24.731874465942383,
+          "vector_ms": 17.554271903629925,
+          "graph_ms": 7.16490958029819,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 10000000,
+          "latency": 28.788232803344727,
+          "vector_ms": 22.906462111357875,
+          "graph_ms": 7.8729627256047126,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 100000000,
+          "latency": 27.642297744750977,
+          "vector_ms": 22.370266352339197,
+          "graph_ms": 4.933851995479166,
+          "overhead_ms": 0.0
+        },
+        {
+          "scale": 1000000000,
+          "latency": 31.868505477905273,
+          "vector_ms": 25.402375226287678,
+          "graph_ms": 5.399550865003897,
+          "overhead_ms": 0.0
+        }
+      ]
+    }
+  }
+}

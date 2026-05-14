@@ -1,0 +1,126 @@
+digraph BiomedicalOntology {
+    // Graph settings
+    graph [
+        label="Biomedical Ontology — Relationship Diagram"
+        labelloc=t
+        fontsize=20
+        fontname="Helvetica"
+        rankdir=LR
+        splines=ortho
+        nodesep=0.8
+        ranksep=1.5
+        bgcolor="#f9f9f9"
+    ]
+    node [fontname="Helvetica" fontsize=11 style=filled shape=box]
+    edge [fontname="Helvetica" fontsize=9]
+
+    // ============================================================
+    // CLASS HIERARCHY SUBGRAPH
+    // ============================================================
+    subgraph cluster_drug {
+        label="Drug Types" style=filled fillcolor="#dce8f5" color="#4a90d9"
+        Drug [label="Drug" fillcolor="#4a90d9" fontcolor=white]
+        MonoclonalAntibody [label="MonoclonalAntibody" fillcolor="#7ab3e0"]
+        SmallMolecule [label="SmallMolecule" fillcolor="#7ab3e0"]
+        Peptide [label="Peptide" fillcolor="#7ab3e0"]
+        MonoclonalAntibody -> Drug [label="subClassOf" style=dashed color="#4a90d9"]
+        SmallMolecule -> Drug [label="subClassOf" style=dashed color="#4a90d9"]
+        Peptide -> Drug [label="subClassOf" style=dashed color="#4a90d9"]
+    }
+
+    subgraph cluster_disease {
+        label="Disease Types" style=filled fillcolor="#fde8e8" color="#d94a4a"
+        Disease [label="Disease" fillcolor="#d94a4a" fontcolor=white]
+        OncologyDisease [label="OncologyDisease" fillcolor="#e07a7a"]
+        MetabolicDisease [label="MetabolicDisease" fillcolor="#e07a7a"]
+        NeurologicalDisease [label="NeurologicalDisease" fillcolor="#e07a7a"]
+        OncologyDisease -> Disease [label="subClassOf" style=dashed color="#d94a4a"]
+        MetabolicDisease -> Disease [label="subClassOf" style=dashed color="#d94a4a"]
+        NeurologicalDisease -> Disease [label="subClassOf" style=dashed color="#d94a4a"]
+    }
+
+    subgraph cluster_biomarker {
+        label="Biomarker Types" style=filled fillcolor="#e8f5e8" color="#4a9d4a"
+        Biomarker [label="Biomarker" fillcolor="#4a9d4a" fontcolor=white]
+        ProteinBiomarker [label="ProteinBiomarker" fillcolor="#7ac07a"]
+        GeneticBiomarker [label="GeneticBiomarker" fillcolor="#7ac07a"]
+        MetabolicBiomarker [label="MetabolicBiomarker" fillcolor="#7ac07a"]
+        ProteinBiomarker -> Biomarker [label="subClassOf" style=dashed color="#4a9d4a"]
+        GeneticBiomarker -> Biomarker [label="subClassOf" style=dashed color="#4a9d4a"]
+        MetabolicBiomarker -> Biomarker [label="subClassOf" style=dashed color="#4a9d4a"]
+    }
+
+    subgraph cluster_protein {
+        label="Protein Types" style=filled fillcolor="#f5eaf5" color="#9a4a9a"
+        Protein [label="Protein" fillcolor="#9a4a9a" fontcolor=white]
+        ImmuneCheckpointProtein [label="ImmuneCheckpointProtein" fillcolor="#c07ac0"]
+        ImmuneCheckpointProtein -> Protein [label="subClassOf" style=dashed color="#9a4a9a"]
+    }
+
+    // ============================================================
+    // STANDALONE CORE CLASSES
+    // ============================================================
+    Gene         [label="Gene"          fillcolor="#f0a030" fontcolor=white]
+    ClinicalTrial [label="ClinicalTrial" fillcolor="#30a0a0" fontcolor=white]
+    AdverseEvent  [label="AdverseEvent"  fillcolor="#e06060" fontcolor=white]
+    Researcher    [label="Researcher"    fillcolor="#6080c0" fontcolor=white]
+    Institution   [label="Institution"   fillcolor="#808080" fontcolor=white]
+    ResearchPaper [label="ResearchPaper" fillcolor="#a06040" fontcolor=white]
+
+    // ============================================================
+    // INFERRED / REASONED CLASSES
+    // ============================================================
+    subgraph cluster_inferred {
+        label="OWL Inferred Classes\n(auto-classified by reasoner)" style=filled fillcolor="#fffbe6" color="#c8a000"
+        ApprovedTreatment   [label="ApprovedTreatment\n[Drug+treats Disease+Approved]"   fillcolor="#ffe066" shape=ellipse]
+        Immunotherapy       [label="Immunotherapy\n[Drug+targets ImmuneCheckpointProtein]" fillcolor="#ffe066" shape=ellipse]
+        HighImpactResearcher [label="HighImpactResearcher\n[Researcher+hIndex≥70]"        fillcolor="#ffe066" shape=ellipse]
+        DefinitiveEvidence  [label="DefinitiveEvidence\n[Trial Phase3+Completed]"         fillcolor="#ffe066" shape=ellipse]
+        EpidemicDisease     [label="EpidemicDisease\n[Disease+prevalence=VeryHigh]"       fillcolor="#ffe066" shape=ellipse]
+    }
+
+    // ============================================================
+    // OBJECT PROPERTY EDGES (relationships)
+    // ============================================================
+
+    // Drug ↔ Disease
+    Drug -> Disease        [label="treats" color="#d94a4a" fontcolor="#d94a4a" penwidth=2]
+    Disease -> Drug        [label="treatedBy\n(inverse of treats)" color="#d94a4a" fontcolor="#d94a4a" style=dotted]
+
+    // Drug → Protein
+    Drug -> Protein        [label="targets" color="#9a4a9a" fontcolor="#9a4a9a" penwidth=2]
+
+    // Drug ↔ ClinicalTrial
+    Drug -> ClinicalTrial  [label="investigatedBy" color="#30a0a0" fontcolor="#30a0a0" penwidth=2]
+    ClinicalTrial -> Drug  [label="investigatesDrug\n(inverse)" color="#30a0a0" fontcolor="#30a0a0" style=dotted]
+
+    // Disease → Gene
+    Disease -> Gene        [label="associatedWithGene" color="#f0a030" fontcolor="#f0a030" penwidth=2]
+
+    // Disease ↔ ClinicalTrial
+    Disease -> ClinicalTrial [label="studiedIn" color="#30a0a0" fontcolor="#30a0a0" penwidth=2]
+    ClinicalTrial -> Disease [label="studiesDisease\n(inverse)" color="#30a0a0" fontcolor="#30a0a0" style=dotted]
+
+    // Biomarker → Drug
+    Biomarker -> Drug      [label="predictsResponseTo" color="#4a90d9" fontcolor="#4a90d9" penwidth=2]
+
+    // ClinicalTrial relationships
+    ClinicalTrial -> AdverseEvent [label="reportsAdverseEvent" color="#e06060" fontcolor="#e06060" penwidth=2]
+    ClinicalTrial -> Institution  [label="sponsoredBy"         color="#808080" fontcolor="#808080" penwidth=2]
+
+    // Research relationships
+    ResearchPaper -> Researcher   [label="authoredBy"      color="#6080c0" fontcolor="#6080c0" penwidth=2]
+    Researcher -> Institution     [label="affiliatedWith"  color="#808080" fontcolor="#808080" penwidth=2]
+    ResearchPaper -> Drug         [label="mentionsDrug"    color="#4a90d9" fontcolor="#4a90d9" penwidth=1]
+    ResearchPaper -> Disease      [label="mentionsDisease" color="#d94a4a" fontcolor="#d94a4a" penwidth=1]
+
+    // Drug symmetric
+    Drug -> Drug           [label="similarTo\n(symmetric)" color="#888888" fontcolor="#888888" style=dashed]
+
+    // Inferred class links (equivalentClass arrows)
+    ApprovedTreatment -> Drug           [label="≡ subtype" style=dashed color="#c8a000"]
+    Immunotherapy -> Drug               [label="≡ subtype" style=dashed color="#c8a000"]
+    HighImpactResearcher -> Researcher  [label="≡ subtype" style=dashed color="#c8a000"]
+    DefinitiveEvidence -> ClinicalTrial [label="≡ subtype" style=dashed color="#c8a000"]
+    EpidemicDisease -> Disease          [label="≡ subtype" style=dashed color="#c8a000"]
+}

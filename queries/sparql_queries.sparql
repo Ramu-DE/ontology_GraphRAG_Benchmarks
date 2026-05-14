@@ -1,0 +1,642 @@
+# ========================================
+# BIOMEDICAL KNOWLEDGE GRAPH - SPARQL QUERIES
+# Demonstrating W3C SPARQL 1.1 Standard
+# ========================================
+
+PREFIX bio: <http://example.com/biomedical#>
+PREFIX data: <http://example.com/data/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# ========================================
+# QUERY 1: Simple Entity Retrieval
+# ========================================
+# Find all drugs with their names and approval status
+
+SELECT ?drug ?name ?status ?year
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?name ;
+          bio:approvalStatus ?status ;
+          bio:approvalYear ?year .
+}
+ORDER BY DESC(?year)
+
+# ========================================
+# QUERY 2: Relationship Traversal
+# ========================================
+# Find all drugs that treat a specific disease (NSCLC)
+
+SELECT ?drug ?drugName ?mechanism
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:mechanism ?mechanism ;
+          bio:treats ?disease .
+
+    ?disease bio:diseaseName "Non-Small Cell Lung Cancer" .
+}
+
+# ========================================
+# QUERY 3: Multi-Hop Graph Traversal
+# ========================================
+# Find drugs, the diseases they treat, and the genes associated with those diseases
+
+SELECT ?drugName ?diseaseName ?geneSymbol ?associationStrength
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:treats ?disease .
+
+    ?disease bio:diseaseName ?diseaseName ;
+             bio:associatedWithGene ?gene .
+
+    ?gene bio:geneSymbol ?geneSymbol .
+
+    # Get association strength from reified statement
+    ?association rdf:subject ?disease ;
+                rdf:predicate bio:associatedWithGene ;
+                rdf:object ?gene ;
+                bio:associationStrength ?associationStrength .
+}
+ORDER BY ?drugName ?diseaseName
+
+# ========================================
+# QUERY 4: Complex Pattern Matching
+# ========================================
+# Find immunotherapy drugs (targeting immune checkpoint proteins)
+# with their binding affinity and diseases treated
+
+SELECT ?drugName ?proteinName ?affinity ?diseaseName ?efficacy
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:targets ?protein ;
+          bio:treats ?disease .
+
+    ?protein a bio:ImmuneCheckpointProtein ;
+            bio:proteinName ?proteinName .
+
+    ?disease bio:diseaseName ?diseaseName .
+
+    # Get binding affinity from reified statement
+    ?targeting rdf:subject ?drug ;
+              rdf:predicate bio:targets ;
+              rdf:object ?protein ;
+              bio:bindingAffinity ?affinity .
+
+    # Get efficacy rate from reified statement
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+}
+ORDER BY DESC(?efficacy)
+
+# ========================================
+# QUERY 5: Aggregation and Statistics
+# ========================================
+# Count drugs by approval status and calculate average approval year
+
+SELECT ?status (COUNT(?drug) as ?count) (AVG(?year) as ?avgYear)
+WHERE {
+    ?drug a bio:Drug ;
+          bio:approvalStatus ?status ;
+          bio:approvalYear ?year .
+}
+GROUP BY ?status
+ORDER BY DESC(?count)
+
+# ========================================
+# QUERY 6: Clinical Trial Analysis
+# ========================================
+# Find completed Phase 3 trials with their drugs, diseases, and outcomes
+
+SELECT ?trialTitle ?drugName ?diseaseName ?phase ?status ?enrollment
+WHERE {
+    ?trial a bio:ClinicalTrial ;
+          bio:trialTitle ?trialTitle ;
+          bio:phase ?phase ;
+          bio:trialStatus ?status ;
+          bio:enrollment ?enrollment ;
+          bio:investigatesDrug ?drug ;
+          bio:studiesDisease ?disease .
+
+    ?drug bio:drugName ?drugName .
+    ?disease bio:diseaseName ?diseaseName .
+
+    FILTER(?phase = "Phase 3" && ?status = "Completed")
+}
+ORDER BY DESC(?enrollment)
+
+# ========================================
+# QUERY 7: Adverse Event Safety Analysis
+# ========================================
+# Find drugs and their reported adverse events from trials
+
+SELECT ?drugName ?adverseEvent ?trialTitle ?severity
+WHERE {
+    ?trial a bio:ClinicalTrial ;
+          bio:trialTitle ?trialTitle ;
+          bio:investigatesDrug ?drug ;
+          bio:reportsAdverseEvent ?event .
+
+    ?drug bio:drugName ?drugName .
+    ?event rdfs:label ?adverseEvent .
+
+    OPTIONAL {
+        ?event bio:severity ?severity .
+    }
+}
+ORDER BY ?drugName ?adverseEvent
+
+# ========================================
+# QUERY 8: Biomarker-Driven Treatment Selection
+# ========================================
+# Find biomarkers that predict response to specific drug types
+
+SELECT ?biomarkerName ?drugName ?drugType ?mechanismType
+WHERE {
+    ?biomarker a bio:Biomarker ;
+              rdfs:label ?biomarkerName ;
+              bio:predictsResponseTo ?drug .
+
+    ?drug bio:drugName ?drugName ;
+          bio:drugType ?drugType ;
+          bio:targets ?protein .
+
+    ?targeting rdf:subject ?drug ;
+              rdf:predicate bio:targets ;
+              rdf:object ?protein ;
+              bio:mechanismType ?mechanismType .
+}
+ORDER BY ?biomarkerName
+
+# ========================================
+# QUERY 9: Research Network Analysis
+# ========================================
+# Find researchers, their institutions, and papers with drug mentions
+
+SELECT ?researcherName ?institutionName ?paperTitle ?drugMentioned
+WHERE {
+    ?researcher a bio:Researcher ;
+               bio:researcherName ?researcherName ;
+               bio:affiliatedWith ?institution .
+
+    ?institution rdfs:label ?institutionName .
+
+    ?paper bio:authoredBy ?researcher ;
+          rdfs:label ?paperTitle ;
+          bio:mentionsDrug ?drug .
+
+    ?drug bio:drugName ?drugMentioned .
+}
+ORDER BY ?researcherName
+
+# ========================================
+# QUERY 10: High-Impact Researcher Identification
+# ========================================
+# Find high-impact researchers (h-index >= 70) with their specialization
+
+SELECT ?name ?specialization ?hIndex ?publications ?institution
+WHERE {
+    ?researcher a bio:Researcher ;
+               bio:researcherName ?name ;
+               bio:specialization ?specialization ;
+               bio:hIndex ?hIndex ;
+               bio:totalPublications ?publications ;
+               bio:affiliatedWith ?inst .
+
+    ?inst rdfs:label ?institution .
+
+    FILTER(?hIndex >= 70)
+}
+ORDER BY DESC(?hIndex)
+
+# ========================================
+# QUERY 11: Drug Discovery Pipeline
+# ========================================
+# Find drugs, their molecular targets, and genetic associations
+
+SELECT ?drugName ?mechanism ?proteinName ?proteinClass ?geneName ?diseaseTarget
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:mechanism ?mechanism ;
+          bio:targets ?protein ;
+          bio:treats ?disease .
+
+    ?protein bio:proteinName ?proteinName ;
+            bio:proteinClass ?proteinClass .
+
+    ?disease bio:diseaseName ?diseaseTarget ;
+            bio:associatedWithGene ?gene .
+
+    ?gene bio:geneName ?geneName .
+}
+ORDER BY ?drugName
+
+# ========================================
+# QUERY 12: Efficacy Comparison
+# ========================================
+# Compare drug efficacy rates for treating the same disease
+
+SELECT ?diseaseName ?drugName ?efficacyRate ?approvalYear
+WHERE {
+    ?drug bio:treats ?disease ;
+          bio:drugName ?drugName ;
+          bio:approvalYear ?approvalYear .
+
+    ?disease bio:diseaseName ?diseaseName .
+
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacyRate .
+
+    FILTER(?diseaseName = "Non-Small Cell Lung Cancer")
+}
+ORDER BY DESC(?efficacyRate)
+
+# ========================================
+# QUERY 13: Oncology Drug Landscape
+# ========================================
+# Find all drugs treating oncology diseases with their mechanisms
+
+SELECT DISTINCT ?drugName ?drugType ?mechanism ?oncologyDisease ?prevalence
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:drugType ?drugType ;
+          bio:mechanism ?mechanism ;
+          bio:treats ?disease .
+
+    ?disease a bio:OncologyDisease ;
+            bio:diseaseName ?oncologyDisease ;
+            bio:prevalence ?prevalence .
+}
+ORDER BY ?prevalence ?drugName
+
+# ========================================
+# QUERY 14: Gene-Disease-Drug Connections
+# ========================================
+# Find complete pathways from genes to diseases to treatments
+
+SELECT ?geneSymbol ?geneName ?diseaseName ?drugName ?efficacy
+WHERE {
+    ?gene bio:geneSymbol ?geneSymbol ;
+          bio:geneName ?geneName .
+
+    ?disease bio:associatedWithGene ?gene ;
+            bio:diseaseName ?diseaseName ;
+            bio:treatedBy ?drug .
+
+    ?drug bio:drugName ?drugName .
+
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+
+    FILTER(?efficacy > 0.40)
+}
+ORDER BY DESC(?efficacy)
+
+# ========================================
+# QUERY 15: Protein Target Analysis
+# ========================================
+# Find most commonly targeted proteins and drugs targeting them
+
+SELECT ?proteinName ?proteinClass (COUNT(?drug) as ?drugCount)
+       (GROUP_CONCAT(?drugName; separator=", ") as ?drugs)
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:targets ?protein .
+
+    ?protein bio:proteinName ?proteinName ;
+            bio:proteinClass ?proteinClass .
+}
+GROUP BY ?proteinName ?proteinClass
+HAVING (COUNT(?drug) > 1)
+ORDER BY DESC(?drugCount)
+
+# ========================================
+# QUERY 16: Metabolic Disease Treatment Portfolio
+# ========================================
+# Find all treatments for metabolic diseases
+
+SELECT ?diseaseName ?icd10 ?drugName ?drugType ?approvalYear ?efficacy
+WHERE {
+    ?disease a bio:MetabolicDisease ;
+            bio:diseaseName ?diseaseName ;
+            bio:icd10Code ?icd10 ;
+            bio:treatedBy ?drug .
+
+    ?drug bio:drugName ?drugName ;
+          bio:drugType ?drugType ;
+          bio:approvalYear ?approvalYear .
+
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+}
+ORDER BY ?diseaseName DESC(?efficacy)
+
+# ========================================
+# QUERY 17: Clinical Trial Timeline
+# ========================================
+# Find trials by year with enrollment trends
+
+SELECT ?year (COUNT(?trial) as ?trialCount) (AVG(?enrollment) as ?avgEnrollment)
+WHERE {
+    ?trial a bio:ClinicalTrial ;
+          bio:startDate ?date ;
+          bio:enrollment ?enrollment .
+
+    BIND(YEAR(?date) as ?year)
+}
+GROUP BY ?year
+ORDER BY ?year
+
+# ========================================
+# QUERY 18: Alzheimer's Disease Research Focus
+# ========================================
+# Find all research related to Alzheimer's Disease
+
+SELECT ?drugName ?mechanism ?approvalYear ?trialTitle ?phase ?proteinTarget
+WHERE {
+    ?disease bio:diseaseName "Alzheimer's Disease" .
+
+    # Find drugs treating Alzheimer's
+    ?drug bio:treats ?disease ;
+          bio:drugName ?drugName ;
+          bio:mechanism ?mechanism ;
+          bio:approvalYear ?approvalYear .
+
+    # Find trials studying this drug for Alzheimer's
+    ?trial bio:investigatesDrug ?drug ;
+          bio:studiesDisease ?disease ;
+          bio:trialTitle ?trialTitle ;
+          bio:phase ?phase .
+
+    # Find protein targets
+    OPTIONAL {
+        ?drug bio:targets ?protein .
+        ?protein bio:proteinName ?proteinTarget .
+    }
+}
+ORDER BY ?approvalYear
+
+# ========================================
+# QUERY 19: OPTIONAL Pattern - Drug Properties
+# ========================================
+# Find drugs with optional efficacy and binding affinity data
+
+SELECT ?drugName ?diseaseTreated ?efficacy ?proteinTarget ?affinity
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName .
+
+    OPTIONAL {
+        ?drug bio:treats ?disease .
+        ?disease bio:diseaseName ?diseaseTreated .
+
+        ?treatment rdf:subject ?drug ;
+                  rdf:predicate bio:treats ;
+                  rdf:object ?disease ;
+                  bio:efficacyRate ?efficacy .
+    }
+
+    OPTIONAL {
+        ?drug bio:targets ?protein .
+        ?protein bio:proteinName ?proteinTarget .
+
+        ?targeting rdf:subject ?drug ;
+                  rdf:predicate bio:targets ;
+                  rdf:object ?protein ;
+                  bio:bindingAffinity ?affinity .
+    }
+}
+ORDER BY ?drugName
+
+# ========================================
+# QUERY 20: UNION - Find all mentions in research
+# ========================================
+# Find papers mentioning either specific drugs OR specific diseases
+
+SELECT ?paperTitle ?authorName ?mentionedEntity ?entityType
+WHERE {
+    ?paper rdfs:label ?paperTitle ;
+          bio:authoredBy ?researcher .
+
+    ?researcher bio:researcherName ?authorName .
+
+    {
+        ?paper bio:mentionsDrug ?entity .
+        ?entity bio:drugName ?mentionedEntity .
+        BIND("Drug" as ?entityType)
+    }
+    UNION
+    {
+        ?paper bio:mentionsDisease ?entity .
+        ?entity bio:diseaseName ?mentionedEntity .
+        BIND("Disease" as ?entityType)
+    }
+}
+ORDER BY ?paperTitle
+
+# ========================================
+# QUERY 21: FILTER with Regex - Gene Search
+# ========================================
+# Find genes with specific naming patterns
+
+SELECT ?geneSymbol ?geneName ?chromosome ?function
+WHERE {
+    ?gene a bio:Gene ;
+          bio:geneSymbol ?geneSymbol ;
+          bio:geneName ?geneName ;
+          bio:chromosome ?chromosome ;
+          bio:geneFunction ?function .
+
+    # Find genes related to cancer (containing specific keywords)
+    FILTER(REGEX(?geneName, "Cancer|Tumor|Oncogene", "i"))
+}
+ORDER BY ?geneSymbol
+
+# ========================================
+# QUERY 22: Subquery - Drugs with Above-Average Efficacy
+# ========================================
+# Find drugs with efficacy higher than the average
+
+SELECT ?drugName ?diseaseName ?efficacy ?avgEfficacy
+WHERE {
+    ?drug bio:drugName ?drugName ;
+          bio:treats ?disease .
+
+    ?disease bio:diseaseName ?diseaseName .
+
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+
+    {
+        SELECT (AVG(?eff) as ?avgEfficacy)
+        WHERE {
+            ?t rdf:predicate bio:treats ;
+               bio:efficacyRate ?eff .
+        }
+    }
+
+    FILTER(?efficacy > ?avgEfficacy)
+}
+ORDER BY DESC(?efficacy)
+
+# ========================================
+# QUERY 23: CONSTRUCT - Create New Triples
+# ========================================
+# Create simplified treatment recommendations
+
+CONSTRUCT {
+    ?drug bio:recommendedFor ?disease .
+    ?drug rdfs:label ?drugName .
+    ?disease rdfs:label ?diseaseName .
+}
+WHERE {
+    ?drug bio:treats ?disease ;
+          bio:drugName ?drugName ;
+          bio:approvalStatus "Approved" .
+
+    ?disease bio:diseaseName ?diseaseName .
+
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+
+    FILTER(?efficacy > 0.50)
+}
+
+# ========================================
+# QUERY 24: ASK - Boolean Query
+# ========================================
+# Check if there are any immunotherapy drugs for melanoma
+
+ASK {
+    ?drug a bio:Immunotherapy ;
+          bio:treats ?disease .
+
+    ?disease bio:diseaseName "Melanoma" .
+}
+
+# ========================================
+# QUERY 25: DESCRIBE - Get All Information
+# ========================================
+# Get all triples about a specific drug
+
+DESCRIBE data:drug/D001
+
+# ========================================
+# QUERY 26: Property Paths - Transitive Relationships
+# ========================================
+# Find all researchers in the same research network
+# (connected through institutions and collaborations)
+
+SELECT ?researcher1Name ?researcher2Name ?sharedInstitution
+WHERE {
+    ?researcher1 bio:researcherName ?researcher1Name ;
+                bio:affiliatedWith ?institution .
+
+    ?researcher2 bio:researcherName ?researcher2Name ;
+                bio:affiliatedWith ?institution .
+
+    ?institution rdfs:label ?sharedInstitution .
+
+    FILTER(?researcher1 != ?researcher2)
+}
+ORDER BY ?sharedInstitution
+
+# ========================================
+# QUERY 27: Named Graph Reasoning
+# ========================================
+# Find inferred classes (drugs classified as immunotherapy)
+
+SELECT ?drugName ?inferredType
+WHERE {
+    ?drug bio:drugName ?drugName ;
+          a ?inferredType .
+
+    # Find drugs inferred to be Immunotherapy
+    FILTER(?inferredType = bio:Immunotherapy)
+}
+
+# ========================================
+# QUERY 28: Complex Business Question
+# ========================================
+# "Which approved immunotherapy drugs have the highest efficacy
+#  for oncology diseases, with supporting clinical trial evidence?"
+
+SELECT DISTINCT ?drugName ?mechanism ?oncologyDisease ?efficacy
+                ?trialPhase ?enrollment ?adverseEvents
+WHERE {
+    # Find approved immunotherapy drugs
+    ?drug a bio:Immunotherapy ;
+          bio:drugName ?drugName ;
+          bio:mechanism ?mechanism ;
+          bio:approvalStatus "Approved" ;
+          bio:treats ?disease .
+
+    # Disease must be oncology
+    ?disease a bio:OncologyDisease ;
+            bio:diseaseName ?oncologyDisease .
+
+    # Get efficacy data
+    ?treatment rdf:subject ?drug ;
+              rdf:predicate bio:treats ;
+              rdf:object ?disease ;
+              bio:efficacyRate ?efficacy .
+
+    # Find supporting clinical trials
+    ?trial bio:investigatesDrug ?drug ;
+          bio:studiesDisease ?disease ;
+          bio:phase ?trialPhase ;
+          bio:enrollment ?enrollment .
+
+    # Count adverse events reported
+    {
+        SELECT ?drug (COUNT(?ae) as ?adverseEvents)
+        WHERE {
+            ?t bio:investigatesDrug ?drug ;
+               bio:reportsAdverseEvent ?ae .
+        }
+        GROUP BY ?drug
+    }
+
+    # High efficacy filter
+    FILTER(?efficacy > 0.40)
+}
+ORDER BY DESC(?efficacy) DESC(?enrollment)
+
+# ========================================
+# QUERY 29: Federated Query Preparation
+# ========================================
+# Find drugs with external database IDs for federation
+
+SELECT ?drugName ?genericName ?approvalYear
+WHERE {
+    ?drug a bio:Drug ;
+          bio:drugName ?drugName ;
+          bio:genericName ?genericName ;
+          bio:approvalYear ?approvalYear ;
+          bio:approvalStatus "Approved" .
+
+    # These drugs could be federated with external databases like:
+    # - DrugBank
+    # - PubChem
+    # - ChEMBL
+    # Using SERVICE keyword for federated SPARQL
+}
+ORDER BY ?approvalYear

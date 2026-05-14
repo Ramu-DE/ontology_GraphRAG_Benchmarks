@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-05-12T17:41:00.882250",
+  "database": {
+    "uri": "neo4j+s://cad612f1.databases.neo4j.io",
+    "node_count": 162,
+    "relationship_count": 286,
+    "drug_count": 10
+  },
+  "results": [
+    {
+      "operation": "simple_node_query",
+      "latency_ms": 189.6017551422119,
+      "iterations": 10
+    },
+    {
+      "operation": "graph_traversal",
+      "latency_ms": 189.33076858520508,
+      "iterations": 10
+    },
+    {
+      "operation": "vector_search",
+      "latency_ms": 192.12312698364258,
+      "iterations": 10
+    },
+    {
+      "operation": "unified_vector_graph",
+      "latency_ms": 195.200777053833,
+      "iterations": 10,
+      "friction": "NONE"
+    }
+  ]
+}

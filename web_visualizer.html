@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strands Multi-Agent Visualizer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .controls select, .controls button {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+            transition: background 0.3s;
+        }
+
+        .controls button:hover {
+            background: #764ba2;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .agent-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .agent-card.active {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .agent-card.complete {
+            border-color: #28a745;
+        }
+
+        .agent-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .agent-role {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .agent-stats {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .visualization-area {
+            padding: 30px;
+            position: relative;
+        }
+
+        .hop-sequence {
+            margin-bottom: 30px;
+        }
+
+        .hop-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hop-item.current {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .hop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .hop-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .hop-agents {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .hop-agents .arrow {
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .hop-action {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .cypher-query {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .cypher-query .keyword {
+            color: #66d9ef;
+            font-weight: bold;
+        }
+
+        .cypher-query .string {
+            color: #e6db74;
+        }
+
+        .hop-results {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .result-count {
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+
+        .graph-visualization {
+            margin-top: 30px;
+            min-height: 400px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node circle {
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+
+        .node text {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-width: 2px;
+            opacity: 0.6;
+        }
+
+        .link-label {
+            font-size: 10px;
+            fill: #666;
+        }
+
+        .summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .summary h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .timeline {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            padding-bottom: 30px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item:last-child {
+            border-left: none;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #667eea;
+        }
+
+        .timeline-time {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .pulsing {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 Strands Multi-Agent Visualizer</h1>
+            <p>Hop-by-Hop Traversal Visualization</p>
+        </div>
+
+        <div class="controls">
+            <label for="workflowSelect">Select Workflow:</label>
+            <select id="workflowSelect">
+                <option value="clinical_safety">Clinical Safety Analysis</option>
+                <option value="repurposing">Drug Repurposing</option>
+                <option value="research_landscape">Research Landscape</option>
+                <option value="comparative">Comparative Analysis</option>
+                <option value="evidence_chain">Evidence Chain</option>
+            </select>
+
+            <button id="loadBtn">Load Trace</button>
+            <button id="playBtn">▶️ Play</button>
+            <button id="pauseBtn">⏸️ Pause</button>
+            <button id="resetBtn">🔄 Reset</button>
+
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+            <button id="uploadBtn">📁 Upload Trace</button>
+
+            <div style="flex: 1;"></div>
+            <div id="playbackSpeed">
+                <label>Speed:</label>
+                <select id="speedSelect">
+                    <option value="2000">Slow</option>
+                    <option value="1000" selected>Normal</option>
+                    <option value="500">Fast</option>
+                    <option value="0">Instant</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar" id="agentSidebar">
+                <h3 style="margin-bottom: 20px; color: #667eea;">Agents</h3>
+                <!-- Agent cards will be dynamically inserted -->
+            </div>
+
+            <div class="visualization-area">
+                <div id="workflowTitle" style="font-size: 1.5em; font-weight: bold; margin-bottom: 20px; color: #667eea;">
+                    Select a workflow to begin
+                </div>
+
+                <div class="hop-sequence" id="hopSequence">
+                    <!-- Hops will be dynamically inserted -->
+                </div>
+
+                <div class="summary" id="summary" style="display: none;">
+                    <h3>Workflow Summary</h3>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Time</div>
+                            <div class="stat-value" id="totalTime">0s</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Hops</div>
+                            <div class="stat-value" id="totalHops">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Graph Queries</div>
+                            <div class="stat-value" id="totalQueries">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Messages</div>
+                            <div class="stat-value" id="totalMessages">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline" id="timeline" style="display: none;">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">Timeline</h3>
+                    <!-- Timeline items will be dynamically inserted -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentTrace = null;
+        let currentHopIndex = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        let playbackSpeed = 1000;
+
+        // Load sample trace data
+        const sampleTraces = {
+            clinical_safety: {
+                workflow: "Clinical Safety: Pembrolizumab",
+                agents: {
+                    "ClinicalSafetyAgent": {role: "Clinical Safety Specialist", queries_executed: 3},
+                    "PharmacologyAgent": {role: "Pharmacology Specialist", queries_executed: 2},
+                    "TrialDataAgent": {role: "Clinical Trial Specialist", queries_executed: 1},
+                    "GeneticsAgent": {role: "Genetics Specialist", queries_executed: 1}
+                },
+                hops: [
+                    {
+                        hop_number: 1,
+                        from_agent: "ClinicalSafetyAgent",
+                        to_agent: "PharmacologyAgent",
+                        action: "Get drug mechanism and protein targets",
+                        cypher_query: "MATCH (d:Drug {name: $drug})-[t:TARGETS]->(p:Protein)\nRETURN d.mechanism, collect(p.name) as targets",
+                        parameters: {drug: "Pembrolizumab"},
+                        results_count: 1,
+                        processing_time_ms: 45.2,
+                        reasoning: "Need to understand drug mechanism before assessing safety"
+                    },
+                    {
+                        hop_number: 2,
+                        from_agent: "ClinicalSafetyAgent",
+                        to_agent: "TrialDataAgent",
+                        action: "Retrieve adverse events from clinical trials",
+                        cypher_query: "MATCH (d:Drug {name: $drug})<-[:INVESTIGATES]-(t:ClinicalTrial)-[:REPORTS]->(e:AdverseEvent)\nRETURN e.name, e.severity, e.frequency\nORDER BY e.severity DESC",
+                        parameters: {drug: "Pembrolizumab"},
+                        results_count: 4,
+                        processing_time_ms: 62.8,
+                        reasoning: "Assess adverse event profile from trial data"
+                    },
+                    {
+                        hop_number: 3,
+                        from_agent: "ClinicalSafetyAgent",
+                        to_agent: "PharmacologyAgent",
+                        action: "Check potential drug interactions",
+                        cypher_query: "MATCH (d1:Drug {name: $drug})-[:TARGETS]->(p:Protein)<-[:TARGETS]-(d2:Drug)\nWHERE d1 <> d2\nRETURN d2.name, p.name as shared_target",
+                        parameters: {drug: "Pembrolizumab"},
+                        results_count: 2,
+                        processing_time_ms: 38.5,
+                        reasoning: "Identify drugs with overlapping targets"
+                    },
+                    {
+                        hop_number: 4,
+                        from_agent: "ClinicalSafetyAgent",
+                        to_agent: "GeneticsAgent",
+                        action: "Validate EGFR mutation match",
+                        cypher_query: "MATCH (g:Gene {symbol: $gene})-[:ASSOCIATED_WITH]->(d:Disease)<-[:TREATS]-(drug:Drug {name: $drug})\nRETURN g.symbol, d.name, drug.name",
+                        parameters: {gene: "EGFR", drug: "Pembrolizumab"},
+                        results_count: 1,
+                        processing_time_ms: 52.1,
+                        reasoning: "Validate drug efficacy for patient's genetic profile"
+                    }
+                ]
+            }
+        };
+
+        // Initialize
+        function init() {
+            document.getElementById('loadBtn').addEventListener('click', loadTrace);
+            document.getElementById('playBtn').addEventListener('click', play);
+            document.getElementById('pauseBtn').addEventListener('click', pause);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            document.getElementById('speedSelect').addEventListener('change', (e) => {
+                playbackSpeed = parseInt(e.target.value);
+            });
+        }
+
+        function loadTrace() {
+            const workflow = document.getElementById('workflowSelect').value;
+            currentTrace = sampleTraces[workflow];
+
+            if (currentTrace) {
+                renderAgents();
+                reset();
+                document.getElementById('workflowTitle').textContent = currentTrace.workflow;
+            }
+        }
+
+        function renderAgents() {
+            const sidebar = document.getElementById('agentSidebar');
+            sidebar.innerHTML = '<h3 style="margin-bottom: 20px; color: #667eea;">Agents</h3>';
+
+            for (const [name, data] of Object.entries(currentTrace.agents)) {
+                const card = document.createElement('div');
+                card.className = 'agent-card';
+                card.id = `agent-${name}`;
+                card.innerHTML = `
+                    <div class="agent-name">${name}</div>
+                    <div class="agent-role">${data.role}</div>
+                    <div class="agent-stats">
+                        ⚡ ${data.queries_executed} queries
+                    </div>
+                `;
+                sidebar.appendChild(card);
+            }
+        }
+
+        function play() {
+            if (!currentTrace) {
+                alert('Please load a trace first');
+                return;
+            }
+
+            isPlaying = true;
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+
+            playInterval = setInterval(() => {
+                if (currentHopIndex < currentTrace.hops.length) {
+                    showHop(currentHopIndex);
+                    currentHopIndex++;
+                } else {
+                    pause();
+                    showSummary();
+                }
+            }, playbackSpeed || 1);
+        }
+
+        function pause() {
+            isPlaying = false;
+            clearInterval(playInterval);
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+        }
+
+        function reset() {
+            pause();
+            currentHopIndex = 0;
+            document.getElementById('hopSequence').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('timeline').style.display = 'none';
+
+            // Reset agent cards
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('active', 'complete');
+            });
+        }
+
+        function showHop(index) {
+            const hop = currentTrace.hops[index];
+            const container = document.getElementById('hopSequence');
+
+            // Highlight agents
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById(`agent-${hop.from_agent}`)?.classList.add('active');
+            document.getElementById(`agent-${hop.to_agent}`)?.classList.add('active', 'pulsing');
+
+            setTimeout(() => {
+                document.querySelectorAll('.pulsing').forEach(el => el.classList.remove('pulsing'));
+            }, 1000);
+
+            // Create hop item
+            const hopDiv = document.createElement('div');
+            hopDiv.className = 'hop-item current';
+            hopDiv.style.animationDelay = '0s';
+
+            // Highlight Cypher keywords
+            let highlightedQuery = hop.cypher_query
+                .replace(/\b(MATCH|WHERE|RETURN|ORDER BY|LIMIT|WITH|CREATE|MERGE)\b/g, '<span class="keyword">$1</span>')
+                .replace(/"([^"]*)"/g, '<span class="string">"$1"</span>');
+
+            hopDiv.innerHTML = `
+                <div class="hop-header">
+                    <div class="hop-number">${hop.hop_number}</div>
+                    <div class="hop-agents">
+                        <strong>${hop.from_agent}</strong>
+                        <span class="arrow">→</span>
+                        <strong>${hop.to_agent}</strong>
+                    </div>
+                    <div style="color: #999; font-size: 0.9em;">${hop.processing_time_ms.toFixed(1)}ms</div>
+                </div>
+
+                <div class="hop-action">📋 ${hop.action}</div>
+
+                <div style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
+                    💭 ${hop.reasoning}
+                </div>
+
+                <div class="cypher-query">${highlightedQuery}</div>
+
+                <div style="font-size: 0.9em; color: #999; margin-top: 10px;">
+                    Parameters: ${JSON.stringify(hop.parameters)}
+                </div>
+
+                <div class="hop-results">
+                    <div class="result-count">✅ Found ${hop.results_count} results</div>
+                </div>
+            `;
+
+            container.appendChild(hopDiv);
+
+            // Scroll to bottom
+            hopDiv.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+
+            // Mark previous hops as not current
+            container.querySelectorAll('.hop-item').forEach(item => {
+                if (item !== hopDiv) {
+                    item.classList.remove('current');
+                }
+            });
+        }
+
+        function showSummary() {
+            const summary = document.getElementById('summary');
+            const timeline = document.getElementById('timeline');
+
+            // Calculate stats
+            const totalTime = currentTrace.hops.reduce((sum, hop) => sum + hop.processing_time_ms, 0);
+            const totalQueries = currentTrace.hops.length;
+            const totalMessages = totalQueries * 2; // Assuming request + response
+
+            document.getElementById('totalTime').textContent = (totalTime / 1000).toFixed(2) + 's';
+            document.getElementById('totalHops').textContent = currentTrace.hops.length;
+            document.getElementById('totalQueries').textContent = totalQueries;
+            document.getElementById('totalMessages').textContent = totalMessages;
+
+            summary.style.display = 'block';
+
+            // Show timeline
+            timeline.innerHTML = '<h3 style="color: #667eea; margin-bottom: 20px;">Timeline</h3>';
+            currentTrace.hops.forEach((hop, index) => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-time">+${hop.processing_time_ms.toFixed(1)}ms</div>
+                    <div class="timeline-content">
+                        <strong>Hop ${hop.hop_number}:</strong> ${hop.action}<br>
+                        <span style="color: #999; font-size: 0.9em;">
+                            ${hop.from_agent} → ${hop.to_agent}
+                        </span>
+                    </div>
+                `;
+                timeline.appendChild(item);
+            });
+
+            timeline.style.display = 'block';
+
+            // Mark all agents as complete
+            document.querySelectorAll('.agent-card').forEach(card => {
+                card.classList.remove('active');
+                card.classList.add('complete');
+            });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        currentTrace = JSON.parse(e.target.result);
+                        renderAgents();
+                        reset();
+                        document.getElementById('workflowTitle').textContent = currentTrace.workflow;
+                    } catch (error) {
+                        alert('Error parsing JSON file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

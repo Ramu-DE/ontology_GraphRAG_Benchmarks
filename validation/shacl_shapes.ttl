@@ -1,0 +1,457 @@
+@prefix : <http://example.com/biomedical#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# ========================================
+# SHACL SHAPES FOR DATA VALIDATION
+# W3C Standard for RDF Graph Validation
+# ========================================
+
+# ========================================
+# DRUG SHAPE
+# ========================================
+
+:DrugShape a sh:NodeShape ;
+    sh:targetClass :Drug ;
+    sh:name "Drug Validation Shape" ;
+    sh:description "Validates drug entities and their properties" ;
+
+    # Required properties
+    sh:property [
+        sh:path :drugId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^D[0-9]{3}$" ;
+        sh:message "Drug must have exactly one drugId matching pattern D###" ;
+    ] ;
+
+    sh:property [
+        sh:path :drugName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 2 ;
+        sh:message "Drug must have exactly one non-empty name" ;
+    ] ;
+
+    sh:property [
+        sh:path :approvalStatus ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ("Approved" "Experimental" "Withdrawn") ;
+        sh:message "Drug must have approval status: Approved, Experimental, or Withdrawn" ;
+    ] ;
+
+    sh:property [
+        sh:path :approvalYear ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:gYear ;
+        sh:minInclusive "1900"^^xsd:gYear ;
+        sh:maxInclusive "2030"^^xsd:gYear ;
+        sh:message "Approval year must be between 1900 and 2030" ;
+    ] ;
+
+    # Relationship constraints
+    sh:property [
+        sh:path :treats ;
+        sh:class :Disease ;
+        sh:message "Drug can only treat Disease entities" ;
+    ] ;
+
+    sh:property [
+        sh:path :targets ;
+        sh:class :Protein ;
+        sh:message "Drug can only target Protein entities" ;
+    ] .
+
+# ========================================
+# DISEASE SHAPE
+# ========================================
+
+:DiseaseShape a sh:NodeShape ;
+    sh:targetClass :Disease ;
+    sh:name "Disease Validation Shape" ;
+    sh:description "Validates disease entities and their properties" ;
+
+    sh:property [
+        sh:path :diseaseId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^DIS[0-9]{3}$" ;
+        sh:message "Disease must have exactly one diseaseId matching pattern DIS###" ;
+    ] ;
+
+    sh:property [
+        sh:path :diseaseName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Disease must have exactly one name" ;
+    ] ;
+
+    sh:property [
+        sh:path :diseaseCategory ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ("Oncology" "Metabolic" "Neurology" "Cardiovascular" "Infectious") ;
+        sh:message "Disease category must be one of: Oncology, Metabolic, Neurology, Cardiovascular, Infectious" ;
+    ] ;
+
+    sh:property [
+        sh:path :icd10Code ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z][0-9]{2}(\\.[0-9]{1,2})?$" ;
+        sh:message "ICD-10 code must match format like C34.9 or E11" ;
+    ] ;
+
+    sh:property [
+        sh:path :prevalence ;
+        sh:maxCount 1 ;
+        sh:in ("Very High" "High" "Medium" "Low" "Rare") ;
+        sh:message "Prevalence must be: Very High, High, Medium, Low, or Rare" ;
+    ] ;
+
+    sh:property [
+        sh:path :associatedWithGene ;
+        sh:class :Gene ;
+        sh:message "Disease can only be associated with Gene entities" ;
+    ] .
+
+# ========================================
+# CLINICAL TRIAL SHAPE
+# ========================================
+
+:ClinicalTrialShape a sh:NodeShape ;
+    sh:targetClass :ClinicalTrial ;
+    sh:name "Clinical Trial Validation Shape" ;
+    sh:description "Validates clinical trial entities and their properties" ;
+
+    sh:property [
+        sh:path :trialId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^CT[0-9]{3}$" ;
+        sh:message "Trial must have exactly one trialId matching pattern CT###" ;
+    ] ;
+
+    sh:property [
+        sh:path :nctId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^NCT[0-9]{8}$" ;
+        sh:message "Trial must have valid NCT ID (format: NCT########)" ;
+    ] ;
+
+    sh:property [
+        sh:path :phase ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ("Phase 1" "Phase 2" "Phase 3" "Phase 4") ;
+        sh:message "Trial phase must be: Phase 1, Phase 2, Phase 3, or Phase 4" ;
+    ] ;
+
+    sh:property [
+        sh:path :trialStatus ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:in ("Active" "Completed" "Recruiting" "Suspended" "Terminated") ;
+        sh:message "Trial status must be valid" ;
+    ] ;
+
+    sh:property [
+        sh:path :enrollment ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:message "Enrollment must be a positive integer" ;
+    ] ;
+
+    sh:property [
+        sh:path :startDate ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:date ;
+        sh:message "Trial must have a start date" ;
+    ] ;
+
+    # Relationship constraints
+    sh:property [
+        sh:path :investigatesDrug ;
+        sh:minCount 1 ;
+        sh:class :Drug ;
+        sh:message "Trial must investigate at least one drug" ;
+    ] ;
+
+    sh:property [
+        sh:path :studiesDisease ;
+        sh:minCount 1 ;
+        sh:class :Disease ;
+        sh:message "Trial must study at least one disease" ;
+    ] ;
+
+    sh:property [
+        sh:path :reportsAdverseEvent ;
+        sh:class :AdverseEvent ;
+        sh:message "Trial can only report AdverseEvent entities" ;
+    ] .
+
+# ========================================
+# GENE SHAPE
+# ========================================
+
+:GeneShape a sh:NodeShape ;
+    sh:targetClass :Gene ;
+    sh:name "Gene Validation Shape" ;
+    sh:description "Validates gene entities and their properties" ;
+
+    sh:property [
+        sh:path :geneId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^G[0-9]{3}$" ;
+        sh:message "Gene must have exactly one geneId matching pattern G###" ;
+    ] ;
+
+    sh:property [
+        sh:path :geneSymbol ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z0-9-]+$" ;
+        sh:message "Gene symbol must be uppercase alphanumeric with hyphens" ;
+    ] ;
+
+    sh:property [
+        sh:path :geneName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Gene must have a full name" ;
+    ] ;
+
+    sh:property [
+        sh:path :chromosome ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Gene must be located on a chromosome" ;
+    ] .
+
+# ========================================
+# PROTEIN SHAPE
+# ========================================
+
+:ProteinShape a sh:NodeShape ;
+    sh:targetClass :Protein ;
+    sh:name "Protein Validation Shape" ;
+    sh:description "Validates protein entities and their properties" ;
+
+    sh:property [
+        sh:path :proteinId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^P[0-9]{3}$" ;
+        sh:message "Protein must have exactly one proteinId matching pattern P###" ;
+    ] ;
+
+    sh:property [
+        sh:path :proteinName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Protein must have a name" ;
+    ] ;
+
+    sh:property [
+        sh:path :uniprotId ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[OPQ][0-9][A-Z0-9]{3}[0-9]$" ;
+        sh:message "UniProt ID must match standard format (e.g., Q15116)" ;
+    ] ;
+
+    sh:property [
+        sh:path :cellularLocation ;
+        sh:maxCount 1 ;
+        sh:in ("Cell membrane" "Cytoplasm" "Nucleus" "Mitochondria" "Extracellular") ;
+        sh:message "Cellular location must be valid" ;
+    ] .
+
+# ========================================
+# BIOMARKER SHAPE
+# ========================================
+
+:BiomarkerShape a sh:NodeShape ;
+    sh:targetClass :Biomarker ;
+    sh:name "Biomarker Validation Shape" ;
+    sh:description "Validates biomarker entities and their properties" ;
+
+    sh:property [
+        sh:path :predictsResponseTo ;
+        sh:minCount 1 ;
+        sh:class :Drug ;
+        sh:message "Biomarker must predict response to at least one drug" ;
+    ] .
+
+# ========================================
+# RESEARCHER SHAPE
+# ========================================
+
+:ResearcherShape a sh:NodeShape ;
+    sh:targetClass :Researcher ;
+    sh:name "Researcher Validation Shape" ;
+    sh:description "Validates researcher entities and their properties" ;
+
+    sh:property [
+        sh:path :researcherId ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^R[0-9]{3}$" ;
+        sh:message "Researcher must have exactly one researcherId matching pattern R###" ;
+    ] ;
+
+    sh:property [
+        sh:path :researcherName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Researcher must have a name" ;
+    ] ;
+
+    sh:property [
+        sh:path :hIndex ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 300 ;
+        sh:message "h-index must be between 0 and 300" ;
+    ] ;
+
+    sh:property [
+        sh:path :totalPublications ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:message "Total publications must be non-negative" ;
+    ] ;
+
+    sh:property [
+        sh:path :affiliatedWith ;
+        sh:minCount 1 ;
+        sh:class :Institution ;
+        sh:message "Researcher must be affiliated with at least one institution" ;
+    ] .
+
+# ========================================
+# RESEARCH PAPER SHAPE
+# ========================================
+
+:ResearchPaperShape a sh:NodeShape ;
+    sh:targetClass :ResearchPaper ;
+    sh:name "Research Paper Validation Shape" ;
+    sh:description "Validates research paper entities and their properties" ;
+
+    sh:property [
+        sh:path :authoredBy ;
+        sh:minCount 1 ;
+        sh:class :Researcher ;
+        sh:message "Paper must have at least one author" ;
+    ] .
+
+# ========================================
+# ADVERSE EVENT SHAPE
+# ========================================
+
+:AdverseEventShape a sh:NodeShape ;
+    sh:targetClass :AdverseEvent ;
+    sh:name "Adverse Event Validation Shape" ;
+    sh:description "Validates adverse event entities and their properties" ;
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Adverse event must have a label" ;
+    ] .
+
+# ========================================
+# CROSS-ENTITY VALIDATION RULES
+# ========================================
+
+# Rule: Approved drugs treating diseases must have efficacy data
+:ApprovedTreatmentShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:prefixes :prefixes ;
+        sh:select """
+            SELECT ?this
+            WHERE {
+                ?this a :Drug ;
+                      :approvalStatus "Approved" ;
+                      :treats ?disease .
+            }
+        """ ;
+    ] ;
+    sh:message "Approved drugs treating diseases should have documented efficacy" .
+
+# Rule: Phase 3 trials must have sufficient enrollment
+:Phase3EnrollmentShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:prefixes :prefixes ;
+        sh:select """
+            SELECT ?this
+            WHERE {
+                ?this a :ClinicalTrial ;
+                      :phase "Phase 3" ;
+                      :enrollment ?enrollment .
+                FILTER(?enrollment < 100)
+            }
+        """ ;
+    ] ;
+    sh:message "Phase 3 trials should typically have enrollment >= 100" ;
+    sh:severity sh:Warning .
+
+# Rule: Drugs targeting immune checkpoints should be classified as immunotherapy
+:ImmunotherapyClassificationShape a sh:NodeShape ;
+    sh:target [
+        a sh:SPARQLTarget ;
+        sh:prefixes :prefixes ;
+        sh:select """
+            SELECT ?this
+            WHERE {
+                ?this a :Drug ;
+                      :targets ?protein .
+                ?protein a :ImmuneCheckpointProtein .
+                FILTER NOT EXISTS { ?this a :Immunotherapy }
+            }
+        """ ;
+    ] ;
+    sh:message "Drugs targeting immune checkpoint proteins should be classified as Immunotherapy" ;
+    sh:severity sh:Info .
+
+# ========================================
+# PREFIX DEFINITIONS FOR SPARQL TARGETS
+# ========================================
+
+:prefixes a owl:Ontology ;
+    sh:declare [
+        sh:prefix "bio" ;
+        sh:namespace "http://example.com/biomedical#"^^xsd:anyURI ;
+    ] ;
+    sh:declare [
+        sh:prefix "data" ;
+        sh:namespace "http://example.com/data/"^^xsd:anyURI ;
+    ] .

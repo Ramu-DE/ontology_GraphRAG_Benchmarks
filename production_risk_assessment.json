@@ -1,0 +1,96 @@
+{
+  "drug_name": "Pembrolizumab",
+  "mechanism": "PD-1 inhibitor - blocks programmed death receptor-1",
+  "targets": [
+    "PD-1",
+    "PD-L1"
+  ],
+  "patient_profile": {
+    "age": 68,
+    "comorbidities": [
+      "diabetes",
+      "hypertension"
+    ],
+    "genetic_mutation": "EGFR",
+    "previous_treatment": "Nivolumab",
+    "risk_factors": []
+  },
+  "adverse_events": [
+    {
+      "event": "Immune-related pneumonitis",
+      "severity": "high",
+      "frequency": 10.0
+    },
+    {
+      "event": "Colitis",
+      "severity": "moderate",
+      "frequency": 8.0
+    },
+    {
+      "event": "Hepatitis",
+      "severity": "moderate",
+      "frequency": 5.0
+    },
+    {
+      "event": "Thyroid dysfunction",
+      "severity": "low",
+      "frequency": 12.0
+    },
+    {
+      "event": "Skin reactions",
+      "severity": "low",
+      "frequency": 15.0
+    }
+  ],
+  "genetic_validation": {
+    "validated": true,
+    "confidence": 0.95,
+    "evidence_count": 3,
+    "evidence": [
+      {
+        "gene": "EGFR",
+        "disease": "Non-Small Cell Lung Cancer",
+        "status": "validated"
+      }
+    ]
+  },
+  "drug_interactions": [
+    {
+      "severity": "moderate",
+      "description": "Similar mechanisms - increased autoimmune risk",
+      "risk_multiplier": 1.15
+    }
+  ],
+  "risk_assessment": {
+    "simple_algorithm": {
+      "risk_score": 0.25,
+      "risk_level": "low",
+      "methodology": "Count-based (5% per event)"
+    },
+    "production_algorithm": {
+      "risk_score": 0.485,
+      "risk_level": "moderate",
+      "breakdown": {
+        "base_score": 0.25,
+        "severity_weighted_score": 0.45,
+        "frequency_adjusted_score": 0.267,
+        "age_multiplier": 1.32,
+        "comorbidity_multiplier": 1.2,
+        "genetic_multiplier": 1.0,
+        "interaction_multiplier": 1.15,
+        "final_score": 0.485,
+        "risk_level": "moderate",
+        "factors_applied": [
+          "Severity weighting applied",
+          "Frequency weighting applied (5 events)",
+          "Elderly risk factor (age 68): +20%",
+          "Comorbidity factor (2 conditions): +20%",
+          "Genetic validation PASSED (confidence: 0.95)",
+          "Drug interaction (Similar mechanisms - increased autoimmune risk): +14%",
+          "Treatment switch from Nivolumab: +10%"
+        ]
+      },
+      "methodology": "Multi-factor weighted scoring"
+    }
+  }
+}

@@ -1,0 +1,171 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    MODULE 1: LLM FUNDAMENTALS - COMPLETE                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📁 Location: /workshop/LLM
+
+✅ WHAT YOU HAVE:
+
+1. START_HERE.md (4.8K)
+   └─ Your entry point - begin here!
+
+2. 01_LLM_Fundamentals.md (49K)
+   └─ Complete guide with detailed explanations & ASCII diagrams
+   └─ Covers: Tokenization, Embeddings, Generation, Transformers
+
+3. MODULE_1_LEARNING_GUIDE.md (11K)
+   └─ Step-by-step learning path
+   └─ Day-by-day study plan
+   └─ Hands-on exercises & practice problems
+   └─ Self-assessment checklist
+
+4. examples/ (2 interactive demos)
+   ├─ 01_tokenization_demo.py (4.4K)
+   └─ 02_embedding_basics.py (6.5K)
+
+5. README.md (5.2K)
+   └─ Overview of all 5 modules (roadmap)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 LEARNING PATH:
+
+Week 1: Foundation
+──────────────────
+Day 1: Read overview (01_LLM_Fundamentals.md - first 200 lines)
+Day 2: Deep dive tokenization + run demo
+Day 3: Master embeddings + run demo  
+Day 4: Understand text generation
+Day 5: Study transformer architecture
+
+Week 2: Practice
+────────────────
+- Complete hands-on exercises
+- Answer practice problems
+- Connect to GraphRAG benchmark
+- Self-assessment
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 QUICK START (30 minutes):
+
+cd /workshop/LLM
+
+# 1. Read the start guide
+cat START_HERE.md
+
+# 2. Read fundamentals overview
+head -200 01_LLM_Fundamentals.md
+
+# 3. Run tokenization demo
+python3 examples/01_tokenization_demo.py
+
+# 4. Run embedding demo
+python3 examples/02_embedding_basics.py
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 WHAT YOU'LL LEARN:
+
+Module 1 Topics:
+────────────────
+✓ Visual perception vs. machine language understanding
+✓ Tokenization: Text → Subwords → Token IDs
+  - BPE, WordPiece, SentencePiece algorithms
+  - Why token count matters (cost & context limits)
+
+✓ Embeddings: Meaning as geometry
+  - 384-12,288 dimensional vectors
+  - Cosine similarity
+  - Vector arithmetic (king - man + woman = queen)
+
+✓ Text Generation: Probabilities → Text
+  - Greedy, temperature, top-k, top-p sampling
+  - When to use each strategy
+
+✓ Transformer Architecture: The magic behind LLMs
+  - Self-attention mechanism
+  - Multi-head attention
+  - Feed-forward networks
+  - Layer normalization & residual connections
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔗 CONNECTION TO YOUR GRAPHRAG BENCHMARK:
+
+Your benchmark already used these concepts!
+
+Neo4j/Neptune Analytics (Unified):
+  Drug "Pembrolizumab"
+    ↓ Embedding (384-D vector)
+  [0.2, -0.1, ..., 0.5]
+    ↓ Vector search (HNSW)
+  Similar drugs found
+    ↓ Graph traversal
+  Diseases treated found
+  
+Result: 74-195ms, 0ms friction ✓
+
+Module 1 explains HOW each step works internally!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ SUCCESS CRITERIA:
+
+After Module 1, you should be able to:
+□ Explain how text becomes numbers (tokenization)
+□ Calculate approximate token count for any text
+□ Describe why similar meanings = similar vectors
+□ Understand how self-attention works
+□ Choose appropriate temperature for different tasks
+□ Connect these concepts to your GraphRAG work
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📖 KEY FORMULAS:
+
+Cosine Similarity:
+  cos(A, B) = (A · B) / (||A|| × ||B||)
+  Range: -1 (opposite) to 1 (identical)
+
+Attention:
+  Attention(Q, K, V) = softmax(QK^T / √d_k) × V
+
+Temperature Sampling:
+  P_i = exp(logit_i / T) / Σ exp(logit_j / T)
+  T ↓ = more deterministic
+  T ↑ = more random
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎓 WHAT'S NEXT:
+
+After mastering Module 1:
+
+Module 2: Vector Databases & Similarity Search
+  → Explains HNSW algorithm (used in your benchmark!)
+  → Scaling to billions of vectors
+
+Module 5: RAG (Retrieval-Augmented Generation)
+  → Complete RAG pipeline
+  → Unified vs. Two-layer architecture (your benchmark!)
+  → Production implementation
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRO TIP:
+
+Don't rush! Take 1-2 weeks to really understand Module 1.
+Everything else builds on these fundamentals.
+
+Run the demo scripts multiple times with different inputs.
+Try to explain concepts in your own words.
+Connect everything back to your GraphRAG benchmark work.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Ready to start? 🚀
+
+cat START_HERE.md
+
+Happy learning!

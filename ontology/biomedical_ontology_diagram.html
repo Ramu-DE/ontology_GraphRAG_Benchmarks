@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Biomedical Ontology — Relationship Diagram</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Helvetica, Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+  h1 { text-align: center; margin-bottom: 6px; font-size: 22px; color: #222; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 13px; }
+
+  /* ---- SECTION WRAPPER ---- */
+  .section { background: white; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+             box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .section h2 { font-size: 15px; margin-bottom: 14px; padding-bottom: 6px;
+                border-bottom: 2px solid #e0e0e0; color: #333; }
+
+  /* ---- CLASS HIERARCHY ---- */
+  .hierarchy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .hierarchy-box { border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+  .hierarchy-box .parent {
+    padding: 8px 14px; font-weight: bold; font-size: 13px; color: white; }
+  .hierarchy-box .children { background: #fafafa; padding: 8px 14px; }
+  .hierarchy-box .children .child {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; padding: 3px 0; color: #333; }
+  .hierarchy-box .children .child::before {
+    content: "↳"; color: #aaa; font-size: 11px; }
+
+  /* ---- RELATIONSHIP TABLE ---- */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f4f4f4; padding: 8px 12px; text-align: left;
+       font-size: 12px; color: #555; border-bottom: 2px solid #e0e0e0; }
+  td { padding: 7px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafafa; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px;
+         font-size: 11px; font-weight: bold; white-space: nowrap; }
+
+  .arrow { font-size: 16px; color: #888; }
+
+  /* ---- INFERRED RULES ---- */
+  .rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .rule-card { background: #fffbe6; border: 1px solid #f0d060; border-radius: 8px; padding: 12px 14px; }
+  .rule-card .rule-title { font-weight: bold; font-size: 13px; color: #7a5c00; margin-bottom: 6px; }
+  .rule-card .rule-body { font-size: 12px; color: #555; line-height: 1.6; }
+  .rule-card .rule-body .cond { color: #888; font-style: italic; }
+  .rule-card .rule-body .result { color: #2a7a2a; font-weight: bold; }
+
+  /* ---- SPECIAL PROPERTIES ---- */
+  .prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .prop-card { border-radius: 8px; padding: 12px 16px; border: 1px solid #ddd; }
+  .prop-card .prop-name { font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+  .prop-card .prop-type { display: inline-block; font-size: 11px; font-weight: bold;
+                          padding: 1px 7px; border-radius: 10px; margin-bottom: 6px; }
+  .prop-card .prop-example { font-size: 12px; color: #555; font-family: monospace;
+                              background: #f5f5f5; padding: 6px 8px; border-radius: 4px; }
+
+  /* ---- ENTITY ATTRIBUTES ---- */
+  .attr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .attr-card { border-radius: 8px; overflow: hidden; border: 1px solid #ddd; }
+  .attr-card .attr-header { padding: 7px 12px; font-weight: bold; font-size: 12px; color: white; }
+  .attr-card .attr-body { padding: 8px 12px; background: #fafafa; }
+  .attr-card .attr-item { font-size: 11px; color: #444; padding: 2px 0;
+                          display: flex; align-items: center; gap: 5px; }
+  .attr-card .attr-item .type-badge {
+    font-size: 10px; color: #888; font-family: monospace; }
+
+  /* ---- SVG DIAGRAM ---- */
+  .svg-wrap { overflow-x: auto; }
+  svg text { font-family: Helvetica, Arial, sans-serif; }
+
+  /* Colors */
+  .c-drug    { background:#4a90d9; }
+  .c-disease { background:#d94a4a; }
+  .c-bio     { background:#4a9d4a; }
+  .c-protein { background:#9a4a9a; }
+  .c-gene    { background:#e08020; }
+  .c-trial   { background:#20a0a0; }
+  .c-ae      { background:#c05050; }
+  .c-res     { background:#5070c0; }
+  .c-inst    { background:#707070; }
+  .c-paper   { background:#904030; }
+</style>
+</head>
+<body>
+
+<h1>Biomedical Ontology — Relationship Diagram</h1>
+<p class="subtitle">File: /workshop/ontology/biomedical_ontology.ttl &nbsp;|&nbsp; OWL/Turtle format &nbsp;|&nbsp; Version 1.0</p>
+
+<!-- ============================================================ -->
+<!-- 1. CLASS HIERARCHY -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>1. Class Hierarchy (subClassOf relationships)</h2>
+  <div class="hierarchy-grid">
+
+    <div class="hierarchy-box">
+      <div class="parent c-drug">Drug</div>
+      <div class="children">
+        <div class="child">MonoclonalAntibody</div>
+        <div class="child">SmallMolecule</div>
+        <div class="child">Peptide</div>
+      </div>
+    </div>
+
+    <div class="hierarchy-box">
+      <div class="parent c-disease">Disease</div>
+      <div class="children">
+        <div class="child">OncologyDisease</div>
+        <div class="child">MetabolicDisease</div>
+        <div class="child">NeurologicalDisease</div>
+      </div>
+    </div>
+
+    <div class="hierarchy-box">
+      <div class="parent c-bio">Biomarker</div>
+      <div class="children">
+        <div class="child">ProteinBiomarker</div>
+        <div class="child">GeneticBiomarker</div>
+        <div class="child">MetabolicBiomarker</div>
+      </div>
+    </div>
+
+    <div class="hierarchy-box">
+      <div class="parent c-protein">Protein</div>
+      <div class="children">
+        <div class="child">ImmuneCheckpointProtein</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 2. CORE RELATIONSHIP DIAGRAM (SVG) -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>2. Core Entity Relationships (Object Properties)</h2>
+  <div class="svg-wrap">
+  <svg width="980" height="600" viewBox="0 0 980 600">
+    <defs>
+      <!-- Arrow markers -->
+      <marker id="arr-red"    markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#d94a4a"/></marker>
+      <marker id="arr-blue"   markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a90d9"/></marker>
+      <marker id="arr-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#9a4a9a"/></marker>
+      <marker id="arr-teal"   markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#20a0a0"/></marker>
+      <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#e08020"/></marker>
+      <marker id="arr-green"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4a9d4a"/></marker>
+      <marker id="arr-gray"   markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#707070"/></marker>
+      <marker id="arr-navy"   markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#5070c0"/></marker>
+      <marker id="arr-brown"  markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#904030"/></marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="980" height="600" fill="#f9f9fb" rx="10"/>
+
+    <!-- ===== NODES ===== -->
+    <!-- Drug: center-left -->
+    <rect x="130" y="240" width="110" height="44" rx="7" fill="#4a90d9"/>
+    <text x="185" y="257" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Drug</text>
+    <text x="185" y="275" text-anchor="middle" fill="#cce4ff" font-size="10">pharmaceutical compound</text>
+
+    <!-- Disease: center -->
+    <rect x="420" y="130" width="120" height="44" rx="7" fill="#d94a4a"/>
+    <text x="480" y="147" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Disease</text>
+    <text x="480" y="165" text-anchor="middle" fill="#ffd0d0" font-size="10">pathological condition</text>
+
+    <!-- ClinicalTrial: center-right -->
+    <rect x="680" y="240" width="130" height="44" rx="7" fill="#20a0a0"/>
+    <text x="745" y="257" text-anchor="middle" fill="white" font-size="13" font-weight="bold">ClinicalTrial</text>
+    <text x="745" y="275" text-anchor="middle" fill="#ccf0f0" font-size="10">human study</text>
+
+    <!-- Protein: top-left -->
+    <rect x="130" y="70" width="110" height="44" rx="7" fill="#9a4a9a"/>
+    <text x="185" y="87" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Protein</text>
+    <text x="185" y="105" text-anchor="middle" fill="#eeccee" font-size="10">biological macromolecule</text>
+
+    <!-- Gene: top-center -->
+    <rect x="430" y="30" width="100" height="44" rx="7" fill="#e08020"/>
+    <text x="480" y="47" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Gene</text>
+    <text x="480" y="65" text-anchor="middle" fill="#ffe0bb" font-size="10">hereditary unit</text>
+
+    <!-- Biomarker: bottom-left -->
+    <rect x="100" y="420" width="120" height="44" rx="7" fill="#4a9d4a"/>
+    <text x="160" y="437" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Biomarker</text>
+    <text x="160" y="455" text-anchor="middle" fill="#cceecc" font-size="10">measurable indicator</text>
+
+    <!-- AdverseEvent: right -->
+    <rect x="840" y="160" width="120" height="44" rx="7" fill="#c05050"/>
+    <text x="900" y="177" text-anchor="middle" fill="white" font-size="13" font-weight="bold">AdverseEvent</text>
+    <text x="900" y="195" text-anchor="middle" fill="#ffd0d0" font-size="10">undesired side effect</text>
+
+    <!-- Institution: bottom-right -->
+    <rect x="680" y="420" width="120" height="44" rx="7" fill="#707070"/>
+    <text x="740" y="437" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Institution</text>
+    <text x="740" y="455" text-anchor="middle" fill="#e0e0e0" font-size="10">org / sponsor</text>
+
+    <!-- Researcher: bottom-center -->
+    <rect x="410" y="480" width="120" height="44" rx="7" fill="#5070c0"/>
+    <text x="470" y="497" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Researcher</text>
+    <text x="470" y="515" text-anchor="middle" fill="#ccd4f0" font-size="10">scientist</text>
+
+    <!-- ResearchPaper: bottom-left-2 -->
+    <rect x="100" y="520" width="130" height="44" rx="7" fill="#904030"/>
+    <text x="165" y="537" text-anchor="middle" fill="white" font-size="13" font-weight="bold">ResearchPaper</text>
+    <text x="165" y="555" text-anchor="middle" fill="#f0ccbb" font-size="10">scholarly publication</text>
+
+    <!-- ===== EDGES ===== -->
+
+    <!-- Drug → treats → Disease -->
+    <line x1="240" y1="255" x2="418" y2="175" stroke="#d94a4a" stroke-width="2" marker-end="url(#arr-red)"/>
+    <text x="315" y="200" text-anchor="middle" fill="#d94a4a" font-size="11" font-weight="bold">treats</text>
+
+    <!-- Disease → treatedBy → Drug (dotted inverse) -->
+    <line x1="420" y1="185" x2="242" y2="258" stroke="#d94a4a" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arr-red)"/>
+    <text x="310" y="230" text-anchor="middle" fill="#d94a4a" font-size="10">treatedBy (inv)</text>
+
+    <!-- Drug → targets → Protein -->
+    <line x1="175" y1="240" x2="185" y2="116" stroke="#9a4a9a" stroke-width="2" marker-end="url(#arr-purple)"/>
+    <text x="158" y="180" text-anchor="middle" fill="#9a4a9a" font-size="11" font-weight="bold">targets</text>
+
+    <!-- Drug → investigatedBy → ClinicalTrial -->
+    <line x1="240" y1="262" x2="678" y2="262" stroke="#20a0a0" stroke-width="2" marker-end="url(#arr-teal)"/>
+    <text x="460" y="253" text-anchor="middle" fill="#20a0a0" font-size="11" font-weight="bold">investigatedBy</text>
+
+    <!-- Disease → associatedWithGene → Gene -->
+    <line x1="480" y1="130" x2="480" y2="76" stroke="#e08020" stroke-width="2" marker-end="url(#arr-orange)"/>
+    <text x="510" y="108" text-anchor="middle" fill="#e08020" font-size="10" font-weight="bold">assocWithGene</text>
+
+    <!-- Disease → studiedIn → ClinicalTrial -->
+    <line x1="540" y1="165" x2="680" y2="255" stroke="#20a0a0" stroke-width="2" marker-end="url(#arr-teal)"/>
+    <text x="628" y="200" text-anchor="middle" fill="#20a0a0" font-size="11" font-weight="bold">studiedIn</text>
+
+    <!-- Biomarker → predictsResponseTo → Drug -->
+    <line x1="220" y1="445" x2="155" y2="285" stroke="#4a9d4a" stroke-width="2" marker-end="url(#arr-green)"/>
+    <text x="160" y="370" text-anchor="middle" fill="#4a9d4a" font-size="10" font-weight="bold">predictsResponseTo</text>
+
+    <!-- ClinicalTrial → reportsAdverseEvent → AdverseEvent -->
+    <line x1="810" y1="255" x2="880" y2="204" stroke="#c05050" stroke-width="2" marker-end="url(#arr-gray)"/>
+    <text x="872" y="237" text-anchor="middle" fill="#c05050" font-size="10" font-weight="bold">reportsAdverseEvent</text>
+
+    <!-- ClinicalTrial → sponsoredBy → Institution -->
+    <line x1="745" y1="284" x2="742" y2="418" stroke="#707070" stroke-width="2" marker-end="url(#arr-gray)"/>
+    <text x="775" y="355" text-anchor="middle" fill="#707070" font-size="11" font-weight="bold">sponsoredBy</text>
+
+    <!-- ResearchPaper → authoredBy → Researcher -->
+    <line x1="230" y1="542" x2="408" y2="510" stroke="#5070c0" stroke-width="2" marker-end="url(#arr-navy)"/>
+    <text x="318" y="518" text-anchor="middle" fill="#5070c0" font-size="11" font-weight="bold">authoredBy</text>
+
+    <!-- Researcher → affiliatedWith → Institution -->
+    <line x1="530" y1="500" x2="678" y2="453" stroke="#707070" stroke-width="2" marker-end="url(#arr-gray)"/>
+    <text x="614" y="465" text-anchor="middle" fill="#707070" font-size="11" font-weight="bold">affiliatedWith</text>
+
+    <!-- ResearchPaper → mentionsDrug → Drug -->
+    <line x1="165" y1="520" x2="175" y2="285" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr-blue)"/>
+    <text x="130" y="410" text-anchor="middle" fill="#4a90d9" font-size="10">mentionsDrug</text>
+
+    <!-- ResearchPaper → mentionsDisease → Disease -->
+    <line x1="230" y1="530" x2="420" y2="174" stroke="#d94a4a" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr-red)"/>
+    <text x="270" y="340" text-anchor="middle" fill="#d94a4a" font-size="10">mentionsDisease</text>
+
+    <!-- Drug → similarTo → Drug (self-loop) -->
+    <path d="M 130 250 Q 60 220 60 262 Q 60 305 130 275" fill="none" stroke="#888" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-gray)"/>
+    <text x="40" y="255" text-anchor="middle" fill="#888" font-size="10">similarTo</text>
+    <text x="40" y="267" text-anchor="middle" fill="#888" font-size="9">(symmetric)</text>
+
+    <!-- Legend -->
+    <rect x="10" y="10" width="115" height="55" rx="5" fill="white" stroke="#ddd"/>
+    <text x="18" y="24" font-size="10" fill="#555" font-weight="bold">LEGEND</text>
+    <line x1="18" y1="34" x2="45" y2="34" stroke="#333" stroke-width="2" marker-end="url(#arr-gray)"/>
+    <text x="50" y="37" font-size="9" fill="#555">object property</text>
+    <line x1="18" y1="48" x2="45" y2="48" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-gray)"/>
+    <text x="50" y="51" font-size="9" fill="#555">inverse / mention</text>
+    <line x1="18" y1="60" x2="45" y2="60" stroke="#c8a000" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="50" y="63" font-size="9" fill="#555">subClassOf</text>
+
+  </svg>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 3. OBJECT PROPERTIES TABLE -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>3. Object Properties (Relationships) — Full List</h2>
+  <table>
+    <tr>
+      <th>Property</th>
+      <th>Domain (From)</th>
+      <th></th>
+      <th>Range (To)</th>
+      <th>Inverse</th>
+      <th>Notes</th>
+    </tr>
+    <tr>
+      <td><strong>treats</strong></td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-disease" style="color:white">Disease</span></td>
+      <td>treatedBy</td>
+      <td>Core drug-disease link</td>
+    </tr>
+    <tr>
+      <td><strong>targets</strong></td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-protein" style="color:white">Protein</span></td>
+      <td>—</td>
+      <td>Molecular mechanism</td>
+    </tr>
+    <tr>
+      <td><strong>investigatedBy</strong></td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-trial" style="color:white">ClinicalTrial</span></td>
+      <td>investigatesDrug</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>associatedWithGene</strong></td>
+      <td><span class="tag c-disease" style="color:white">Disease</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-gene" style="color:white">Gene</span></td>
+      <td>—</td>
+      <td>Genetic basis</td>
+    </tr>
+    <tr>
+      <td><strong>studiedIn</strong></td>
+      <td><span class="tag c-disease" style="color:white">Disease</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-trial" style="color:white">ClinicalTrial</span></td>
+      <td>studiesDisease</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>predictsResponseTo</strong></td>
+      <td><span class="tag c-bio" style="color:white">Biomarker</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td>—</td>
+      <td>Precision medicine signal</td>
+    </tr>
+    <tr>
+      <td><strong>reportsAdverseEvent</strong></td>
+      <td><span class="tag c-trial" style="color:white">ClinicalTrial</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-ae" style="color:white">AdverseEvent</span></td>
+      <td>—</td>
+      <td>Safety signal</td>
+    </tr>
+    <tr>
+      <td><strong>sponsoredBy</strong></td>
+      <td><span class="tag c-trial" style="color:white">ClinicalTrial</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-inst" style="color:white">Institution</span></td>
+      <td>—</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>authoredBy</strong></td>
+      <td><span class="tag c-paper" style="color:white">ResearchPaper</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-res" style="color:white">Researcher</span></td>
+      <td>—</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>affiliatedWith</strong></td>
+      <td><span class="tag c-res" style="color:white">Researcher</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-inst" style="color:white">Institution</span></td>
+      <td>—</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>mentionsDrug</strong></td>
+      <td><span class="tag c-paper" style="color:white">ResearchPaper</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td>—</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>mentionsDisease</strong></td>
+      <td><span class="tag c-paper" style="color:white">ResearchPaper</span></td>
+      <td class="arrow">→</td>
+      <td><span class="tag c-disease" style="color:white">Disease</span></td>
+      <td>—</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong>similarTo</strong></td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td class="arrow">↔</td>
+      <td><span class="tag c-drug" style="color:white">Drug</span></td>
+      <td>self (symmetric)</td>
+      <td>Symmetric property</td>
+    </tr>
+    <tr>
+      <td><strong>partOf</strong></td>
+      <td colspan="3">any → any</td>
+      <td>self (transitive)</td>
+      <td>Transitive property</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 4. OWL REASONING RULES -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>4. OWL Reasoning Rules — Auto-Inferred Classes</h2>
+  <div class="rules-grid">
+
+    <div class="rule-card">
+      <div class="rule-title">ApprovedTreatment</div>
+      <div class="rule-body">
+        <span class="cond">IF</span> a Drug<br>
+        <span class="cond">AND</span> treats <em>some</em> Disease<br>
+        <span class="cond">AND</span> approvalStatus = <strong>"Approved"</strong><br>
+        <span class="result">→ THEN: ApprovedTreatment</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-title">Immunotherapy</div>
+      <div class="rule-body">
+        <span class="cond">IF</span> a Drug<br>
+        <span class="cond">AND</span> targets <em>some</em> ImmuneCheckpointProtein<br>
+        <span class="result">→ THEN: Immunotherapy</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-title">HighImpactResearcher</div>
+      <div class="rule-body">
+        <span class="cond">IF</span> a Researcher<br>
+        <span class="cond">AND</span> hIndex ≥ <strong>70</strong><br>
+        <span class="result">→ THEN: HighImpactResearcher</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-title">DefinitiveEvidence</div>
+      <div class="rule-body">
+        <span class="cond">IF</span> a ClinicalTrial<br>
+        <span class="cond">AND</span> phase = <strong>"Phase 3"</strong><br>
+        <span class="cond">AND</span> trialStatus = <strong>"Completed"</strong><br>
+        <span class="result">→ THEN: DefinitiveEvidence</span>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-title">EpidemicDisease</div>
+      <div class="rule-body">
+        <span class="cond">IF</span> a Disease<br>
+        <span class="cond">AND</span> prevalence = <strong>"Very High"</strong><br>
+        <span class="result">→ THEN: EpidemicDisease</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 5. ENTITY ATTRIBUTES -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>5. Datatype Properties (Attributes per Entity)</h2>
+  <div class="attr-grid">
+
+    <div class="attr-card">
+      <div class="attr-header c-drug">Drug</div>
+      <div class="attr-body">
+        <div class="attr-item">drugId <span class="type-badge">string</span></div>
+        <div class="attr-item">drugName <span class="type-badge">string</span></div>
+        <div class="attr-item">genericName <span class="type-badge">string</span></div>
+        <div class="attr-item">drugType <span class="type-badge">string</span></div>
+        <div class="attr-item">approvalStatus <span class="type-badge">string</span></div>
+        <div class="attr-item">approvalYear <span class="type-badge">gYear</span></div>
+        <div class="attr-item">mechanism <span class="type-badge">string</span></div>
+      </div>
+    </div>
+
+    <div class="attr-card">
+      <div class="attr-header c-disease">Disease</div>
+      <div class="attr-body">
+        <div class="attr-item">diseaseId <span class="type-badge">string</span></div>
+        <div class="attr-item">diseaseName <span class="type-badge">string</span></div>
+        <div class="attr-item">diseaseCategory <span class="type-badge">string</span></div>
+        <div class="attr-item">icd10Code <span class="type-badge">string</span></div>
+        <div class="attr-item">prevalence <span class="type-badge">string</span></div>
+      </div>
+    </div>
+
+    <div class="attr-card">
+      <div class="attr-header c-trial">ClinicalTrial</div>
+      <div class="attr-body">
+        <div class="attr-item">trialId <span class="type-badge">string</span></div>
+        <div class="attr-item">nctId <span class="type-badge">string</span></div>
+        <div class="attr-item">trialTitle <span class="type-badge">string</span></div>
+        <div class="attr-item">phase <span class="type-badge">string</span></div>
+        <div class="attr-item">trialStatus <span class="type-badge">string</span></div>
+        <div class="attr-item">startDate <span class="type-badge">date</span></div>
+        <div class="attr-item">enrollment <span class="type-badge">integer</span></div>
+        <div class="attr-item">sponsor <span class="type-badge">string</span></div>
+      </div>
+    </div>
+
+    <div class="attr-card">
+      <div class="attr-header c-gene">Gene</div>
+      <div class="attr-body">
+        <div class="attr-item">geneId <span class="type-badge">string</span></div>
+        <div class="attr-item">geneSymbol <span class="type-badge">string</span></div>
+        <div class="attr-item">geneName <span class="type-badge">string</span></div>
+        <div class="attr-item">chromosome <span class="type-badge">string</span></div>
+        <div class="attr-item">geneFunction <span class="type-badge">string</span></div>
+      </div>
+    </div>
+
+    <div class="attr-card">
+      <div class="attr-header c-protein">Protein</div>
+      <div class="attr-body">
+        <div class="attr-item">proteinId <span class="type-badge">string</span></div>
+        <div class="attr-item">proteinName <span class="type-badge">string</span></div>
+        <div class="attr-item">uniprotId <span class="type-badge">string</span></div>
+        <div class="attr-item">proteinClass <span class="type-badge">string</span></div>
+        <div class="attr-item">cellularLocation <span class="type-badge">string</span></div>
+      </div>
+    </div>
+
+    <div class="attr-card">
+      <div class="attr-header c-res">Researcher</div>
+      <div class="attr-body">
+        <div class="attr-item">researcherId <span class="type-badge">string</span></div>
+        <div class="attr-item">researcherName <span class="type-badge">string</span></div>
+        <div class="attr-item">title <span class="type-badge">string</span></div>
+        <div class="attr-item">specialization <span class="type-badge">string</span></div>
+        <div class="attr-item">hIndex <span class="type-badge">integer</span></div>
+        <div class="attr-item">totalPublications <span class="type-badge">integer</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 6. SPECIAL PROPERTY CHARACTERISTICS -->
+<!-- ============================================================ -->
+<div class="section">
+  <h2>6. Special Property Characteristics</h2>
+  <div class="prop-grid">
+
+    <div class="prop-card" style="background:#f0f8ff; border-color:#4a90d9">
+      <div class="prop-name">similarTo</div>
+      <span class="prop-type" style="background:#4a90d9; color:white">Symmetric</span>
+      <div class="prop-example">
+        Drug_A similarTo Drug_B<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;⟹ Drug_B similarTo Drug_A&nbsp;✓ (auto-inferred)
+      </div>
+    </div>
+
+    <div class="prop-card" style="background:#f0fff0; border-color:#4a9d4a">
+      <div class="prop-name">partOf</div>
+      <span class="prop-type" style="background:#4a9d4a; color:white">Transitive</span>
+      <div class="prop-example">
+        Heart partOf CardiovascularSystem<br>
+        CardiovascularSystem partOf Body<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;⟹ Heart partOf Body&nbsp;✓ (auto-inferred)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

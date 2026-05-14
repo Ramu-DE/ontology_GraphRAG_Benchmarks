@@ -1,0 +1,56 @@
+# ── Credentials & Secrets ───────────────────────────────────
+.env
+*.pem
+*.key
+service-account-key.json
+*credentials*
+*secret*
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── Jupyter ──────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# ── IDE & Editor ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── Claude Code internal ─────────────────────────────────────
+.claude/
+
+# ── Node / Web ───────────────────────────────────────────────
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# ── Large binaries ───────────────────────────────────────────
+lambda_function.zip
+*.zip
+output/
+strands_output.txt
+
+# ── Sub-project repos (have their own git) ───────────────────
+FDE/ade-academy/
+googlewebsite/

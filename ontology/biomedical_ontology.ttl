@@ -1,0 +1,570 @@
+@prefix : <http://example.com/biomedical#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ========================================
+# ONTOLOGY METADATA
+# ========================================
+
+:BiomedicalOntology a owl:Ontology ;
+    rdfs:label "Biomedical Knowledge Graph Ontology" ;
+    rdfs:comment "Formal ontology for pharmaceutical research, clinical trials, and drug discovery" ;
+    owl:versionInfo "1.0" .
+
+# ========================================
+# CLASSES - Core Entities
+# ========================================
+
+# Medical/Clinical Domain
+:Drug a owl:Class ;
+    rdfs:label "Drug" ;
+    rdfs:comment "A pharmaceutical compound used for treatment" .
+
+:Disease a owl:Class ;
+    rdfs:label "Disease" ;
+    rdfs:comment "A pathological condition affecting an organism" .
+
+:ClinicalTrial a owl:Class ;
+    rdfs:label "Clinical Trial" ;
+    rdfs:comment "A research study involving human participants to evaluate medical interventions" .
+
+:AdverseEvent a owl:Class ;
+    rdfs:label "Adverse Event" ;
+    rdfs:comment "An undesirable experience associated with medical treatment" .
+
+# Biological Domain
+:Gene a owl:Class ;
+    rdfs:label "Gene" ;
+    rdfs:comment "A unit of heredity containing genetic information" .
+
+:Protein a owl:Class ;
+    rdfs:label "Protein" ;
+    rdfs:comment "A biological macromolecule performing cellular functions" .
+
+:Biomarker a owl:Class ;
+    rdfs:label "Biomarker" ;
+    rdfs:comment "A measurable indicator of biological state or condition" .
+
+# Research Domain
+:Researcher a owl:Class ;
+    rdfs:label "Researcher" ;
+    rdfs:comment "A scientist conducting biomedical research" .
+
+:Institution a owl:Class ;
+    rdfs:label "Institution" ;
+    rdfs:comment "An organization conducting or sponsoring research" .
+
+:ResearchPaper a owl:Class ;
+    rdfs:label "Research Paper" ;
+    rdfs:comment "A scholarly publication reporting research findings" .
+
+# ========================================
+# SUBCLASSES - Drug Types
+# ========================================
+
+:MonoclonalAntibody a owl:Class ;
+    rdfs:subClassOf :Drug ;
+    rdfs:label "Monoclonal Antibody" ;
+    rdfs:comment "A laboratory-produced antibody designed to target specific antigens" .
+
+:SmallMolecule a owl:Class ;
+    rdfs:subClassOf :Drug ;
+    rdfs:label "Small Molecule" ;
+    rdfs:comment "A low molecular weight organic compound" .
+
+:Peptide a owl:Class ;
+    rdfs:subClassOf :Drug ;
+    rdfs:label "Peptide" ;
+    rdfs:comment "A short chain of amino acids" .
+
+# ========================================
+# SUBCLASSES - Disease Categories
+# ========================================
+
+:OncologyDisease a owl:Class ;
+    rdfs:subClassOf :Disease ;
+    rdfs:label "Oncology Disease" ;
+    rdfs:comment "A cancer or tumor-related disease" .
+
+:MetabolicDisease a owl:Class ;
+    rdfs:subClassOf :Disease ;
+    rdfs:label "Metabolic Disease" ;
+    rdfs:comment "A disease affecting metabolism" .
+
+:NeurologicalDisease a owl:Class ;
+    rdfs:subClassOf :Disease ;
+    rdfs:label "Neurological Disease" ;
+    rdfs:comment "A disease affecting the nervous system" .
+
+# ========================================
+# SUBCLASSES - Biomarker Types
+# ========================================
+
+:ProteinBiomarker a owl:Class ;
+    rdfs:subClassOf :Biomarker ;
+    rdfs:label "Protein Biomarker" ;
+    rdfs:comment "A protein measured as an indicator" .
+
+:GeneticBiomarker a owl:Class ;
+    rdfs:subClassOf :Biomarker ;
+    rdfs:label "Genetic Biomarker" ;
+    rdfs:comment "A genetic variant measured as an indicator" .
+
+:MetabolicBiomarker a owl:Class ;
+    rdfs:subClassOf :Biomarker ;
+    rdfs:label "Metabolic Biomarker" ;
+    rdfs:comment "A metabolic measurement as an indicator" .
+
+# ========================================
+# OBJECT PROPERTIES - Drug Relationships
+# ========================================
+
+:treats a owl:ObjectProperty ;
+    rdfs:label "treats" ;
+    rdfs:comment "Indicates a drug is used to treat a disease" ;
+    rdfs:domain :Drug ;
+    rdfs:range :Disease .
+
+:targets a owl:ObjectProperty ;
+    rdfs:label "targets" ;
+    rdfs:comment "Indicates a drug targets a specific protein" ;
+    rdfs:domain :Drug ;
+    rdfs:range :Protein .
+
+:investigatedBy a owl:ObjectProperty ;
+    rdfs:label "investigated by" ;
+    rdfs:comment "Indicates a drug is investigated in a clinical trial" ;
+    rdfs:domain :Drug ;
+    rdfs:range :ClinicalTrial .
+
+# ========================================
+# OBJECT PROPERTIES - Disease Relationships
+# ========================================
+
+:associatedWithGene a owl:ObjectProperty ;
+    rdfs:label "associated with gene" ;
+    rdfs:comment "Indicates a disease is genetically associated with a gene" ;
+    rdfs:domain :Disease ;
+    rdfs:range :Gene .
+
+:studiedIn a owl:ObjectProperty ;
+    rdfs:label "studied in" ;
+    rdfs:comment "Indicates a disease is studied in a clinical trial" ;
+    rdfs:domain :Disease ;
+    rdfs:range :ClinicalTrial .
+
+:treatedBy a owl:ObjectProperty ;
+    rdfs:label "treated by" ;
+    rdfs:comment "Indicates a disease is treated by a drug" ;
+    rdfs:domain :Disease ;
+    rdfs:range :Drug ;
+    owl:inverseOf :treats .
+
+# ========================================
+# OBJECT PROPERTIES - Biomarker Relationships
+# ========================================
+
+:predictsResponseTo a owl:ObjectProperty ;
+    rdfs:label "predicts response to" ;
+    rdfs:comment "Indicates a biomarker predicts treatment response" ;
+    rdfs:domain :Biomarker ;
+    rdfs:range :Drug .
+
+# ========================================
+# OBJECT PROPERTIES - Clinical Trial Relationships
+# ========================================
+
+:investigatesDrug a owl:ObjectProperty ;
+    rdfs:label "investigates drug" ;
+    rdfs:comment "Indicates a trial investigates a specific drug" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range :Drug ;
+    owl:inverseOf :investigatedBy .
+
+:studiesDisease a owl:ObjectProperty ;
+    rdfs:label "studies disease" ;
+    rdfs:comment "Indicates a trial studies a specific disease" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range :Disease ;
+    owl:inverseOf :studiedIn .
+
+:reportsAdverseEvent a owl:ObjectProperty ;
+    rdfs:label "reports adverse event" ;
+    rdfs:comment "Indicates a trial reported a specific adverse event" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range :AdverseEvent .
+
+:sponsoredBy a owl:ObjectProperty ;
+    rdfs:label "sponsored by" ;
+    rdfs:comment "Indicates a trial is sponsored by an institution" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range :Institution .
+
+# ========================================
+# OBJECT PROPERTIES - Research Relationships
+# ========================================
+
+:authoredBy a owl:ObjectProperty ;
+    rdfs:label "authored by" ;
+    rdfs:comment "Indicates a paper is authored by a researcher" ;
+    rdfs:domain :ResearchPaper ;
+    rdfs:range :Researcher .
+
+:affiliatedWith a owl:ObjectProperty ;
+    rdfs:label "affiliated with" ;
+    rdfs:comment "Indicates a researcher is affiliated with an institution" ;
+    rdfs:domain :Researcher ;
+    rdfs:range :Institution .
+
+:mentionsDrug a owl:ObjectProperty ;
+    rdfs:label "mentions drug" ;
+    rdfs:comment "Indicates a paper mentions a specific drug" ;
+    rdfs:domain :ResearchPaper ;
+    rdfs:range :Drug .
+
+:mentionsDisease a owl:ObjectProperty ;
+    rdfs:label "mentions disease" ;
+    rdfs:comment "Indicates a paper mentions a specific disease" ;
+    rdfs:domain :ResearchPaper ;
+    rdfs:range :Disease .
+
+# ========================================
+# DATATYPE PROPERTIES - Drug Properties
+# ========================================
+
+:drugId a owl:DatatypeProperty ;
+    rdfs:label "drug ID" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+:drugName a owl:DatatypeProperty ;
+    rdfs:label "drug name" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+:genericName a owl:DatatypeProperty ;
+    rdfs:label "generic name" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+:drugType a owl:DatatypeProperty ;
+    rdfs:label "drug type" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+:approvalStatus a owl:DatatypeProperty ;
+    rdfs:label "approval status" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+:approvalYear a owl:DatatypeProperty ;
+    rdfs:label "approval year" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:gYear .
+
+:mechanism a owl:DatatypeProperty ;
+    rdfs:label "mechanism of action" ;
+    rdfs:domain :Drug ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Disease Properties
+# ========================================
+
+:diseaseId a owl:DatatypeProperty ;
+    rdfs:label "disease ID" ;
+    rdfs:domain :Disease ;
+    rdfs:range xsd:string .
+
+:diseaseName a owl:DatatypeProperty ;
+    rdfs:label "disease name" ;
+    rdfs:domain :Disease ;
+    rdfs:range xsd:string .
+
+:diseaseCategory a owl:DatatypeProperty ;
+    rdfs:label "disease category" ;
+    rdfs:domain :Disease ;
+    rdfs:range xsd:string .
+
+:icd10Code a owl:DatatypeProperty ;
+    rdfs:label "ICD-10 code" ;
+    rdfs:domain :Disease ;
+    rdfs:range xsd:string .
+
+:prevalence a owl:DatatypeProperty ;
+    rdfs:label "prevalence" ;
+    rdfs:domain :Disease ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Clinical Trial Properties
+# ========================================
+
+:trialId a owl:DatatypeProperty ;
+    rdfs:label "trial ID" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+:nctId a owl:DatatypeProperty ;
+    rdfs:label "NCT ID" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+:trialTitle a owl:DatatypeProperty ;
+    rdfs:label "trial title" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+:phase a owl:DatatypeProperty ;
+    rdfs:label "phase" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+:trialStatus a owl:DatatypeProperty ;
+    rdfs:label "trial status" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+:startDate a owl:DatatypeProperty ;
+    rdfs:label "start date" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:date .
+
+:enrollment a owl:DatatypeProperty ;
+    rdfs:label "enrollment" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:integer .
+
+:sponsor a owl:DatatypeProperty ;
+    rdfs:label "sponsor" ;
+    rdfs:domain :ClinicalTrial ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Gene Properties
+# ========================================
+
+:geneId a owl:DatatypeProperty ;
+    rdfs:label "gene ID" ;
+    rdfs:domain :Gene ;
+    rdfs:range xsd:string .
+
+:geneSymbol a owl:DatatypeProperty ;
+    rdfs:label "gene symbol" ;
+    rdfs:domain :Gene ;
+    rdfs:range xsd:string .
+
+:geneName a owl:DatatypeProperty ;
+    rdfs:label "gene name" ;
+    rdfs:domain :Gene ;
+    rdfs:range xsd:string .
+
+:chromosome a owl:DatatypeProperty ;
+    rdfs:label "chromosome" ;
+    rdfs:domain :Gene ;
+    rdfs:range xsd:string .
+
+:geneFunction a owl:DatatypeProperty ;
+    rdfs:label "gene function" ;
+    rdfs:domain :Gene ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Protein Properties
+# ========================================
+
+:proteinId a owl:DatatypeProperty ;
+    rdfs:label "protein ID" ;
+    rdfs:domain :Protein ;
+    rdfs:range xsd:string .
+
+:proteinName a owl:DatatypeProperty ;
+    rdfs:label "protein name" ;
+    rdfs:domain :Protein ;
+    rdfs:range xsd:string .
+
+:uniprotId a owl:DatatypeProperty ;
+    rdfs:label "UniProt ID" ;
+    rdfs:domain :Protein ;
+    rdfs:range xsd:string .
+
+:proteinClass a owl:DatatypeProperty ;
+    rdfs:label "protein class" ;
+    rdfs:domain :Protein ;
+    rdfs:range xsd:string .
+
+:cellularLocation a owl:DatatypeProperty ;
+    rdfs:label "cellular location" ;
+    rdfs:domain :Protein ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Relationship Properties
+# ========================================
+
+:efficacyRate a owl:DatatypeProperty ;
+    rdfs:label "efficacy rate" ;
+    rdfs:comment "The effectiveness of a treatment" ;
+    rdfs:range xsd:decimal .
+
+:bindingAffinity a owl:DatatypeProperty ;
+    rdfs:label "binding affinity" ;
+    rdfs:comment "The strength of binding between molecules" ;
+    rdfs:range xsd:string .
+
+:mechanismType a owl:DatatypeProperty ;
+    rdfs:label "mechanism type" ;
+    rdfs:comment "The type of molecular mechanism" ;
+    rdfs:range xsd:string .
+
+:associationStrength a owl:DatatypeProperty ;
+    rdfs:label "association strength" ;
+    rdfs:comment "The strength of genetic association" ;
+    rdfs:range xsd:string .
+
+:evidenceLevel a owl:DatatypeProperty ;
+    rdfs:label "evidence level" ;
+    rdfs:comment "The quality of supporting evidence" ;
+    rdfs:range xsd:string .
+
+# ========================================
+# DATATYPE PROPERTIES - Researcher Properties
+# ========================================
+
+:researcherId a owl:DatatypeProperty ;
+    rdfs:label "researcher ID" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:string .
+
+:researcherName a owl:DatatypeProperty ;
+    rdfs:label "researcher name" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:string .
+
+:title a owl:DatatypeProperty ;
+    rdfs:label "title" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:string .
+
+:specialization a owl:DatatypeProperty ;
+    rdfs:label "specialization" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:string .
+
+:hIndex a owl:DatatypeProperty ;
+    rdfs:label "h-index" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:integer .
+
+:totalPublications a owl:DatatypeProperty ;
+    rdfs:label "total publications" ;
+    rdfs:domain :Researcher ;
+    rdfs:range xsd:integer .
+
+# ========================================
+# OWL REASONING RULES
+# ========================================
+
+# Rule: A drug that treats a disease in an approved trial is an ApprovedTreatment
+:ApprovedTreatment a owl:Class ;
+    rdfs:label "Approved Treatment" ;
+    rdfs:comment "A drug with proven efficacy for a disease" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Drug
+            [ a owl:Restriction ;
+              owl:onProperty :treats ;
+              owl:someValuesFrom :Disease ]
+            [ a owl:Restriction ;
+              owl:onProperty :approvalStatus ;
+              owl:hasValue "Approved" ]
+        )
+    ] .
+
+# Rule: A drug targeting immune checkpoint proteins is an Immunotherapy
+:Immunotherapy a owl:Class ;
+    rdfs:label "Immunotherapy" ;
+    rdfs:comment "A drug that modulates the immune system" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Drug
+            [ a owl:Restriction ;
+              owl:onProperty :targets ;
+              owl:someValuesFrom :ImmuneCheckpointProtein ]
+        )
+    ] .
+
+:ImmuneCheckpointProtein a owl:Class ;
+    rdfs:subClassOf :Protein ;
+    rdfs:label "Immune Checkpoint Protein" ;
+    rdfs:comment "A protein regulating immune responses" .
+
+# Rule: A researcher with h-index >= 70 is a HighImpactResearcher
+:HighImpactResearcher a owl:Class ;
+    rdfs:label "High Impact Researcher" ;
+    rdfs:comment "A researcher with significant academic impact" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Researcher
+            [ a owl:Restriction ;
+              owl:onProperty :hIndex ;
+              owl:someValuesFrom [
+                a rdfs:Datatype ;
+                owl:onDatatype xsd:integer ;
+                owl:withRestrictions ( [ xsd:minInclusive 70 ] )
+              ]
+            ]
+        )
+    ] .
+
+# Rule: A Phase 3 completed trial is a DefinitiveEvidence
+:DefinitiveEvidence a owl:Class ;
+    rdfs:label "Definitive Evidence" ;
+    rdfs:comment "A trial providing conclusive evidence" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :ClinicalTrial
+            [ a owl:Restriction ;
+              owl:onProperty :phase ;
+              owl:hasValue "Phase 3" ]
+            [ a owl:Restriction ;
+              owl:onProperty :trialStatus ;
+              owl:hasValue "Completed" ]
+        )
+    ] .
+
+# Rule: A disease with Very High prevalence is an EpidemicDisease
+:EpidemicDisease a owl:Class ;
+    rdfs:label "Epidemic Disease" ;
+    rdfs:comment "A disease with very high prevalence" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:intersectionOf (
+            :Disease
+            [ a owl:Restriction ;
+              owl:onProperty :prevalence ;
+              owl:hasValue "Very High" ]
+        )
+    ] .
+
+# ========================================
+# PROPERTY CHARACTERISTICS
+# ========================================
+
+# Symmetric property: if drug A is similar to drug B, then B is similar to A
+:similarTo a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "similar to" ;
+    rdfs:comment "Indicates similarity between drugs" ;
+    rdfs:domain :Drug ;
+    rdfs:range :Drug .
+
+# Transitive property: if A is part of B, and B is part of C, then A is part of C
+:partOf a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:label "part of" ;
+    rdfs:comment "Indicates hierarchical containment" .
