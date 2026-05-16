@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strands ReAct Agent — Neptune Analytics Visualization</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #1a1333 40%, #24243e 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .header {
+    text-align: center; margin-bottom: 30px; padding: 30px;
+    background: rgba(255,255,255,0.03); border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .header h1 {
+    font-size: 2em; font-weight: 800;
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header .sub { color: #8892b0; font-size: 0.9em; margin-top: 6px; }
+  .header .arch {
+    display: flex; justify-content: center; gap: 16px; margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .arch-badge {
+    padding: 6px 16px; border-radius: 8px; font-size: 0.78em; font-weight: 600;
+  }
+  .arch-strands { background: rgba(255,152,0,0.15); color: #ffb74d; border: 1px solid rgba(255,152,0,0.3); }
+  .arch-neptune { background: rgba(33,150,243,0.15); color: #64b5f6; border: 1px solid rgba(33,150,243,0.3); }
+  .arch-bedrock { background: rgba(156,39,176,0.15); color: #ce93d8; border: 1px solid rgba(156,39,176,0.3); }
+  .stats { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+  .stat-val { font-size: 1.8em; font-weight: 800; color: #ff9800; }
+  .stat-label { font-size: 0.72em; color: #8892b0; text-transform: uppercase; letter-spacing: 0.06em; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab {
+    padding: 10px 20px; border-radius: 10px 10px 0 0;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+    border-bottom: none; color: #8892b0; cursor: pointer; font-weight: 600; font-size: 0.85em;
+  }
+  .tab:hover { background: rgba(255,255,255,0.08); color: #e0e0e0; }
+  .tab.active { background: rgba(255,152,0,0.08); color: #ff9800; border-color: rgba(255,152,0,0.2); }
+  .tab-content {
+    display: none; background: rgba(255,255,255,0.03); border-radius: 0 16px 16px 16px;
+    border: 1px solid rgba(255,255,255,0.06); padding: 24px;
+  }
+  .tab-content.active { display: block; }
+  .timeline { position: relative; padding-left: 30px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 14px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(180deg, #ff9800, #2196f3, #4caf50);
+  }
+  .tl-step {
+    position: relative; margin-bottom: 12px; padding: 14px 18px;
+    border-radius: 10px; border-left: 3px solid; transition: all 0.2s;
+  }
+  .tl-step:hover { transform: translateX(4px); }
+  .tl-step::before {
+    content: ''; position: absolute; left: -23px; top: 18px;
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .tl-act { background: rgba(33,150,243,0.08); border-color: #2196f3; }
+  .tl-act::before { background: #2196f3; }
+  .step-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .badge {
+    padding: 2px 10px; border-radius: 6px; font-size: 0.72em;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    background: rgba(33,150,243,0.2); color: #64b5f6;
+  }
+  .step-agent { font-size: 0.78em; color: #8892b0; }
+  .step-metrics {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72em;
+    color: #ff9800; margin-left: auto;
+  }
+  .step-body { font-size: 0.85em; color: #a8b2d1; line-height: 1.5; }
+  .step-query {
+    margin-top: 8px; padding: 8px 12px; background: rgba(0,0,0,0.3);
+    border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em; color: #80cbc4; white-space: pre-wrap;
+    max-height: 120px; overflow-y: auto;
+  }
+  .step-path {
+    margin-top: 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em; color: #ce93d8;
+  }
+  .gene-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 22px; margin-bottom: 16px;
+  }
+  .gene-card h3 {
+    font-size: 1.1em; font-weight: 700; color: #ff9800;
+    margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .info-row {
+    display: flex; justify-content: space-between; padding: 4px 0;
+    font-size: 0.82em; border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .info-label { color: #8892b0; }
+  .info-value { color: #e0e0e0; font-weight: 500; }
+  .agent-response {
+    background: rgba(0,0,0,0.2); border-radius: 10px; padding: 18px;
+    font-size: 0.85em; line-height: 1.6; color: #a8b2d1;
+    white-space: pre-wrap; max-height: 600px; overflow-y: auto;
+  }
+  .footer {
+    text-align: center; margin-top: 24px; font-size: 0.75em; color: #4a5568;
+    padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Gene-Protein ReAct Agent</h1>
+    <p class="sub">AWS Strands Agents + Neptune Analytics + Bedrock Claude</p>
+    <div class="arch">
+      <span class="arch-badge arch-strands">Strands Agents SDK</span>
+      <span class="arch-badge arch-neptune">Neptune Analytics (openCypher)</span>
+      <span class="arch-badge arch-bedrock">Bedrock Claude Sonnet</span>
+    </div>
+    <div class="stats" id="headerStats"></div>
+  </div>
+  <div class="tabs" id="tabBar"></div>
+  <div id="tabContents"></div>
+  <div class="footer">Ontology GraphRAG Benchmarks &mdash; Strands ReAct Agent + Neptune Analytics</div>
+</div>
+<script>
+const TRACES = [
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 1: Get basic information about the EGFR gene including symbol, name, chromosome location, and function",
+    "query": "MATCH (g:Gene {symbol: 'EGFR'}) RETURN g.symbol AS symbol, g.name AS name, g.chromosome AS chromosome, g.function AS function",
+    "result_count": 1,
+    "latency_ms": 20.9,
+    "traversal_path": "Gene",
+    "timestamp": "09:44:15.876"
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 2: Find the protein node with name EGFR to confirm dual nomenclature and get protein details",
+    "query": "MATCH (p:Protein {name: 'EGFR'}) RETURN p.name AS name, p.protein_class AS protein_class, p.cellular_location AS cellular_location, p.uniprot_id AS uniprot_id",
+    "result_count": 1,
+    "latency_ms": 23.6,
+    "traversal_path": "Protein",
+    "timestamp": "09:44:18.849"
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 3: Find pathogenic variants in the EGFR gene to assess genetic risk factors",
+    "query": "MATCH (v:Variant {gene_symbol: 'EGFR'}) RETURN v.rsid AS rsid, v.consequence AS consequence, v.clinical_significance AS clinical_significance",
+    "result_count": 1,
+    "latency_ms": 19.0,
+    "traversal_path": "Variant",
+    "timestamp": "09:44:21.785"
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 4: Find diseases associated with EGFR gene including association strength and evidence level",
+    "query": "MATCH (g:Gene {symbol: 'EGFR'})-[a:ASSOCIATED_WITH]->(d:Disease) RETURN d.name AS disease, d.category AS category, a.association_strength AS strength, a.evidence_level AS evidence_level",
+    "result_count": 1,
+    "latency_ms": 24.7,
+    "traversal_path": "Gene -> Disease",
+    "timestamp": "09:44:24.920"
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 5: Find drugs that target EGFR protein and their treatment indications with efficacy rates",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein) WHERE p.name = 'EGFR' OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease) RETURN drug.name AS drug, drug.mechanism AS mechanism, t.binding_affinity AS affinity, t.mechanism_type AS target_mechanism, collect(DISTINCT {disease: dis.name, efficacy: tr.efficacy_rate}) AS indications",
+    "result_count": 2,
+    "latency_ms": 40.5,
+    "traversal_path": "Protein -> Drug -> Disease",
+    "timestamp": "09:44:28.547"
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 6: Find clinical trials investigating the EGFR-targeting drugs (Osimertinib and Cetuximab)",
+    "query": "MATCH (ct:ClinicalTrial)-[:INVESTIGATES]->(d:Drug) WHERE d.name IN ['Osimertinib', 'Cetuximab'] RETURN ct.nct_id AS nct_id, ct.title AS title, ct.phase AS phase, ct.enrollment AS enrollment, ct.sponsor AS sponsor, ct.status AS status, d.name AS drug",
+    "result_count": 2,
+    "latency_ms": 35.6,
+    "traversal_path": "Drug -> ClinicalTrial",
+    "timestamp": "09:44:32.474"
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 7: Find adverse events reported in the clinical trials for EGFR-targeting drugs",
+    "query": "MATCH (ct:ClinicalTrial)-[r:REPORTS_AE]->(ae:AdverseEvent) WHERE ct.nct_id IN ['NCT02296125', 'NCT01908426'] RETURN ct.nct_id AS trial, ae.ae_id AS ae_id, ae.name AS adverse_event, ae.severity AS severity, ae.category AS category, r.incidence_rate AS incidence_rate, r.grade AS grade",
+    "result_count": 5,
+    "latency_ms": 26.9,
+    "traversal_path": "ClinicalTrial -> AdverseEvent",
+    "timestamp": "09:44:36.520"
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 1: Get basic information about the KRAS gene including symbol, name, chromosome location, and function",
+    "query": "MATCH (g:Gene {symbol: 'KRAS'}) RETURN g.symbol AS symbol, g.name AS name, g.chromosome AS chromosome, g.function AS function",
+    "result_count": 1,
+    "latency_ms": 24.2,
+    "traversal_path": "Gene",
+    "timestamp": "09:44:55.920"
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 2: Find the protein node with name KRAS to confirm dual nomenclature and get protein details",
+    "query": "MATCH (p:Protein {name: 'KRAS'}) RETURN p.name AS name, p.protein_class AS protein_class, p.cellular_location AS cellular_location, p.uniprot_id AS uniprot_id",
+    "result_count": 1,
+    "latency_ms": 21.7,
+    "traversal_path": "Protein",
+    "timestamp": "09:44:59.352"
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 3: Find pathogenic variants in the KRAS gene to assess genetic risk factors",
+    "query": "MATCH (v:Variant {gene_symbol: 'KRAS'}) RETURN v.rsid AS rsid, v.consequence AS consequence, v.clinical_significance AS clinical_significance",
+    "result_count": 1,
+    "latency_ms": 17.1,
+    "traversal_path": "Variant",
+    "timestamp": "09:45:02.944"
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 4: Find diseases associated with KRAS gene including association strength and evidence level",
+    "query": "MATCH (g:Gene {symbol: 'KRAS'})-[a:ASSOCIATED_WITH]->(d:Disease) RETURN d.name AS disease, d.category AS category, a.association_strength AS strength, a.evidence_level AS evidence_level",
+    "result_count": 1,
+    "latency_ms": 17.3,
+    "traversal_path": "Gene -> Disease",
+    "timestamp": "09:45:06.703"
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 5: Find drugs that target KRAS protein and their treatment indications with efficacy rates",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein) WHERE p.name = 'KRAS' OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease) RETURN drug.name AS drug, drug.mechanism AS mechanism, t.binding_affinity AS affinity, t.mechanism_type AS target_mechanism, collect(DISTINCT {disease: dis.name, efficacy: tr.efficacy_rate}) AS indications",
+    "result_count": 1,
+    "latency_ms": 23.3,
+    "traversal_path": "Protein -> Drug -> Disease",
+    "timestamp": "09:45:11.491"
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 6: Find clinical trials investigating the KRAS-targeting drug Sotorasib",
+    "query": "MATCH (ct:ClinicalTrial)-[:INVESTIGATES]->(d:Drug) WHERE d.name = 'Sotorasib' RETURN ct.nct_id AS nct_id, ct.title AS title, ct.phase AS phase, ct.enrollment AS enrollment, ct.sponsor AS sponsor, ct.status AS status, d.name AS drug",
+    "result_count": 1,
+    "latency_ms": 22.1,
+    "traversal_path": "Drug -> ClinicalTrial",
+    "timestamp": "09:45:15.666"
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 7: Find adverse events reported in the Sotorasib clinical trial",
+    "query": "MATCH (ct:ClinicalTrial)-[r:REPORTS_AE]->(ae:AdverseEvent) WHERE ct.nct_id = 'NCT03600883' RETURN ct.nct_id AS trial, ae.ae_id AS ae_id, ae.name AS adverse_event, ae.severity AS severity, ae.category AS category, r.incidence_rate AS incidence_rate, r.grade AS grade",
+    "result_count": 2,
+    "latency_ms": 27.1,
+    "traversal_path": "ClinicalTrial -> AdverseEvent",
+    "timestamp": "09:45:21.268"
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 1: Get basic information about the HER2 gene including symbol, name, chromosome location, and function",
+    "query": "MATCH (g:Gene {symbol: 'HER2'}) RETURN g.symbol AS symbol, g.name AS name, g.chromosome AS chromosome, g.function AS function",
+    "result_count": 1,
+    "latency_ms": 15.1,
+    "traversal_path": "Gene",
+    "timestamp": "09:45:42.102"
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 2: Find the protein node with name HER2 to confirm dual nomenclature and get protein details",
+    "query": "MATCH (p:Protein {name: 'HER2'}) RETURN p.name AS name, p.protein_class AS protein_class, p.cellular_location AS cellular_location, p.uniprot_id AS uniprot_id",
+    "result_count": 1,
+    "latency_ms": 18.3,
+    "traversal_path": "Protein",
+    "timestamp": "09:45:47.074"
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 3: Find pathogenic variants in the HER2 gene to assess genetic risk factors",
+    "query": "MATCH (v:Variant {gene_symbol: 'HER2'}) RETURN v.rsid AS rsid, v.consequence AS consequence, v.clinical_significance AS clinical_significance",
+    "result_count": 1,
+    "latency_ms": 40.4,
+    "traversal_path": "Variant",
+    "timestamp": "09:45:50.612"
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 4: Find diseases associated with HER2 gene including association strength and evidence level",
+    "query": "MATCH (g:Gene {symbol: 'HER2'})-[a:ASSOCIATED_WITH]->(d:Disease) RETURN d.name AS disease, d.category AS category, a.association_strength AS strength, a.evidence_level AS evidence_level",
+    "result_count": 1,
+    "latency_ms": 19.8,
+    "traversal_path": "Gene -> Disease",
+    "timestamp": "09:45:54.603"
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 5: Find drugs that target HER2 protein and their treatment indications with efficacy rates",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein) WHERE p.name = 'HER2' OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease) RETURN drug.name AS drug, drug.mechanism AS mechanism, t.binding_affinity AS affinity, t.mechanism_type AS target_mechanism, collect(DISTINCT {disease: dis.name, efficacy: tr.efficacy_rate}) AS indications",
+    "result_count": 1,
+    "latency_ms": 25.0,
+    "traversal_path": "Protein -> Drug -> Disease",
+    "timestamp": "09:45:59.811"
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 6: Find clinical trials investigating the HER2-targeting drug Trastuzumab",
+    "query": "MATCH (ct:ClinicalTrial)-[:INVESTIGATES]->(d:Drug) WHERE d.name = 'Trastuzumab' RETURN ct.nct_id AS nct_id, ct.title AS title, ct.phase AS phase, ct.enrollment AS enrollment, ct.sponsor AS sponsor, ct.status AS status, d.name AS drug",
+    "result_count": 1,
+    "latency_ms": 24.2,
+    "traversal_path": "Drug -> ClinicalTrial",
+    "timestamp": "09:46:04.687"
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 7: Find adverse events reported in the Trastuzumab clinical trial",
+    "query": "MATCH (ct:ClinicalTrial)-[r:REPORTS_AE]->(ae:AdverseEvent) WHERE ct.nct_id = 'NCT01120184' RETURN ct.nct_id AS trial, ae.ae_id AS ae_id, ae.name AS adverse_event, ae.severity AS severity, ae.category AS category, r.incidence_rate AS incidence_rate, r.grade AS grade",
+    "result_count": 2,
+    "latency_ms": 21.9,
+    "traversal_path": "ClinicalTrial -> AdverseEvent",
+    "timestamp": "09:46:09.476"
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 1: Get basic information about the BRAF gene including symbol, name, chromosome location, and function",
+    "query": "MATCH (g:Gene {symbol: 'BRAF'}) RETURN g.symbol AS symbol, g.name AS name, g.chromosome AS chromosome, g.function AS function",
+    "result_count": 1,
+    "latency_ms": 20.4,
+    "traversal_path": "Gene",
+    "timestamp": "09:46:32.079"
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 2: Find the protein node with name BRAF to confirm dual nomenclature and get protein details",
+    "query": "MATCH (p:Protein {name: 'BRAF'}) RETURN p.name AS name, p.protein_class AS protein_class, p.cellular_location AS cellular_location, p.uniprot_id AS uniprot_id",
+    "result_count": 1,
+    "latency_ms": 17.3,
+    "traversal_path": "Protein",
+    "timestamp": "09:46:36.872"
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 3: Find pathogenic variants in the BRAF gene to assess genetic risk factors",
+    "query": "MATCH (v:Variant {gene_symbol: 'BRAF'}) RETURN v.rsid AS rsid, v.consequence AS consequence, v.clinical_significance AS clinical_significance",
+    "result_count": 1,
+    "latency_ms": 20.0,
+    "traversal_path": "Variant",
+    "timestamp": "09:46:41.451"
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 4: Find diseases associated with BRAF gene including association strength and evidence level",
+    "query": "MATCH (g:Gene {symbol: 'BRAF'})-[a:ASSOCIATED_WITH]->(d:Disease) RETURN d.name AS disease, d.category AS category, a.association_strength AS strength, a.evidence_level AS evidence_level",
+    "result_count": 2,
+    "latency_ms": 19.5,
+    "traversal_path": "Gene -> Disease",
+    "timestamp": "09:46:45.480"
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 5: Find drugs that target BRAF protein and their treatment indications with efficacy rates",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein) WHERE p.name = 'BRAF' OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease) RETURN drug.name AS drug, drug.mechanism AS mechanism, t.binding_affinity AS affinity, t.mechanism_type AS target_mechanism, collect(DISTINCT {disease: dis.name, efficacy: tr.efficacy_rate}) AS indications",
+    "result_count": 1,
+    "latency_ms": 26.5,
+    "traversal_path": "Protein -> Drug -> Disease",
+    "timestamp": "09:46:50.375"
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 6: Find clinical trials investigating the BRAF-targeting drug Dabrafenib",
+    "query": "MATCH (ct:ClinicalTrial)-[:INVESTIGATES]->(d:Drug) WHERE d.name = 'Dabrafenib' RETURN ct.nct_id AS nct_id, ct.title AS title, ct.phase AS phase, ct.enrollment AS enrollment, ct.sponsor AS sponsor, ct.status AS status, d.name AS drug",
+    "result_count": 1,
+    "latency_ms": 22.1,
+    "traversal_path": "Drug -> ClinicalTrial",
+    "timestamp": "09:46:55.402"
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 7: Find adverse events reported in the Dabrafenib clinical trial",
+    "query": "MATCH (ct:ClinicalTrial)-[r:REPORTS_AE]->(ae:AdverseEvent) WHERE ct.nct_id = 'NCT01682083' RETURN ct.nct_id AS trial, ae.ae_id AS ae_id, ae.name AS adverse_event, ae.severity AS severity, ae.category AS category, r.incidence_rate AS incidence_rate, r.grade AS grade",
+    "result_count": 2,
+    "latency_ms": 23.8,
+    "traversal_path": "ClinicalTrial -> AdverseEvent",
+    "timestamp": "09:47:06.655"
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 1: Get basic information about the BRCA1 gene including symbol, name, chromosome location, and function",
+    "query": "MATCH (g:Gene {symbol: 'BRCA1'}) RETURN g.symbol AS symbol, g.name AS name, g.chromosome AS chromosome, g.function AS function",
+    "result_count": 1,
+    "latency_ms": 25.5,
+    "traversal_path": "Gene",
+    "timestamp": "09:47:31.644"
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 2: Find the protein node with name BRCA1 to confirm dual nomenclature and get protein details",
+    "query": "MATCH (p:Protein {name: 'BRCA1'}) RETURN p.name AS name, p.protein_class AS protein_class, p.cellular_location AS cellular_location, p.uniprot_id AS uniprot_id",
+    "result_count": 1,
+    "latency_ms": 15.7,
+    "traversal_path": "Protein",
+    "timestamp": "09:47:35.462"
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 3: Find pathogenic variants in the BRCA1 gene to assess genetic risk factors",
+    "query": "MATCH (v:Variant {gene_symbol: 'BRCA1'}) RETURN v.rsid AS rsid, v.consequence AS consequence, v.clinical_significance AS clinical_significance",
+    "result_count": 1,
+    "latency_ms": 17.4,
+    "traversal_path": "Variant",
+    "timestamp": "09:47:39.330"
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 4: Find diseases associated with BRCA1 gene including association strength and evidence level",
+    "query": "MATCH (g:Gene {symbol: 'BRCA1'})-[a:ASSOCIATED_WITH]->(d:Disease) RETURN d.name AS disease, d.category AS category, a.association_strength AS strength, a.evidence_level AS evidence_level",
+    "result_count": 1,
+    "latency_ms": 17.1,
+    "traversal_path": "Gene -> Disease",
+    "timestamp": "09:47:43.721"
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 5: Find drugs that target BRCA1 protein and their treatment indications with efficacy rates",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein) WHERE p.name = 'BRCA1' OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease) RETURN drug.name AS drug, drug.mechanism AS mechanism, t.binding_affinity AS affinity, t.mechanism_type AS target_mechanism, collect(DISTINCT {disease: dis.name, efficacy: tr.efficacy_rate}) AS indications",
+    "result_count": 1,
+    "latency_ms": 21.8,
+    "traversal_path": "Protein -> Drug -> Disease",
+    "timestamp": "09:47:48.383"
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 6: Find clinical trials investigating the BRCA1-targeting drug Olaparib",
+    "query": "MATCH (ct:ClinicalTrial)-[:INVESTIGATES]->(d:Drug) WHERE d.name = 'Olaparib' RETURN ct.nct_id AS nct_id, ct.title AS title, ct.phase AS phase, ct.enrollment AS enrollment, ct.sponsor AS sponsor, ct.status AS status, d.name AS drug",
+    "result_count": 1,
+    "latency_ms": 17.2,
+    "traversal_path": "Drug -> ClinicalTrial",
+    "timestamp": "09:47:53.849"
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "NeptuneQueryTool",
+    "content": "Step 7: Find adverse events reported in the Olaparib clinical trial",
+    "query": "MATCH (ct:ClinicalTrial)-[r:REPORTS_AE]->(ae:AdverseEvent) WHERE ct.nct_id = 'NCT02000622' RETURN ct.nct_id AS trial, ae.ae_id AS ae_id, ae.name AS adverse_event, ae.severity AS severity, ae.category AS category, r.incidence_rate AS incidence_rate, r.grade AS grade",
+    "result_count": 2,
+    "latency_ms": 17.7,
+    "traversal_path": "ClinicalTrial -> AdverseEvent",
+    "timestamp": "09:47:58.960"
+  }
+];
+const SUMMARIES = {
+  "EGFR": {
+    "response_preview": "# COMPREHENSIVE EGFR INVESTIGATION SUMMARY\n\n## Gene and Protein Identity\n- **Gene Symbol**: EGFR (Epidermal Growth Factor Receptor)\n- **Chromosome Location**: 7\n- **Function**: Cell growth and proliferation\n- **Protein Class**: Receptor tyrosine kinase\n- **Cellular Location**: Cell membrane\n- **UniProt ID**: P00533\n\n## Genetic Risk Factors\n- **Pathogenic Variant**: rs121434568 (L858R activating mutation)\n- **Clinical Significance**: Pathogenic - known oncogenic driver mutation\n\n## Disease Associ",
+    "execution_time_ms": 39779.0,
+    "queries_executed": 7
+  },
+  "KRAS": {
+    "response_preview": "# COMPREHENSIVE KRAS INVESTIGATION SUMMARY\n\n## Gene and Protein Identity\n- **Gene Symbol**: KRAS (KRAS Proto-Oncogene)\n- **Chromosome Location**: 12\n- **Function**: Cell signaling\n- **Protein Class**: GTPase\n- **Cellular Location**: Cell membrane\n- **UniProt ID**: P01116\n\n## Genetic Risk Factors\n- **Pathogenic Variant**: rs28934578 (G12C oncogenic mutation)\n- **Clinical Significance**: Pathogenic - one of the most common KRAS mutations in cancer\n\n## Disease Associations\n- **Primary Association**",
+    "execution_time_ms": 45978.6,
+    "queries_executed": 7
+  },
+  "HER2": {
+    "response_preview": "# COMPREHENSIVE HER2 INVESTIGATION SUMMARY\n\n## Gene and Protein Identity\n- **Gene Symbol**: HER2 (Human Epidermal Growth Factor Receptor 2)\n- **Chromosome Location**: 17\n- **Function**: Cell growth\n- **Protein Class**: Receptor tyrosine kinase\n- **Cellular Location**: Cell membrane\n- **UniProt ID**: P04626\n\n## Genetic Risk Factors\n- **Pathogenic Variant**: rs11547328 (Amplification proxy V842I)\n- **Clinical Significance**: Pathogenic - associated with HER2 gene amplification and overexpression\n\n",
+    "execution_time_ms": 49509.6,
+    "queries_executed": 7
+  },
+  "BRAF": {
+    "response_preview": "# COMPREHENSIVE BRAF INVESTIGATION SUMMARY\n\n## Gene and Protein Identity\n- **Gene Symbol**: BRAF (B-Raf Proto-Oncogene)\n- **Chromosome Location**: 7\n- **Function**: Serine/threonine kinase in MAPK/ERK signaling\n- **Protein Class**: Serine/threonine kinase\n- **Cellular Location**: Cytoplasm\n- **UniProt ID**: P15056\n\n## Genetic Risk Factors\n- **Pathogenic Variant**: rs113488022 (V600E - most common BRAF mutation)\n- **Clinical Significance**: Pathogenic - constitutively activating mutation driving ",
+    "execution_time_ms": 60139.9,
+    "queries_executed": 7
+  },
+  "BRCA1": {
+    "response_preview": "# COMPREHENSIVE BRCA1 INVESTIGATION SUMMARY\n\n## Gene and Protein Identity\n- **Gene Symbol**: BRCA1 (Breast Cancer Gene 1)\n- **Chromosome Location**: 17\n- **Function**: DNA repair (homologous recombination)\n- **Protein Class**: DNA repair protein\n- **Cellular Location**: Nucleus\n- **UniProt ID**: P38398\n\n## Genetic Risk Factors\n- **Pathogenic Variant**: rs80357713 (Nonsense premature stop)\n- **Clinical Significance**: Pathogenic - loss-of-function mutation leading to defective DNA repair\n- **Here",
+    "execution_time_ms": 56970.9,
+    "queries_executed": 7
+  }
+};
+const GENES = ["EGFR", "KRAS", "HER2", "BRAF", "BRCA1"];
+
+const totalQueries = TRACES.filter(t => t.type === 'ACT').length;
+const totalLatency = TRACES.filter(t => t.type === 'ACT').reduce((a,b) => a + b.latency_ms, 0);
+const totalTime = Object.values(SUMMARIES).reduce((a,b) => a + b.execution_time_ms, 0);
+
+document.getElementById('headerStats').innerHTML = `
+  <div><div class="stat-val">${GENES.length}</div><div class="stat-label">Genes Investigated</div></div>
+  <div><div class="stat-val">${totalQueries}</div><div class="stat-label">Neptune Queries</div></div>
+  <div><div class="stat-val">${totalLatency.toFixed(0)}ms</div><div class="stat-label">Query Latency</div></div>
+  <div><div class="stat-val">${(totalTime/1000).toFixed(1)}s</div><div class="stat-label">Total Agent Time</div></div>
+`;
+
+const tabBar = document.getElementById('tabBar');
+const tabContents = document.getElementById('tabContents');
+const tabs = [];
+
+tabs.push({ id: 'timeline', label: 'ReAct Timeline', content: buildTimeline() });
+GENES.forEach(g => tabs.push({ id: 'gene-'+g, label: g, content: buildGeneTab(g) }));
+
+tabs.forEach((t, i) => {
+  const el = document.createElement('div');
+  el.className = 'tab' + (i===0?' active':'');
+  el.textContent = t.label;
+  el.onclick = () => switchTab(t.id);
+  el.dataset.id = t.id;
+  tabBar.appendChild(el);
+  const c = document.createElement('div');
+  c.className = 'tab-content' + (i===0?' active':'');
+  c.id = 'content-'+t.id;
+  c.innerHTML = t.content;
+  tabContents.appendChild(c);
+});
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.id===id));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='content-'+id));
+}
+
+function buildTimeline() {
+  let html = '<div class="timeline">';
+  let prevGene = '';
+  TRACES.forEach(t => {
+    if (t.agent !== prevGene) {
+      html += `<div style="text-align:center;padding:10px;font-weight:700;color:#ff9800;font-size:0.85em;">&mdash; ${t.agent} &mdash;</div>`;
+      prevGene = t.agent;
+    }
+    html += `<div class="tl-step tl-act">
+      <div class="step-hdr">
+        <span class="badge">${t.type}</span>
+        <span class="step-agent">#${t.iteration}</span>
+        <span class="step-metrics">${t.result_count} results | ${t.latency_ms.toFixed(1)}ms</span>
+      </div>
+      <div class="step-body">${t.content}</div>
+      ${t.traversal_path ? `<div class="step-path">Path: ${t.traversal_path}</div>` : ''}
+      ${t.query ? `<div class="step-query">${t.query}</div>` : ''}
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildGeneTab(gene) {
+  const s = SUMMARIES[gene] || {};
+  return `<div class="gene-card">
+    <h3>${gene} Investigation</h3>
+    <div class="info-row"><span class="info-label">Queries Executed</span><span class="info-value">${s.queries_executed||0}</span></div>
+    <div class="info-row"><span class="info-label">Agent Time</span><span class="info-value">${(s.execution_time_ms||0).toFixed(0)}ms</span></div>
+  </div>
+  <div class="gene-card">
+    <h3>Agent Response</h3>
+    <div class="agent-response">${(s.response_preview||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+  </div>`;
+}
+</script>
+</body>
+</html>

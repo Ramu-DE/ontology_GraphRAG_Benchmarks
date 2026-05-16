@@ -1,0 +1,41 @@
+{
+  "investigation_date": "2026-05-16T09:48:25.886949",
+  "architecture": {
+    "agent_framework": "AWS Strands Agents SDK",
+    "llm": "Bedrock Claude Sonnet",
+    "graph_database": "Neptune Analytics",
+    "graph_id": "g-0l15plmr0b",
+    "region": "us-west-2",
+    "query_language": "openCypher",
+    "vector_index": "Native HNSW (384 dimensions)"
+  },
+  "genes_investigated": [
+    "EGFR",
+    "KRAS",
+    "HER2",
+    "BRAF",
+    "BRCA1"
+  ],
+  "summary": {
+    "EGFR": {
+      "execution_time_ms": 39779.0,
+      "queries_executed": 7
+    },
+    "KRAS": {
+      "execution_time_ms": 45978.6,
+      "queries_executed": 7
+    },
+    "HER2": {
+      "execution_time_ms": 49509.6,
+      "queries_executed": 7
+    },
+    "BRAF": {
+      "execution_time_ms": 60139.9,
+      "queries_executed": 7
+    },
+    "BRCA1": {
+      "execution_time_ms": 56970.9,
+      "queries_executed": 7
+    }
+  }
+}
