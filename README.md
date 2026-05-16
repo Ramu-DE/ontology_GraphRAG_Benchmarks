@@ -28,7 +28,7 @@ RDF represents information as triples: `Subject -> Predicate -> Object`. Chain e
 
 > RDF doesn't replace your warehouse or lake. It's the context layer on top. The W3C stack turns data into knowledge.
 
-![W3C RDF Stack](Graph/Graph.png)
+![W3C RDF Stack](Graph/w3c_rdf_stack.png)
 
 ---
 

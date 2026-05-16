@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RDF: What Makes AI Understand</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #1a1333 40%, #24243e 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 40px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.03);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 50px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .header h1 {
+    font-size: 2.6em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #f8f8f8 0%, #a8b2d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+
+  .header h1 span {
+    background: linear-gradient(135deg, #64ffda 0%, #00bfa5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header .subtitle {
+    font-size: 1.1em;
+    font-weight: 300;
+    color: #8892b0;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Stack Section ── */
+  .stack-section {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-bottom: 50px;
+  }
+
+  .stack-visual {
+    flex: 0 0 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    perspective: 800px;
+  }
+
+  .layer {
+    position: relative;
+    height: 62px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    font-weight: 600;
+    font-size: 1.15em;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: 6px;
+    transform: rotateX(2deg);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .layer:hover {
+    transform: rotateX(0deg) translateX(8px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  .layer .icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 14px;
+    font-size: 1.1em;
+    backdrop-filter: blur(10px);
+  }
+
+  .layer-shacl  { background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%); }
+  .layer-owl    { background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%); }
+  .layer-sparql { background: linear-gradient(135deg, #3f51b5 0%, #283593 100%); }
+  .layer-rdfs   { background: linear-gradient(135deg, #0288d1 0%, #01579b 100%); }
+  .layer-rdf    { background: linear-gradient(135deg, #00897b 0%, #004d40 100%); }
+
+  .stack-descriptions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .desc-row {
+    height: 62px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    border-left: 3px solid transparent;
+    margin-bottom: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .desc-row:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .desc-shacl  { border-left-color: #e91e63; }
+  .desc-owl    { border-left-color: #9c27b0; }
+  .desc-sparql { border-left-color: #3f51b5; }
+  .desc-rdfs   { border-left-color: #0288d1; }
+  .desc-rdf    { border-left-color: #00897b; }
+
+  .desc-row .role {
+    font-weight: 700;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 80px;
+    margin-right: 14px;
+  }
+
+  .desc-shacl .role  { color: #f48fb1; }
+  .desc-owl .role    { color: #ce93d8; }
+  .desc-sparql .role { color: #9fa8da; }
+  .desc-rdfs .role   { color: #81d4fa; }
+  .desc-rdf .role    { color: #80cbc4; }
+
+  .desc-row .text {
+    font-size: 0.88em;
+    font-weight: 400;
+    color: #a8b2d1;
+    line-height: 1.4;
+  }
+
+  /* ── Bottom Section ── */
+  .bottom-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .card h3 {
+    font-size: 1em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+    color: #64ffda;
+  }
+
+  /* ── Triple Flow ── */
+  .triple-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 22px;
+  }
+
+  .triple-node {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    text-align: center;
+  }
+
+  .triple-subject   { background: linear-gradient(135deg, #e91e63, #c2185b); color: #fff; }
+  .triple-predicate { background: linear-gradient(135deg, #3f51b5, #283593); color: #fff; }
+  .triple-object    { background: linear-gradient(135deg, #00897b, #004d40); color: #fff; }
+
+  .triple-arrow {
+    font-size: 1.4em;
+    color: #64ffda;
+    margin: 0 6px;
+    font-weight: 300;
+  }
+
+  .triple-examples {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78em;
+    color: #8892b0;
+    line-height: 2;
+  }
+
+  .triple-examples .ex-subject   { color: #f48fb1; }
+  .triple-examples .ex-predicate { color: #9fa8da; }
+  .triple-examples .ex-object    { color: #80cbc4; }
+  .triple-examples .ex-arrow     { color: #64ffda; }
+
+  .chain-note {
+    margin-top: 16px;
+    font-size: 0.85em;
+    color: #8892b0;
+    line-height: 1.6;
+    font-style: italic;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 14px;
+  }
+
+  /* ── Takeaways ── */
+  .takeaway-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .takeaway-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .takeaway-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    flex-shrink: 0;
+  }
+
+  .tk-1 .takeaway-icon { background: rgba(233,30,99,0.15); }
+  .tk-2 .takeaway-icon { background: rgba(63,81,181,0.15); }
+  .tk-3 .takeaway-icon { background: rgba(0,137,123,0.15); }
+  .tk-4 .takeaway-icon { background: rgba(156,39,176,0.15); }
+
+  .takeaway-text {
+    font-size: 0.82em;
+    color: #a8b2d1;
+    line-height: 1.5;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.8em;
+    color: #4a5568;
+    letter-spacing: 0.05em;
+  }
+
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>RDF: What Makes AI <span>Understand</span></h1>
+      <p class="subtitle">From infrastructure to intelligence. More meaning &gt; more data.</p>
+    </div>
+
+    <!-- Stack -->
+    <div class="stack-section">
+      <div class="stack-visual">
+        <div class="layer layer-shacl">
+          <div class="icon">&#10003;</div>
+          SHACL
+        </div>
+        <div class="layer layer-owl">
+          <div class="icon">&#128038;</div>
+          OWL
+        </div>
+        <div class="layer layer-sparql">
+          <div class="icon">&#128269;</div>
+          SPARQL
+        </div>
+        <div class="layer layer-rdfs">
+          <div class="icon">&#9649;</div>
+          RDFS
+        </div>
+        <div class="layer layer-rdf">
+          <div class="icon">&#9653;</div>
+          RDF
+        </div>
+      </div>
+
+      <div class="stack-descriptions">
+        <div class="desc-row desc-shacl">
+          <span class="role">Validate</span>
+          <span class="text">Enforce shapes and structural constraints on RDF graphs.</span>
+        </div>
+        <div class="desc-row desc-owl">
+          <span class="role">Reason</span>
+          <span class="text">Define rich ontologies (classes, properties, axioms) and enable inference of new knowledge.</span>
+        </div>
+        <div class="desc-row desc-sparql">
+          <span class="role">Query</span>
+          <span class="text">Standard query language for RDF graphs. Designed for relationship traversal, pattern matching, and federation.</span>
+        </div>
+        <div class="desc-row desc-rdfs">
+          <span class="role">Schema</span>
+          <span class="text">Provide basic schema vocabulary (classes, properties, domains, ranges, hierarchies).</span>
+        </div>
+        <div class="desc-row desc-rdf">
+          <span class="role">Model</span>
+          <span class="text">Foundation data model built on triples: Subject &rarr; Predicate &rarr; Object. Forms a directed labeled graph.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+
+      <!-- What RDF Actually Is -->
+      <div class="card">
+        <h3>What RDF Actually Is</h3>
+        <p style="font-size:0.88em; color:#a8b2d1; margin-bottom:16px;">RDF represents information as triples:</p>
+        <div class="triple-flow">
+          <div class="triple-node triple-subject">Subject</div>
+          <span class="triple-arrow">&rarr;</span>
+          <div class="triple-node triple-predicate">Predicate</div>
+          <span class="triple-arrow">&rarr;</span>
+          <div class="triple-node triple-object">Object</div>
+        </div>
+        <div class="triple-examples">
+          <span class="ex-subject">"Customer_99"</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-predicate">"operates_in"</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-object">"Region_APac"</span><br>
+          <span class="ex-subject">"Order_4821"</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-predicate">"belongs_to"</span>
+          <span class="ex-arrow">&rarr;</span>
+          <span class="ex-object">"Customer_99"</span>
+        </div>
+        <p class="chain-note">Chain enough triples and you get a graph that machines can traverse, reason over, and use as grounded context.</p>
+      </div>
+
+      <!-- Key Takeaways -->
+      <div class="card">
+        <h3>Key Takeaways</h3>
+        <div class="takeaway-grid">
+          <div class="takeaway-item tk-1">
+            <div class="takeaway-icon">&#128218;</div>
+            <div class="takeaway-text">RDF doesn't replace your warehouse or lake. It's the context layer on top.</div>
+          </div>
+          <div class="takeaway-item tk-2">
+            <div class="takeaway-icon">&#128300;</div>
+            <div class="takeaway-text">The W3C stack (RDF, SPARQL, OWL, SHACL) turns data into knowledge.</div>
+          </div>
+          <div class="takeaway-item tk-3">
+            <div class="takeaway-icon">&#129302;</div>
+            <div class="takeaway-text">AI systems need meaning, not just more data.</div>
+          </div>
+          <div class="takeaway-item tk-4">
+            <div class="takeaway-icon">&#128640;</div>
+            <div class="takeaway-text">The market is moving. Your architecture should too.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Biomedical Knowledge Graph &mdash; Ontology GraphRAG Benchmarks
+    </div>
+
+  </div>
+</body>
+</html>
