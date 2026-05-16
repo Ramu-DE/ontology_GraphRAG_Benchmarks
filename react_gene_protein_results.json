@@ -1,0 +1,595 @@
+{
+  "investigation_date": "2026-05-16T09:27:25.160566",
+  "genes_investigated": [
+    "EGFR",
+    "KRAS",
+    "HER2",
+    "BRAF",
+    "BRCA1"
+  ],
+  "execution_stats": [
+    {
+      "gene": "EGFR",
+      "total_ms": 3094.2,
+      "queries": 8,
+      "query_latency_ms": 3091.6,
+      "edges": 15,
+      "steps": 24
+    },
+    {
+      "gene": "KRAS",
+      "total_ms": 2938.2,
+      "queries": 8,
+      "query_latency_ms": 2935.7,
+      "edges": 9,
+      "steps": 24
+    },
+    {
+      "gene": "HER2",
+      "total_ms": 2950.6,
+      "queries": 8,
+      "query_latency_ms": 2948.1,
+      "edges": 9,
+      "steps": 24
+    },
+    {
+      "gene": "BRAF",
+      "total_ms": 2964.5,
+      "queries": 8,
+      "query_latency_ms": 2961.8,
+      "edges": 11,
+      "steps": 24
+    },
+    {
+      "gene": "BRCA1",
+      "total_ms": 3084.2,
+      "queries": 8,
+      "query_latency_ms": 3081.6,
+      "edges": 8,
+      "steps": 24
+    }
+  ],
+  "profiles": {
+    "EGFR": {
+      "gene_info": {
+        "symbol": "EGFR",
+        "name": "Epidermal Growth Factor Receptor",
+        "chromosome": 7,
+        "function": "Cell growth and proliferation",
+        "gene_id": "G001"
+      },
+      "protein_info": {
+        "name": "EGFR",
+        "protein_class": "Receptor tyrosine kinase",
+        "cellular_location": "Cell membrane",
+        "uniprot_id": "P00533",
+        "protein_id": "protein_P003"
+      },
+      "variants": [
+        {
+          "rsid": "rs121434568",
+          "consequence": "Missense (L858R - activating mutation)",
+          "significance": "Pathogenic",
+          "chromosome": 7,
+          "position": 55249063,
+          "ref": "C",
+          "alt": "T"
+        }
+      ],
+      "diseases": [
+        {
+          "disease": "Non-Small Cell Lung Cancer",
+          "category": "Oncology",
+          "icd10": "C34.9",
+          "prevalence": "High",
+          "strength": "Strong",
+          "evidence_level": "High"
+        }
+      ],
+      "drugs": [
+        {
+          "drug": "Osimertinib",
+          "mechanism": "EGFR T790M inhibitor",
+          "drug_type": "Small Molecule",
+          "status": "Approved",
+          "year": 2015,
+          "affinity": "Very High",
+          "target_mechanism": "Inhibitor",
+          "protein_target": "EGFR",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Non-Small Cell Lung Cancer",
+              "efficacy": 0.71
+            }
+          ]
+        },
+        {
+          "drug": "Cetuximab",
+          "mechanism": "EGFR monoclonal antibody",
+          "drug_type": "Monoclonal Antibody",
+          "status": "Approved",
+          "year": 2004,
+          "affinity": "High",
+          "target_mechanism": "Antagonist",
+          "protein_target": "EGFR",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Non-Small Cell Lung Cancer",
+              "efficacy": 0.35
+            },
+            {
+              "category": "Oncology",
+              "disease": "Colorectal Cancer",
+              "efficacy": 0.42
+            }
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "drug": "Cetuximab",
+          "trial_title": "Cetuximab + Chemotherapy in Colorectal Cancer",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 687,
+          "nct_id": "NCT01908426",
+          "sponsor": "Eli Lilly",
+          "start_date": "2013-07-01",
+          "disease": "Colorectal Cancer"
+        },
+        {
+          "drug": "Osimertinib",
+          "trial_title": "Osimertinib in EGFR T790M+ NSCLC (AURA3)",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 419,
+          "nct_id": "NCT02296125",
+          "sponsor": "AstraZeneca",
+          "start_date": "2014-09-01",
+          "disease": "Non-Small Cell Lung Cancer"
+        }
+      ],
+      "adverse_events_count": 5,
+      "co_targeting_drugs": [
+        {
+          "co_drug": "Cetuximab",
+          "mechanism": "EGFR monoclonal antibody"
+        },
+        {
+          "co_drug": "Osimertinib",
+          "mechanism": "EGFR T790M inhibitor"
+        }
+      ],
+      "pathways": [],
+      "risk_scores": {
+        "genetic_evidence_score": 40,
+        "therapeutic_coverage_score": 60,
+        "clinical_evidence_score": 70,
+        "safety_score": 70,
+        "overall_score": 60.0,
+        "risk_level": "Low Risk",
+        "evidence_grade": "B",
+        "factors": {
+          "severe_adverse_events": 1,
+          "moderate_adverse_events": 1,
+          "phase3_trials": 2,
+          "total_enrollment": 1106,
+          "strong_genetic_associations": 1,
+          "pathogenic_variants": 1,
+          "high_affinity_drugs": 2,
+          "co_targeting_drugs": 2,
+          "total_drugs": 2,
+          "total_diseases": 1
+        }
+      }
+    },
+    "KRAS": {
+      "gene_info": {
+        "symbol": "KRAS",
+        "name": "KRAS Proto-Oncogene",
+        "chromosome": 12,
+        "function": "Cell signaling",
+        "gene_id": "G002"
+      },
+      "protein_info": {
+        "name": "KRAS",
+        "protein_class": "GTPase",
+        "cellular_location": "Cell membrane",
+        "uniprot_id": "P01116",
+        "protein_id": "protein_P026"
+      },
+      "variants": [
+        {
+          "rsid": "rs28934578",
+          "consequence": "Missense (G12C - oncogenic)",
+          "significance": "Pathogenic",
+          "chromosome": 12,
+          "position": 25398284,
+          "ref": "C",
+          "alt": "A"
+        }
+      ],
+      "diseases": [
+        {
+          "disease": "Non-Small Cell Lung Cancer",
+          "category": "Oncology",
+          "icd10": "C34.9",
+          "prevalence": "High",
+          "strength": "Strong",
+          "evidence_level": "High"
+        },
+        {
+          "disease": "Colorectal Cancer",
+          "category": "Oncology",
+          "icd10": "C18",
+          "prevalence": "High",
+          "strength": "Strong",
+          "evidence_level": "High"
+        }
+      ],
+      "drugs": [
+        {
+          "drug": "Sotorasib",
+          "mechanism": "KRAS G12C inhibitor",
+          "drug_type": "Small Molecule",
+          "status": "Approved",
+          "year": 2021,
+          "affinity": "Very High",
+          "target_mechanism": "Inhibitor",
+          "protein_target": "KRAS",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Non-Small Cell Lung Cancer",
+              "efficacy": 0.37
+            }
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "drug": "Sotorasib",
+          "trial_title": "Sotorasib in KRAS G12C NSCLC (CodeBreaK 200)",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 345,
+          "nct_id": "NCT03600883",
+          "sponsor": "Amgen",
+          "start_date": "2018-09-01",
+          "disease": "Non-Small Cell Lung Cancer"
+        }
+      ],
+      "adverse_events_count": 2,
+      "co_targeting_drugs": [],
+      "pathways": [],
+      "risk_scores": {
+        "genetic_evidence_score": 65,
+        "therapeutic_coverage_score": 30,
+        "clinical_evidence_score": 25,
+        "safety_score": 100,
+        "overall_score": 51.2,
+        "risk_level": "Low Risk",
+        "evidence_grade": "C",
+        "factors": {
+          "severe_adverse_events": 0,
+          "moderate_adverse_events": 0,
+          "phase3_trials": 1,
+          "total_enrollment": 345,
+          "strong_genetic_associations": 2,
+          "pathogenic_variants": 1,
+          "high_affinity_drugs": 1,
+          "co_targeting_drugs": 0,
+          "total_drugs": 1,
+          "total_diseases": 2
+        }
+      }
+    },
+    "HER2": {
+      "gene_info": {
+        "symbol": "HER2",
+        "name": "Human Epidermal Growth Factor Receptor 2",
+        "chromosome": 17,
+        "function": "Cell growth",
+        "gene_id": "G007"
+      },
+      "protein_info": {
+        "name": "HER2",
+        "protein_class": "Receptor tyrosine kinase",
+        "cellular_location": "Cell membrane",
+        "uniprot_id": "P04626",
+        "protein_id": "protein_P004"
+      },
+      "variants": [
+        {
+          "rsid": "rs11547328",
+          "consequence": "Amplification proxy (V842I)",
+          "significance": "Pathogenic",
+          "chromosome": 17,
+          "position": 37881000,
+          "ref": "A",
+          "alt": "G"
+        }
+      ],
+      "diseases": [
+        {
+          "disease": "Breast Cancer",
+          "category": "Oncology",
+          "icd10": "C50.9",
+          "prevalence": "High",
+          "strength": "Strong",
+          "evidence_level": "High"
+        }
+      ],
+      "drugs": [
+        {
+          "drug": "Trastuzumab",
+          "mechanism": "HER2 inhibitor",
+          "drug_type": "Monoclonal Antibody",
+          "status": "Approved",
+          "year": 1998,
+          "affinity": "Very High",
+          "target_mechanism": "Antagonist",
+          "protein_target": "HER2",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Breast Cancer",
+              "efficacy": 0.52
+            }
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "drug": "Trastuzumab",
+          "trial_title": "Trastuzumab + Pertuzumab in HER2+ Breast Cancer (CLEOPATRA)",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 808,
+          "nct_id": "NCT01120184",
+          "sponsor": "Roche",
+          "start_date": "2008-02-01",
+          "disease": "Breast Cancer"
+        }
+      ],
+      "adverse_events_count": 2,
+      "co_targeting_drugs": [],
+      "pathways": [
+        {
+          "pathway": "HER2/ERBB Signaling",
+          "category": "Cell Growth"
+        }
+      ],
+      "risk_scores": {
+        "genetic_evidence_score": 40,
+        "therapeutic_coverage_score": 30,
+        "clinical_evidence_score": 35,
+        "safety_score": 90,
+        "overall_score": 46.0,
+        "risk_level": "Low Risk",
+        "evidence_grade": "C",
+        "factors": {
+          "severe_adverse_events": 0,
+          "moderate_adverse_events": 1,
+          "phase3_trials": 1,
+          "total_enrollment": 808,
+          "strong_genetic_associations": 1,
+          "pathogenic_variants": 1,
+          "high_affinity_drugs": 1,
+          "co_targeting_drugs": 0,
+          "total_drugs": 1,
+          "total_diseases": 1
+        }
+      }
+    },
+    "BRAF": {
+      "gene_info": {
+        "symbol": "BRAF",
+        "name": "B-Raf Proto-Oncogene",
+        "chromosome": 7,
+        "function": "Serine/threonine kinase in MAPK/ERK signaling",
+        "gene_id": "G011"
+      },
+      "protein_info": {
+        "name": "BRAF",
+        "protein_class": "Serine/threonine kinase",
+        "cellular_location": "Cytoplasm",
+        "uniprot_id": "P15056",
+        "protein_id": "protein_P017"
+      },
+      "variants": [
+        {
+          "rsid": "rs113488022",
+          "consequence": "Missense (V600E - oncogenic, most common BRAF mutation)",
+          "significance": "Pathogenic",
+          "chromosome": 7,
+          "position": 140453136,
+          "ref": "A",
+          "alt": "T"
+        }
+      ],
+      "diseases": [
+        {
+          "disease": "Melanoma",
+          "category": "Oncology",
+          "icd10": "C43.9",
+          "prevalence": "Medium",
+          "strength": "Very Strong",
+          "evidence_level": "High"
+        },
+        {
+          "disease": "Colorectal Cancer",
+          "category": "Oncology",
+          "icd10": "C18",
+          "prevalence": "High",
+          "strength": "Strong",
+          "evidence_level": "High"
+        },
+        {
+          "disease": "Non-Small Cell Lung Cancer",
+          "category": "Oncology",
+          "icd10": "C34.9",
+          "prevalence": "High",
+          "strength": "Moderate",
+          "evidence_level": "High"
+        }
+      ],
+      "drugs": [
+        {
+          "drug": "Dabrafenib",
+          "mechanism": "BRAF V600E inhibitor",
+          "drug_type": "Small Molecule",
+          "status": "Approved",
+          "year": 2013,
+          "affinity": "Very High",
+          "target_mechanism": "Inhibitor",
+          "protein_target": "BRAF",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Non-Small Cell Lung Cancer",
+              "efficacy": 0.36
+            },
+            {
+              "category": "Oncology",
+              "disease": "Melanoma",
+              "efficacy": 0.5
+            }
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "drug": "Dabrafenib",
+          "trial_title": "Dabrafenib + Trametinib in BRAF V600 Melanoma",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 870,
+          "nct_id": "NCT01682083",
+          "sponsor": "Novartis",
+          "start_date": "2012-08-01",
+          "disease": "Melanoma"
+        }
+      ],
+      "adverse_events_count": 2,
+      "co_targeting_drugs": [],
+      "pathways": [],
+      "risk_scores": {
+        "genetic_evidence_score": 65,
+        "therapeutic_coverage_score": 30,
+        "clinical_evidence_score": 35,
+        "safety_score": 80,
+        "overall_score": 50.2,
+        "risk_level": "Low Risk",
+        "evidence_grade": "C",
+        "factors": {
+          "severe_adverse_events": 1,
+          "moderate_adverse_events": 0,
+          "phase3_trials": 1,
+          "total_enrollment": 870,
+          "strong_genetic_associations": 2,
+          "pathogenic_variants": 1,
+          "high_affinity_drugs": 1,
+          "co_targeting_drugs": 0,
+          "total_drugs": 1,
+          "total_diseases": 3
+        }
+      }
+    },
+    "BRCA1": {
+      "gene_info": {
+        "symbol": "BRCA1",
+        "name": "Breast Cancer Gene 1",
+        "chromosome": 17,
+        "function": "DNA repair",
+        "gene_id": "G004"
+      },
+      "protein_info": {
+        "name": "BRCA1",
+        "protein_class": "DNA repair",
+        "cellular_location": "Nucleus",
+        "uniprot_id": "P38398",
+        "protein_id": "protein_P027"
+      },
+      "variants": [
+        {
+          "rsid": "rs80357713",
+          "consequence": "Nonsense (premature stop)",
+          "significance": "Pathogenic",
+          "chromosome": 17,
+          "position": 41215920,
+          "ref": "G",
+          "alt": "A"
+        }
+      ],
+      "diseases": [
+        {
+          "disease": "Breast Cancer",
+          "category": "Oncology",
+          "icd10": "C50.9",
+          "prevalence": "High",
+          "strength": "Very Strong",
+          "evidence_level": "High"
+        }
+      ],
+      "drugs": [
+        {
+          "drug": "Olaparib",
+          "mechanism": "PARP inhibitor (BRCA1 synthetic lethality)",
+          "drug_type": "Small Molecule",
+          "status": "Approved",
+          "year": 2014,
+          "affinity": "High",
+          "target_mechanism": "Synthetic Lethality",
+          "protein_target": "BRCA1",
+          "indications": [
+            {
+              "category": "Oncology",
+              "disease": "Breast Cancer",
+              "efficacy": 0.6
+            }
+          ]
+        }
+      ],
+      "trials": [
+        {
+          "drug": "Olaparib",
+          "trial_title": "Olaparib in BRCA-Mutated Breast Cancer (OlympiAD)",
+          "phase": "Phase 3",
+          "status": "Completed",
+          "enrollment": 302,
+          "nct_id": "NCT02000622",
+          "sponsor": "AstraZeneca",
+          "start_date": "2014-04-01",
+          "disease": "Breast Cancer"
+        }
+      ],
+      "adverse_events_count": 2,
+      "co_targeting_drugs": [],
+      "pathways": [],
+      "risk_scores": {
+        "genetic_evidence_score": 40,
+        "therapeutic_coverage_score": 30,
+        "clinical_evidence_score": 25,
+        "safety_score": 90,
+        "overall_score": 43.0,
+        "risk_level": "Low Risk",
+        "evidence_grade": "C",
+        "factors": {
+          "severe_adverse_events": 0,
+          "moderate_adverse_events": 1,
+          "phase3_trials": 1,
+          "total_enrollment": 302,
+          "strong_genetic_associations": 1,
+          "pathogenic_variants": 1,
+          "high_affinity_drugs": 1,
+          "co_targeting_drugs": 0,
+          "total_drugs": 1,
+          "total_diseases": 1
+        }
+      }
+    }
+  }
+}

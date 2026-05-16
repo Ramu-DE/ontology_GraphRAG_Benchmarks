@@ -1,0 +1,3169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gene-Protein ReAct Agent: Traversal Visualization</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0c29 0%, #1a1333 40%, #24243e 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 30px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .header h1 {
+    font-size: 2em;
+    font-weight: 800;
+    background: linear-gradient(135deg, #64ffda, #00bfa5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .header p { color: #8892b0; font-size: 0.95em; }
+  .header .stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 16px;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-val {
+    font-size: 1.8em;
+    font-weight: 800;
+    color: #64ffda;
+  }
+  .stat-label {
+    font-size: 0.75em;
+    color: #8892b0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Tab navigation */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 10px 20px;
+    border-radius: 10px 10px 0 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-bottom: none;
+    color: #8892b0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85em;
+    transition: all 0.2s;
+  }
+  .tab:hover { background: rgba(255,255,255,0.08); color: #e0e0e0; }
+  .tab.active {
+    background: rgba(100,255,218,0.08);
+    color: #64ffda;
+    border-color: rgba(100,255,218,0.2);
+  }
+  .tab-content {
+    display: none;
+    background: rgba(255,255,255,0.03);
+    border-radius: 0 16px 16px 16px;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 24px;
+  }
+  .tab-content.active { display: block; }
+
+  /* ReAct Steps */
+  .react-timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+  .react-timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #64ffda, #3f51b5, #e91e63);
+  }
+  .react-step {
+    position: relative;
+    margin-bottom: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    border-left: 3px solid;
+    transition: all 0.2s;
+  }
+  .react-step:hover { transform: translateX(4px); }
+  .react-step::before {
+    content: '';
+    position: absolute;
+    left: -23px;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .step-think {
+    background: rgba(100,255,218,0.06);
+    border-color: #64ffda;
+  }
+  .step-think::before { background: #64ffda; }
+  .step-act {
+    background: rgba(63,81,181,0.08);
+    border-color: #3f51b5;
+  }
+  .step-act::before { background: #3f51b5; }
+  .step-observe {
+    background: rgba(233,30,99,0.06);
+    border-color: #e91e63;
+  }
+  .step-observe::before { background: #e91e63; }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .step-badge {
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .step-think .step-badge { background: rgba(100,255,218,0.2); color: #64ffda; }
+  .step-act .step-badge { background: rgba(63,81,181,0.25); color: #9fa8da; }
+  .step-observe .step-badge { background: rgba(233,30,99,0.2); color: #f48fb1; }
+  .step-agent { font-size: 0.78em; color: #8892b0; }
+  .step-metrics {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em;
+    color: #64ffda;
+    margin-left: auto;
+  }
+  .step-content {
+    font-size: 0.85em;
+    color: #a8b2d1;
+    line-height: 1.5;
+  }
+  .step-query {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em;
+    color: #80cbc4;
+    white-space: pre-wrap;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .step-traversal {
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72em;
+    color: #ce93d8;
+  }
+  .iter-divider {
+    text-align: center;
+    padding: 10px;
+    font-weight: 700;
+    color: #64ffda;
+    font-size: 0.85em;
+    letter-spacing: 0.06em;
+  }
+
+  /* Gene Cards */
+  .gene-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+  }
+  .gene-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .gene-card h3 {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #64ffda;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.82em;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .info-label { color: #8892b0; }
+  .info-value { color: #e0e0e0; font-weight: 500; }
+
+  /* Score bars */
+  .score-section { margin-top: 16px; }
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .score-label {
+    flex: 0 0 160px;
+    font-size: 0.78em;
+    color: #8892b0;
+  }
+  .score-bar-bg {
+    flex: 1;
+    height: 20px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .score-bar {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 0.7em;
+    font-weight: 700;
+    color: rgba(0,0,0,0.7);
+  }
+  .score-green { background: linear-gradient(90deg, #00897b, #64ffda); }
+  .score-blue { background: linear-gradient(90deg, #283593, #42a5f5); }
+  .score-purple { background: linear-gradient(90deg, #4a148c, #ce93d8); }
+  .score-amber { background: linear-gradient(90deg, #e65100, #ffb74d); }
+
+  /* Edge table */
+  .edge-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8em;
+  }
+  .edge-table th {
+    text-align: left;
+    padding: 8px 10px;
+    background: rgba(100,255,218,0.08);
+    color: #64ffda;
+    font-weight: 600;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .edge-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #a8b2d1;
+  }
+  .edge-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .rel-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .rel-ENCODES { background: rgba(0,137,123,0.2); color: #80cbc4; }
+  .rel-HAS_VARIANT { background: rgba(233,30,99,0.15); color: #f48fb1; }
+  .rel-ASSOCIATED_WITH { background: rgba(156,39,176,0.2); color: #ce93d8; }
+  .rel-TARGETS { background: rgba(63,81,181,0.2); color: #9fa8da; }
+  .rel-TREATS { background: rgba(100,255,218,0.15); color: #64ffda; }
+  .rel-INVESTIGATES { background: rgba(255,152,0,0.2); color: #ffb74d; }
+  .rel-REPORTS_AE { background: rgba(244,67,54,0.2); color: #ef9a9a; }
+  .rel-INHIBITS_PATHWAY { background: rgba(33,150,243,0.2); color: #90caf9; }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82em;
+  }
+  .compare-table th {
+    padding: 10px;
+    background: rgba(100,255,218,0.08);
+    color: #64ffda;
+    font-weight: 600;
+    text-align: center;
+  }
+  .compare-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    text-align: center;
+    color: #a8b2d1;
+  }
+  .compare-table td:first-child { text-align: left; color: #8892b0; }
+  .grade-A { color: #64ffda; font-weight: 700; }
+  .grade-B { color: #42a5f5; font-weight: 700; }
+  .grade-C { color: #ffb74d; font-weight: 700; }
+  .grade-D { color: #ef5350; font-weight: 700; }
+
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.75em;
+    color: #4a5568;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>Gene-Protein ReAct Agent</h1>
+  <p>AWS Strands + Neo4j Knowledge Graph &mdash; Multi-Agent Reasoning-Acting-Observing Loop</p>
+  <p style="margin-top:6px; font-size:0.85em; color:#a8b2d1;">
+    Gene symbols that serve as protein names: tracing the complete biological chain
+  </p>
+  <div class="stats" id="headerStats"></div>
+</div>
+
+<div class="tabs" id="tabBar"></div>
+<div id="tabContents"></div>
+
+<div class="footer">
+  Ontology GraphRAG Benchmarks &mdash; Gene-Protein ReAct Agent Visualization
+</div>
+
+</div>
+
+<script>
+const GENES = {
+  "EGFR": {
+    "gene_info": {
+      "symbol": "EGFR",
+      "name": "Epidermal Growth Factor Receptor",
+      "chromosome": 7,
+      "function": "Cell growth and proliferation",
+      "gene_id": "G001"
+    },
+    "protein_info": {
+      "name": "EGFR",
+      "protein_class": "Receptor tyrosine kinase",
+      "cellular_location": "Cell membrane",
+      "uniprot_id": "P00533",
+      "protein_id": "protein_P003"
+    },
+    "variants": [
+      {
+        "rsid": "rs121434568",
+        "consequence": "Missense (L858R - activating mutation)",
+        "significance": "Pathogenic",
+        "chromosome": 7,
+        "position": 55249063,
+        "ref": "C",
+        "alt": "T"
+      }
+    ],
+    "diseases": [
+      {
+        "disease": "Non-Small Cell Lung Cancer",
+        "category": "Oncology",
+        "icd10": "C34.9",
+        "prevalence": "High",
+        "strength": "Strong",
+        "evidence_level": "High"
+      }
+    ],
+    "drugs": [
+      {
+        "drug": "Osimertinib",
+        "mechanism": "EGFR T790M inhibitor",
+        "drug_type": "Small Molecule",
+        "status": "Approved",
+        "year": 2015,
+        "affinity": "Very High",
+        "target_mechanism": "Inhibitor",
+        "protein_target": "EGFR",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Non-Small Cell Lung Cancer",
+            "efficacy": 0.71
+          }
+        ]
+      },
+      {
+        "drug": "Cetuximab",
+        "mechanism": "EGFR monoclonal antibody",
+        "drug_type": "Monoclonal Antibody",
+        "status": "Approved",
+        "year": 2004,
+        "affinity": "High",
+        "target_mechanism": "Antagonist",
+        "protein_target": "EGFR",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Non-Small Cell Lung Cancer",
+            "efficacy": 0.35
+          },
+          {
+            "category": "Oncology",
+            "disease": "Colorectal Cancer",
+            "efficacy": 0.42
+          }
+        ]
+      }
+    ],
+    "trials": [
+      {
+        "drug": "Cetuximab",
+        "trial_title": "Cetuximab + Chemotherapy in Colorectal Cancer",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 687,
+        "nct_id": "NCT01908426",
+        "sponsor": "Eli Lilly",
+        "start_date": "2013-07-01",
+        "disease": "Colorectal Cancer"
+      },
+      {
+        "drug": "Osimertinib",
+        "trial_title": "Osimertinib in EGFR T790M+ NSCLC (AURA3)",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 419,
+        "nct_id": "NCT02296125",
+        "sponsor": "AstraZeneca",
+        "start_date": "2014-09-01",
+        "disease": "Non-Small Cell Lung Cancer"
+      }
+    ],
+    "adverse_events": [
+      {
+        "drug": "Osimertinib",
+        "event": "Immune-related pneumonitis",
+        "severity": "Severe",
+        "category": "Immune-related",
+        "frequency": "Uncommon",
+        "incidence_rate": 0.04,
+        "grade": 3,
+        "trial": "Osimertinib in EGFR T790M+ NSCLC (AURA3)"
+      },
+      {
+        "drug": "Cetuximab",
+        "event": "Hypoglycemia",
+        "severity": "Moderate",
+        "category": "Metabolic",
+        "frequency": "Common",
+        "incidence_rate": 0.78,
+        "grade": 1,
+        "trial": "Cetuximab + Chemotherapy in Colorectal Cancer"
+      },
+      {
+        "drug": "Cetuximab",
+        "event": "Diarrhea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.15,
+        "grade": 2,
+        "trial": "Cetuximab + Chemotherapy in Colorectal Cancer"
+      },
+      {
+        "drug": "Osimertinib",
+        "event": "Hypothyroidism",
+        "severity": "Mild",
+        "category": "Endocrine",
+        "frequency": "Common",
+        "incidence_rate": 0.12,
+        "grade": 1,
+        "trial": "Osimertinib in EGFR T790M+ NSCLC (AURA3)"
+      },
+      {
+        "drug": "Osimertinib",
+        "event": "Nausea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.08,
+        "grade": 2,
+        "trial": "Osimertinib in EGFR T790M+ NSCLC (AURA3)"
+      }
+    ],
+    "co_targeting_drugs": [
+      {
+        "co_drug": "Cetuximab",
+        "mechanism": "EGFR monoclonal antibody"
+      },
+      {
+        "co_drug": "Osimertinib",
+        "mechanism": "EGFR T790M inhibitor"
+      }
+    ],
+    "pathways": [],
+    "risk_scores": {
+      "genetic_evidence_score": 40,
+      "therapeutic_coverage_score": 60,
+      "clinical_evidence_score": 70,
+      "safety_score": 70,
+      "overall_score": 60.0,
+      "risk_level": "Low Risk",
+      "evidence_grade": "B",
+      "factors": {
+        "severe_adverse_events": 1,
+        "moderate_adverse_events": 1,
+        "phase3_trials": 2,
+        "total_enrollment": 1106,
+        "strong_genetic_associations": 1,
+        "pathogenic_variants": 1,
+        "high_affinity_drugs": 2,
+        "co_targeting_drugs": 2,
+        "total_drugs": 2,
+        "total_diseases": 1
+      }
+    }
+  },
+  "KRAS": {
+    "gene_info": {
+      "symbol": "KRAS",
+      "name": "KRAS Proto-Oncogene",
+      "chromosome": 12,
+      "function": "Cell signaling",
+      "gene_id": "G002"
+    },
+    "protein_info": {
+      "name": "KRAS",
+      "protein_class": "GTPase",
+      "cellular_location": "Cell membrane",
+      "uniprot_id": "P01116",
+      "protein_id": "protein_P026"
+    },
+    "variants": [
+      {
+        "rsid": "rs28934578",
+        "consequence": "Missense (G12C - oncogenic)",
+        "significance": "Pathogenic",
+        "chromosome": 12,
+        "position": 25398284,
+        "ref": "C",
+        "alt": "A"
+      }
+    ],
+    "diseases": [
+      {
+        "disease": "Non-Small Cell Lung Cancer",
+        "category": "Oncology",
+        "icd10": "C34.9",
+        "prevalence": "High",
+        "strength": "Strong",
+        "evidence_level": "High"
+      },
+      {
+        "disease": "Colorectal Cancer",
+        "category": "Oncology",
+        "icd10": "C18",
+        "prevalence": "High",
+        "strength": "Strong",
+        "evidence_level": "High"
+      }
+    ],
+    "drugs": [
+      {
+        "drug": "Sotorasib",
+        "mechanism": "KRAS G12C inhibitor",
+        "drug_type": "Small Molecule",
+        "status": "Approved",
+        "year": 2021,
+        "affinity": "Very High",
+        "target_mechanism": "Inhibitor",
+        "protein_target": "KRAS",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Non-Small Cell Lung Cancer",
+            "efficacy": 0.37
+          }
+        ]
+      }
+    ],
+    "trials": [
+      {
+        "drug": "Sotorasib",
+        "trial_title": "Sotorasib in KRAS G12C NSCLC (CodeBreaK 200)",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 345,
+        "nct_id": "NCT03600883",
+        "sponsor": "Amgen",
+        "start_date": "2018-09-01",
+        "disease": "Non-Small Cell Lung Cancer"
+      }
+    ],
+    "adverse_events": [
+      {
+        "drug": "Sotorasib",
+        "event": "Diarrhea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.25,
+        "grade": 2,
+        "trial": "Sotorasib in KRAS G12C NSCLC (CodeBreaK 200)"
+      },
+      {
+        "drug": "Sotorasib",
+        "event": "Nausea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.1,
+        "grade": 2,
+        "trial": "Sotorasib in KRAS G12C NSCLC (CodeBreaK 200)"
+      }
+    ],
+    "co_targeting_drugs": [],
+    "pathways": [],
+    "risk_scores": {
+      "genetic_evidence_score": 65,
+      "therapeutic_coverage_score": 30,
+      "clinical_evidence_score": 25,
+      "safety_score": 100,
+      "overall_score": 51.2,
+      "risk_level": "Low Risk",
+      "evidence_grade": "C",
+      "factors": {
+        "severe_adverse_events": 0,
+        "moderate_adverse_events": 0,
+        "phase3_trials": 1,
+        "total_enrollment": 345,
+        "strong_genetic_associations": 2,
+        "pathogenic_variants": 1,
+        "high_affinity_drugs": 1,
+        "co_targeting_drugs": 0,
+        "total_drugs": 1,
+        "total_diseases": 2
+      }
+    }
+  },
+  "HER2": {
+    "gene_info": {
+      "symbol": "HER2",
+      "name": "Human Epidermal Growth Factor Receptor 2",
+      "chromosome": 17,
+      "function": "Cell growth",
+      "gene_id": "G007"
+    },
+    "protein_info": {
+      "name": "HER2",
+      "protein_class": "Receptor tyrosine kinase",
+      "cellular_location": "Cell membrane",
+      "uniprot_id": "P04626",
+      "protein_id": "protein_P004"
+    },
+    "variants": [
+      {
+        "rsid": "rs11547328",
+        "consequence": "Amplification proxy (V842I)",
+        "significance": "Pathogenic",
+        "chromosome": 17,
+        "position": 37881000,
+        "ref": "A",
+        "alt": "G"
+      }
+    ],
+    "diseases": [
+      {
+        "disease": "Breast Cancer",
+        "category": "Oncology",
+        "icd10": "C50.9",
+        "prevalence": "High",
+        "strength": "Strong",
+        "evidence_level": "High"
+      }
+    ],
+    "drugs": [
+      {
+        "drug": "Trastuzumab",
+        "mechanism": "HER2 inhibitor",
+        "drug_type": "Monoclonal Antibody",
+        "status": "Approved",
+        "year": 1998,
+        "affinity": "Very High",
+        "target_mechanism": "Antagonist",
+        "protein_target": "HER2",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Breast Cancer",
+            "efficacy": 0.52
+          }
+        ]
+      }
+    ],
+    "trials": [
+      {
+        "drug": "Trastuzumab",
+        "trial_title": "Trastuzumab + Pertuzumab in HER2+ Breast Cancer (CLEOPATRA)",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 808,
+        "nct_id": "NCT01120184",
+        "sponsor": "Roche",
+        "start_date": "2008-02-01",
+        "disease": "Breast Cancer"
+      }
+    ],
+    "adverse_events": [
+      {
+        "drug": "Trastuzumab",
+        "event": "Hyperthyroidism",
+        "severity": "Moderate",
+        "category": "Endocrine",
+        "frequency": "Uncommon",
+        "incidence_rate": 0.08,
+        "grade": 2,
+        "trial": "Trastuzumab + Pertuzumab in HER2+ Breast Cancer (CLEOPATRA)"
+      },
+      {
+        "drug": "Trastuzumab",
+        "event": "Nausea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.12,
+        "grade": 2,
+        "trial": "Trastuzumab + Pertuzumab in HER2+ Breast Cancer (CLEOPATRA)"
+      }
+    ],
+    "co_targeting_drugs": [],
+    "pathways": [
+      {
+        "pathway": "HER2/ERBB Signaling",
+        "category": "Cell Growth"
+      }
+    ],
+    "risk_scores": {
+      "genetic_evidence_score": 40,
+      "therapeutic_coverage_score": 30,
+      "clinical_evidence_score": 35,
+      "safety_score": 90,
+      "overall_score": 46.0,
+      "risk_level": "Low Risk",
+      "evidence_grade": "C",
+      "factors": {
+        "severe_adverse_events": 0,
+        "moderate_adverse_events": 1,
+        "phase3_trials": 1,
+        "total_enrollment": 808,
+        "strong_genetic_associations": 1,
+        "pathogenic_variants": 1,
+        "high_affinity_drugs": 1,
+        "co_targeting_drugs": 0,
+        "total_drugs": 1,
+        "total_diseases": 1
+      }
+    }
+  },
+  "BRAF": {
+    "gene_info": {
+      "symbol": "BRAF",
+      "name": "B-Raf Proto-Oncogene",
+      "chromosome": 7,
+      "function": "Serine/threonine kinase in MAPK/ERK signaling",
+      "gene_id": "G011"
+    },
+    "protein_info": {
+      "name": "BRAF",
+      "protein_class": "Serine/threonine kinase",
+      "cellular_location": "Cytoplasm",
+      "uniprot_id": "P15056",
+      "protein_id": "protein_P017"
+    },
+    "variants": [
+      {
+        "rsid": "rs113488022",
+        "consequence": "Missense (V600E - oncogenic, most common BRAF mutation)",
+        "significance": "Pathogenic",
+        "chromosome": 7,
+        "position": 140453136,
+        "ref": "A",
+        "alt": "T"
+      }
+    ],
+    "diseases": [
+      {
+        "disease": "Melanoma",
+        "category": "Oncology",
+        "icd10": "C43.9",
+        "prevalence": "Medium",
+        "strength": "Very Strong",
+        "evidence_level": "High"
+      },
+      {
+        "disease": "Colorectal Cancer",
+        "category": "Oncology",
+        "icd10": "C18",
+        "prevalence": "High",
+        "strength": "Strong",
+        "evidence_level": "High"
+      },
+      {
+        "disease": "Non-Small Cell Lung Cancer",
+        "category": "Oncology",
+        "icd10": "C34.9",
+        "prevalence": "High",
+        "strength": "Moderate",
+        "evidence_level": "High"
+      }
+    ],
+    "drugs": [
+      {
+        "drug": "Dabrafenib",
+        "mechanism": "BRAF V600E inhibitor",
+        "drug_type": "Small Molecule",
+        "status": "Approved",
+        "year": 2013,
+        "affinity": "Very High",
+        "target_mechanism": "Inhibitor",
+        "protein_target": "BRAF",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Non-Small Cell Lung Cancer",
+            "efficacy": 0.36
+          },
+          {
+            "category": "Oncology",
+            "disease": "Melanoma",
+            "efficacy": 0.5
+          }
+        ]
+      }
+    ],
+    "trials": [
+      {
+        "drug": "Dabrafenib",
+        "trial_title": "Dabrafenib + Trametinib in BRAF V600 Melanoma",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 870,
+        "nct_id": "NCT01682083",
+        "sponsor": "Novartis",
+        "start_date": "2012-08-01",
+        "disease": "Melanoma"
+      }
+    ],
+    "adverse_events": [
+      {
+        "drug": "Dabrafenib",
+        "event": "Amyloid-related imaging abnormalities",
+        "severity": "Severe",
+        "category": "Neurological",
+        "frequency": "Uncommon",
+        "incidence_rate": 0.18,
+        "grade": 2,
+        "trial": "Dabrafenib + Trametinib in BRAF V600 Melanoma"
+      },
+      {
+        "drug": "Dabrafenib",
+        "event": "Nausea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.06,
+        "grade": 2,
+        "trial": "Dabrafenib + Trametinib in BRAF V600 Melanoma"
+      }
+    ],
+    "co_targeting_drugs": [],
+    "pathways": [],
+    "risk_scores": {
+      "genetic_evidence_score": 65,
+      "therapeutic_coverage_score": 30,
+      "clinical_evidence_score": 35,
+      "safety_score": 80,
+      "overall_score": 50.2,
+      "risk_level": "Low Risk",
+      "evidence_grade": "C",
+      "factors": {
+        "severe_adverse_events": 1,
+        "moderate_adverse_events": 0,
+        "phase3_trials": 1,
+        "total_enrollment": 870,
+        "strong_genetic_associations": 2,
+        "pathogenic_variants": 1,
+        "high_affinity_drugs": 1,
+        "co_targeting_drugs": 0,
+        "total_drugs": 1,
+        "total_diseases": 3
+      }
+    }
+  },
+  "BRCA1": {
+    "gene_info": {
+      "symbol": "BRCA1",
+      "name": "Breast Cancer Gene 1",
+      "chromosome": 17,
+      "function": "DNA repair",
+      "gene_id": "G004"
+    },
+    "protein_info": {
+      "name": "BRCA1",
+      "protein_class": "DNA repair",
+      "cellular_location": "Nucleus",
+      "uniprot_id": "P38398",
+      "protein_id": "protein_P027"
+    },
+    "variants": [
+      {
+        "rsid": "rs80357713",
+        "consequence": "Nonsense (premature stop)",
+        "significance": "Pathogenic",
+        "chromosome": 17,
+        "position": 41215920,
+        "ref": "G",
+        "alt": "A"
+      }
+    ],
+    "diseases": [
+      {
+        "disease": "Breast Cancer",
+        "category": "Oncology",
+        "icd10": "C50.9",
+        "prevalence": "High",
+        "strength": "Very Strong",
+        "evidence_level": "High"
+      }
+    ],
+    "drugs": [
+      {
+        "drug": "Olaparib",
+        "mechanism": "PARP inhibitor (BRCA1 synthetic lethality)",
+        "drug_type": "Small Molecule",
+        "status": "Approved",
+        "year": 2014,
+        "affinity": "High",
+        "target_mechanism": "Synthetic Lethality",
+        "protein_target": "BRCA1",
+        "indications": [
+          {
+            "category": "Oncology",
+            "disease": "Breast Cancer",
+            "efficacy": 0.6
+          }
+        ]
+      }
+    ],
+    "trials": [
+      {
+        "drug": "Olaparib",
+        "trial_title": "Olaparib in BRCA-Mutated Breast Cancer (OlympiAD)",
+        "phase": "Phase 3",
+        "status": "Completed",
+        "enrollment": 302,
+        "nct_id": "NCT02000622",
+        "sponsor": "AstraZeneca",
+        "start_date": "2014-04-01",
+        "disease": "Breast Cancer"
+      }
+    ],
+    "adverse_events": [
+      {
+        "drug": "Olaparib",
+        "event": "Infusion reaction",
+        "severity": "Moderate",
+        "category": "Allergic",
+        "frequency": "Common",
+        "incidence_rate": 0.05,
+        "grade": 3,
+        "trial": "Olaparib in BRCA-Mutated Breast Cancer (OlympiAD)"
+      },
+      {
+        "drug": "Olaparib",
+        "event": "Diarrhea",
+        "severity": "Mild",
+        "category": "Gastrointestinal",
+        "frequency": "Very Common",
+        "incidence_rate": 0.32,
+        "grade": 2,
+        "trial": "Olaparib in BRCA-Mutated Breast Cancer (OlympiAD)"
+      }
+    ],
+    "co_targeting_drugs": [],
+    "pathways": [],
+    "risk_scores": {
+      "genetic_evidence_score": 40,
+      "therapeutic_coverage_score": 30,
+      "clinical_evidence_score": 25,
+      "safety_score": 90,
+      "overall_score": 43.0,
+      "risk_level": "Low Risk",
+      "evidence_grade": "C",
+      "factors": {
+        "severe_adverse_events": 0,
+        "moderate_adverse_events": 1,
+        "phase3_trials": 1,
+        "total_enrollment": 302,
+        "strong_genetic_associations": 1,
+        "pathogenic_variants": 1,
+        "high_affinity_drugs": 1,
+        "co_targeting_drugs": 0,
+        "total_drugs": 1,
+        "total_diseases": 1
+      }
+    }
+  }
+};
+const STEPS = [
+  {
+    "iteration": 1,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Starting investigation of EGFR. First, I need to confirm this gene exists in the knowledge graph and retrieve its genomic properties \u2014 chromosome location, biological function, and full name.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:10.122",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Query gene node for EGFR",
+    "query": "MATCH (g:Gene {symbol: $sym})\n            RETURN g.symbol AS symbol, g.name AS name,\n                   g.chromosome AS chromosome, g.function AS function,\n                   g.node_id AS gene_id",
+    "result_count": 1,
+    "latency_ms": 1795.34,
+    "timestamp": "09:27:11.918",
+    "traversal_path": "(Gene:EGFR)"
+  },
+  {
+    "iteration": 1,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found EGFR: Epidermal Growth Factor Receptor on chromosome 7. Function: Cell growth and proliferation. Proceeding to check the corresponding protein.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 1795.34,
+    "timestamp": "09:27:11.918",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "THINK",
+    "agent": "MolecularBiologyAgent",
+    "content": "Gene EGFR confirmed. Since many gene symbols also name their protein product (e.g., EGFR gene encodes EGFR protein), I need to find the protein node \u2014 checking both exact name match and the gene's known protein target.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:11.918",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "MolecularBiologyAgent",
+    "content": "Find protein encoded by / named after EGFR",
+    "query": "MATCH (p:Protein)\n            WHERE p.name = $sym OR p.name CONTAINS $sym\n            RETURN p.name AS name, p.protein_class AS protein_class,\n                   p.cellular_location AS cellular_location,\n                   p.uniprot_id AS uniprot_id, p.node_id AS protein_id",
+    "result_count": 1,
+    "latency_ms": 190.61,
+    "timestamp": "09:27:12.109",
+    "traversal_path": "(Gene:EGFR) ~~symbol match~~> (Protein:EGFR)"
+  },
+  {
+    "iteration": 2,
+    "type": "OBSERVE",
+    "agent": "MolecularBiologyAgent",
+    "content": "Found protein EGFR \u2014 Receptor tyrosine kinase located at Cell membrane. UniProt: P00533. The gene symbol IS the protein name \u2014 confirming dual nomenclature.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 190.61,
+    "timestamp": "09:27:12.109",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Now I need to check for known pathogenic variants in EGFR. Variants like EGFR L858R or KRAS G12C are clinically actionable \u2014 they determine which drugs will be effective and which patients should receive them.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:12.109",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find pathogenic variants of EGFR",
+    "query": "MATCH (v:Variant)\n            WHERE v.gene_symbol = $sym\n            RETURN v.rsid AS rsid, v.consequence AS consequence,\n                   v.clinical_significance AS significance,\n                   v.chromosome AS chromosome, v.position AS position,\n                   v.ref_allele AS ref, v.alt_allele AS alt",
+    "result_count": 1,
+    "latency_ms": 176.86,
+    "timestamp": "09:27:12.286",
+    "traversal_path": "(Gene:EGFR) --has--> (Variant)"
+  },
+  {
+    "iteration": 3,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 variant(s): rs121434568 (Missense (L858R - activating mutation)). These are clinically significant mutations that affect drug response.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 176.86,
+    "timestamp": "09:27:12.286",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "With gene identity and variants confirmed, I need to map which diseases EGFR is associated with. The ASSOCIATED_WITH relationships carry association_strength and evidence_level \u2014 critical for clinical decision-making.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:12.286",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find diseases associated with EGFR",
+    "query": "MATCH (g:Gene {symbol: $sym})-[a:ASSOCIATED_WITH]->(d:Disease)\n            RETURN d.name AS disease, d.category AS category,\n                   d.icd10_code AS icd10, d.prevalence AS prevalence,\n                   a.association_strength AS strength,\n                   a.evidence_level AS evidence_level\n            ORDER BY\n                CASE a.association_strength\n                    WHEN 'Very Strong' THEN 1 WHEN 'Strong' THEN 2\n                    WHEN 'Moderate' THEN 3 ELSE 4\n                END",
+    "result_count": 1,
+    "latency_ms": 176.58,
+    "timestamp": "09:27:12.463",
+    "traversal_path": "(Gene:EGFR) --ASSOCIATED_WITH--> (Disease)"
+  },
+  {
+    "iteration": 4,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 disease associations: Non-Small Cell Lung Cancer (Strong). Now I need to find drugs that target the EGFR protein AND treat these diseases \u2014 the therapeutic bridge.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 176.58,
+    "timestamp": "09:27:12.463",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "THINK",
+    "agent": "PharmacologyAgent",
+    "content": "Critical step: find all drugs that TARGET the EGFR protein. The TARGETS relationship has binding_affinity and mechanism_type properties. Then cross-reference which diseases each drug TREATS with efficacy_rate.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:12.463",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "PharmacologyAgent",
+    "content": "Find drugs targeting EGFR and their disease indications",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease)\n            RETURN drug.name AS drug, drug.mechanism AS mechanism,\n                   drug.drug_type AS drug_type,\n                   drug.approval_status AS status,\n                   drug.approval_year AS year,\n                   t.binding_affinity AS affinity,\n                   t.mechanism_type AS target_mechanism,\n                   p.name AS protein_target,\n                   collect(DISTINCT {\n                       disease: dis.name,\n                       efficacy: tr.efficacy_rate,\n                       category: dis.category\n                   }) AS indications\n            ORDER BY t.binding_affinity DESC",
+    "result_count": 2,
+    "latency_ms": 178.83,
+    "timestamp": "09:27:12.642",
+    "traversal_path": "(Drug) --TARGETS--> (Protein:EGFR) & (Drug) --TREATS--> (Disease)"
+  },
+  {
+    "iteration": 5,
+    "type": "OBSERVE",
+    "agent": "PharmacologyAgent",
+    "content": "Found 2 drug(s) targeting EGFR: Osimertinib (Very High affinity, Inhibitor), Cetuximab (High affinity, Antagonist). Need clinical trial evidence and safety profiles next.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 178.83,
+    "timestamp": "09:27:12.642",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "THINK",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Now I need clinical trial evidence for these drugs: ['Osimertinib', 'Cetuximab']. Trials carry phase, enrollment, status, and NCT IDs. Higher enrollment in Phase 3 = stronger evidence. This validates the drug-disease link.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:12.642",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Find clinical trials for drugs targeting EGFR",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            OPTIONAL MATCH (t)-[:STUDIES]->(dis:Disease)\n            RETURN drug.name AS drug, t.title AS trial_title,\n                   t.phase AS phase, t.status AS status,\n                   t.enrollment AS enrollment, t.nct_id AS nct_id,\n                   t.sponsor AS sponsor, t.start_date AS start_date,\n                   dis.name AS disease\n            ORDER BY t.enrollment DESC",
+    "result_count": 2,
+    "latency_ms": 176.37,
+    "timestamp": "09:27:12.819",
+    "traversal_path": "(ClinicalTrial) --INVESTIGATES--> (Drug) --TARGETS--> (Protein:EGFR)"
+  },
+  {
+    "iteration": 6,
+    "type": "OBSERVE",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Found 2 clinical trials. 2 are Phase 3 with total enrollment of 1,106 patients. Sponsors include Eli Lilly, AstraZeneca. Next: adverse event profiles.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 176.37,
+    "timestamp": "09:27:12.819",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "THINK",
+    "agent": "SafetyProfileAgent",
+    "content": "Safety is paramount. I need to check adverse events reported across trials for drugs targeting EGFR. The REPORTS_AE relationships link trials to adverse events with incidence_rate and grade. Severe events (grade 3+) are potential treatment-limiting toxicities.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:12.819",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "SafetyProfileAgent",
+    "content": "Find adverse events for EGFR-targeting drugs",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            MATCH (t)-[r:REPORTS_AE]->(ae:AdverseEvent)\n            RETURN drug.name AS drug, ae.name AS event,\n                   ae.severity AS severity, ae.category AS category,\n                   ae.frequency AS frequency,\n                   r.incidence_rate AS incidence_rate, r.grade AS grade,\n                   t.title AS trial\n            ORDER BY\n                CASE ae.severity\n                    WHEN 'Severe' THEN 1 WHEN 'Moderate' THEN 2\n                    WHEN 'Mild' THEN 3 ELSE 4\n                END,\n                r.incidence_rate DESC",
+    "result_count": 5,
+    "latency_ms": 188.6,
+    "timestamp": "09:27:13.007",
+    "traversal_path": "(ClinicalTrial) --REPORTS_AE--> (AdverseEvent)"
+  },
+  {
+    "iteration": 7,
+    "type": "OBSERVE",
+    "agent": "SafetyProfileAgent",
+    "content": "Found 5 adverse event reports, 1 severe. Key events: Immune-related pneumonitis (Severe); Hypoglycemia (Moderate); Hypothyroidism (Mild); Diarrhea (Mild); Nausea (Mild). Final step: pathway analysis and drug interactions.",
+    "query": "",
+    "result_count": 5,
+    "latency_ms": 188.6,
+    "timestamp": "09:27:13.008",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "THINK",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Final iteration. I need two things: (1) signaling pathways involving EGFR \u2014 these explain WHY the gene causes disease, and (2) other drugs that target the same protein \u2014 potential combination therapies or contraindications.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:13.008",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "ACT",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Find pathways and co-targeting drugs for EGFR",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[:INHIBITS_PATHWAY]->(pw:Pathway)\n            WITH drug, p, collect(DISTINCT {pathway: pw.name, category: pw.category}) AS pathways\n            OPTIONAL MATCH (other:Drug)-[:TARGETS]->(p)\n            WHERE other <> drug\n            RETURN drug.name AS drug, p.name AS protein,\n                   pathways,\n                   collect(DISTINCT {\n                       co_drug: other.name,\n                       mechanism: other.mechanism\n                   }) AS co_targeting_drugs",
+    "result_count": 2,
+    "latency_ms": 208.4,
+    "timestamp": "09:27:13.216",
+    "traversal_path": "(Drug) --INHIBITS_PATHWAY--> (Pathway) & (OtherDrug) --TARGETS--> (Protein:EGFR)"
+  },
+  {
+    "iteration": 8,
+    "type": "OBSERVE",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Pathways: none found in graph. Co-targeting drugs (same protein target): Osimertinib, Cetuximab. Investigation complete \u2014 all 8 iterations done. Building risk profile.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 208.4,
+    "timestamp": "09:27:13.216",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Starting investigation of KRAS. First, I need to confirm this gene exists in the knowledge graph and retrieve its genomic properties \u2014 chromosome location, biological function, and full name.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:13.217",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Query gene node for KRAS",
+    "query": "MATCH (g:Gene {symbol: $sym})\n            RETURN g.symbol AS symbol, g.name AS name,\n                   g.chromosome AS chromosome, g.function AS function,\n                   g.node_id AS gene_id",
+    "result_count": 1,
+    "latency_ms": 1746.43,
+    "timestamp": "09:27:14.964",
+    "traversal_path": "(Gene:KRAS)"
+  },
+  {
+    "iteration": 1,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found KRAS: KRAS Proto-Oncogene on chromosome 12. Function: Cell signaling. Proceeding to check the corresponding protein.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 1746.43,
+    "timestamp": "09:27:14.964",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "THINK",
+    "agent": "MolecularBiologyAgent",
+    "content": "Gene KRAS confirmed. Since many gene symbols also name their protein product (e.g., EGFR gene encodes EGFR protein), I need to find the protein node \u2014 checking both exact name match and the gene's known protein target.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:14.964",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "MolecularBiologyAgent",
+    "content": "Find protein encoded by / named after KRAS",
+    "query": "MATCH (p:Protein)\n            WHERE p.name = $sym OR p.name CONTAINS $sym\n            RETURN p.name AS name, p.protein_class AS protein_class,\n                   p.cellular_location AS cellular_location,\n                   p.uniprot_id AS uniprot_id, p.node_id AS protein_id",
+    "result_count": 1,
+    "latency_ms": 169.73,
+    "timestamp": "09:27:15.134",
+    "traversal_path": "(Gene:KRAS) ~~symbol match~~> (Protein:KRAS)"
+  },
+  {
+    "iteration": 2,
+    "type": "OBSERVE",
+    "agent": "MolecularBiologyAgent",
+    "content": "Found protein KRAS \u2014 GTPase located at Cell membrane. UniProt: P01116. The gene symbol IS the protein name \u2014 confirming dual nomenclature.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 169.73,
+    "timestamp": "09:27:15.134",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Now I need to check for known pathogenic variants in KRAS. Variants like EGFR L858R or KRAS G12C are clinically actionable \u2014 they determine which drugs will be effective and which patients should receive them.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.134",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find pathogenic variants of KRAS",
+    "query": "MATCH (v:Variant)\n            WHERE v.gene_symbol = $sym\n            RETURN v.rsid AS rsid, v.consequence AS consequence,\n                   v.clinical_significance AS significance,\n                   v.chromosome AS chromosome, v.position AS position,\n                   v.ref_allele AS ref, v.alt_allele AS alt",
+    "result_count": 1,
+    "latency_ms": 169.05,
+    "timestamp": "09:27:15.303",
+    "traversal_path": "(Gene:KRAS) --has--> (Variant)"
+  },
+  {
+    "iteration": 3,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 variant(s): rs28934578 (Missense (G12C - oncogenic)). These are clinically significant mutations that affect drug response.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 169.05,
+    "timestamp": "09:27:15.303",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "With gene identity and variants confirmed, I need to map which diseases KRAS is associated with. The ASSOCIATED_WITH relationships carry association_strength and evidence_level \u2014 critical for clinical decision-making.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.303",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find diseases associated with KRAS",
+    "query": "MATCH (g:Gene {symbol: $sym})-[a:ASSOCIATED_WITH]->(d:Disease)\n            RETURN d.name AS disease, d.category AS category,\n                   d.icd10_code AS icd10, d.prevalence AS prevalence,\n                   a.association_strength AS strength,\n                   a.evidence_level AS evidence_level\n            ORDER BY\n                CASE a.association_strength\n                    WHEN 'Very Strong' THEN 1 WHEN 'Strong' THEN 2\n                    WHEN 'Moderate' THEN 3 ELSE 4\n                END",
+    "result_count": 2,
+    "latency_ms": 169.94,
+    "timestamp": "09:27:15.473",
+    "traversal_path": "(Gene:KRAS) --ASSOCIATED_WITH--> (Disease)"
+  },
+  {
+    "iteration": 4,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 2 disease associations: Non-Small Cell Lung Cancer (Strong), Colorectal Cancer (Strong). Now I need to find drugs that target the KRAS protein AND treat these diseases \u2014 the therapeutic bridge.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 169.94,
+    "timestamp": "09:27:15.473",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "THINK",
+    "agent": "PharmacologyAgent",
+    "content": "Critical step: find all drugs that TARGET the KRAS protein. The TARGETS relationship has binding_affinity and mechanism_type properties. Then cross-reference which diseases each drug TREATS with efficacy_rate.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.474",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "PharmacologyAgent",
+    "content": "Find drugs targeting KRAS and their disease indications",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease)\n            RETURN drug.name AS drug, drug.mechanism AS mechanism,\n                   drug.drug_type AS drug_type,\n                   drug.approval_status AS status,\n                   drug.approval_year AS year,\n                   t.binding_affinity AS affinity,\n                   t.mechanism_type AS target_mechanism,\n                   p.name AS protein_target,\n                   collect(DISTINCT {\n                       disease: dis.name,\n                       efficacy: tr.efficacy_rate,\n                       category: dis.category\n                   }) AS indications\n            ORDER BY t.binding_affinity DESC",
+    "result_count": 1,
+    "latency_ms": 169.68,
+    "timestamp": "09:27:15.643",
+    "traversal_path": "(Drug) --TARGETS--> (Protein:KRAS) & (Drug) --TREATS--> (Disease)"
+  },
+  {
+    "iteration": 5,
+    "type": "OBSERVE",
+    "agent": "PharmacologyAgent",
+    "content": "Found 1 drug(s) targeting KRAS: Sotorasib (Very High affinity, Inhibitor). Need clinical trial evidence and safety profiles next.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 169.68,
+    "timestamp": "09:27:15.643",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "THINK",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Now I need clinical trial evidence for these drugs: ['Sotorasib']. Trials carry phase, enrollment, status, and NCT IDs. Higher enrollment in Phase 3 = stronger evidence. This validates the drug-disease link.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.644",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Find clinical trials for drugs targeting KRAS",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            OPTIONAL MATCH (t)-[:STUDIES]->(dis:Disease)\n            RETURN drug.name AS drug, t.title AS trial_title,\n                   t.phase AS phase, t.status AS status,\n                   t.enrollment AS enrollment, t.nct_id AS nct_id,\n                   t.sponsor AS sponsor, t.start_date AS start_date,\n                   dis.name AS disease\n            ORDER BY t.enrollment DESC",
+    "result_count": 1,
+    "latency_ms": 171.02,
+    "timestamp": "09:27:15.815",
+    "traversal_path": "(ClinicalTrial) --INVESTIGATES--> (Drug) --TARGETS--> (Protein:KRAS)"
+  },
+  {
+    "iteration": 6,
+    "type": "OBSERVE",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Found 1 clinical trials. 1 are Phase 3 with total enrollment of 345 patients. Sponsors include Amgen. Next: adverse event profiles.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 171.02,
+    "timestamp": "09:27:15.815",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "THINK",
+    "agent": "SafetyProfileAgent",
+    "content": "Safety is paramount. I need to check adverse events reported across trials for drugs targeting KRAS. The REPORTS_AE relationships link trials to adverse events with incidence_rate and grade. Severe events (grade 3+) are potential treatment-limiting toxicities.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.815",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "SafetyProfileAgent",
+    "content": "Find adverse events for KRAS-targeting drugs",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            MATCH (t)-[r:REPORTS_AE]->(ae:AdverseEvent)\n            RETURN drug.name AS drug, ae.name AS event,\n                   ae.severity AS severity, ae.category AS category,\n                   ae.frequency AS frequency,\n                   r.incidence_rate AS incidence_rate, r.grade AS grade,\n                   t.title AS trial\n            ORDER BY\n                CASE ae.severity\n                    WHEN 'Severe' THEN 1 WHEN 'Moderate' THEN 2\n                    WHEN 'Mild' THEN 3 ELSE 4\n                END,\n                r.incidence_rate DESC",
+    "result_count": 2,
+    "latency_ms": 169.79,
+    "timestamp": "09:27:15.985",
+    "traversal_path": "(ClinicalTrial) --REPORTS_AE--> (AdverseEvent)"
+  },
+  {
+    "iteration": 7,
+    "type": "OBSERVE",
+    "agent": "SafetyProfileAgent",
+    "content": "Found 2 adverse event reports, 0 severe. Key events: Diarrhea (Mild); Nausea (Mild). Final step: pathway analysis and drug interactions.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 169.79,
+    "timestamp": "09:27:15.985",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "THINK",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Final iteration. I need two things: (1) signaling pathways involving KRAS \u2014 these explain WHY the gene causes disease, and (2) other drugs that target the same protein \u2014 potential combination therapies or contraindications.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:15.985",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "ACT",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Find pathways and co-targeting drugs for KRAS",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[:INHIBITS_PATHWAY]->(pw:Pathway)\n            WITH drug, p, collect(DISTINCT {pathway: pw.name, category: pw.category}) AS pathways\n            OPTIONAL MATCH (other:Drug)-[:TARGETS]->(p)\n            WHERE other <> drug\n            RETURN drug.name AS drug, p.name AS protein,\n                   pathways,\n                   collect(DISTINCT {\n                       co_drug: other.name,\n                       mechanism: other.mechanism\n                   }) AS co_targeting_drugs",
+    "result_count": 1,
+    "latency_ms": 170.04,
+    "timestamp": "09:27:16.155",
+    "traversal_path": "(Drug) --INHIBITS_PATHWAY--> (Pathway) & (OtherDrug) --TARGETS--> (Protein:KRAS)"
+  },
+  {
+    "iteration": 8,
+    "type": "OBSERVE",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Pathways: none found in graph. Co-targeting drugs (same protein target): none. Investigation complete \u2014 all 8 iterations done. Building risk profile.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 170.04,
+    "timestamp": "09:27:16.155",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Starting investigation of HER2. First, I need to confirm this gene exists in the knowledge graph and retrieve its genomic properties \u2014 chromosome location, biological function, and full name.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:16.156",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Query gene node for HER2",
+    "query": "MATCH (g:Gene {symbol: $sym})\n            RETURN g.symbol AS symbol, g.name AS name,\n                   g.chromosome AS chromosome, g.function AS function,\n                   g.node_id AS gene_id",
+    "result_count": 1,
+    "latency_ms": 1744.49,
+    "timestamp": "09:27:17.901",
+    "traversal_path": "(Gene:HER2)"
+  },
+  {
+    "iteration": 1,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found HER2: Human Epidermal Growth Factor Receptor 2 on chromosome 17. Function: Cell growth. Proceeding to check the corresponding protein.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 1744.49,
+    "timestamp": "09:27:17.901",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "THINK",
+    "agent": "MolecularBiologyAgent",
+    "content": "Gene HER2 confirmed. Since many gene symbols also name their protein product (e.g., EGFR gene encodes EGFR protein), I need to find the protein node \u2014 checking both exact name match and the gene's known protein target.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:17.901",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "MolecularBiologyAgent",
+    "content": "Find protein encoded by / named after HER2",
+    "query": "MATCH (p:Protein)\n            WHERE p.name = $sym OR p.name CONTAINS $sym\n            RETURN p.name AS name, p.protein_class AS protein_class,\n                   p.cellular_location AS cellular_location,\n                   p.uniprot_id AS uniprot_id, p.node_id AS protein_id",
+    "result_count": 1,
+    "latency_ms": 168.97,
+    "timestamp": "09:27:18.070",
+    "traversal_path": "(Gene:HER2) ~~symbol match~~> (Protein:HER2)"
+  },
+  {
+    "iteration": 2,
+    "type": "OBSERVE",
+    "agent": "MolecularBiologyAgent",
+    "content": "Found protein HER2 \u2014 Receptor tyrosine kinase located at Cell membrane. UniProt: P04626. The gene symbol IS the protein name \u2014 confirming dual nomenclature.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 168.97,
+    "timestamp": "09:27:18.070",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Now I need to check for known pathogenic variants in HER2. Variants like EGFR L858R or KRAS G12C are clinically actionable \u2014 they determine which drugs will be effective and which patients should receive them.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.070",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find pathogenic variants of HER2",
+    "query": "MATCH (v:Variant)\n            WHERE v.gene_symbol = $sym\n            RETURN v.rsid AS rsid, v.consequence AS consequence,\n                   v.clinical_significance AS significance,\n                   v.chromosome AS chromosome, v.position AS position,\n                   v.ref_allele AS ref, v.alt_allele AS alt",
+    "result_count": 1,
+    "latency_ms": 169.76,
+    "timestamp": "09:27:18.240",
+    "traversal_path": "(Gene:HER2) --has--> (Variant)"
+  },
+  {
+    "iteration": 3,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 variant(s): rs11547328 (Amplification proxy (V842I)). These are clinically significant mutations that affect drug response.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 169.76,
+    "timestamp": "09:27:18.240",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "With gene identity and variants confirmed, I need to map which diseases HER2 is associated with. The ASSOCIATED_WITH relationships carry association_strength and evidence_level \u2014 critical for clinical decision-making.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.240",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find diseases associated with HER2",
+    "query": "MATCH (g:Gene {symbol: $sym})-[a:ASSOCIATED_WITH]->(d:Disease)\n            RETURN d.name AS disease, d.category AS category,\n                   d.icd10_code AS icd10, d.prevalence AS prevalence,\n                   a.association_strength AS strength,\n                   a.evidence_level AS evidence_level\n            ORDER BY\n                CASE a.association_strength\n                    WHEN 'Very Strong' THEN 1 WHEN 'Strong' THEN 2\n                    WHEN 'Moderate' THEN 3 ELSE 4\n                END",
+    "result_count": 1,
+    "latency_ms": 171.79,
+    "timestamp": "09:27:18.412",
+    "traversal_path": "(Gene:HER2) --ASSOCIATED_WITH--> (Disease)"
+  },
+  {
+    "iteration": 4,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 disease associations: Breast Cancer (Strong). Now I need to find drugs that target the HER2 protein AND treat these diseases \u2014 the therapeutic bridge.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 171.79,
+    "timestamp": "09:27:18.412",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "THINK",
+    "agent": "PharmacologyAgent",
+    "content": "Critical step: find all drugs that TARGET the HER2 protein. The TARGETS relationship has binding_affinity and mechanism_type properties. Then cross-reference which diseases each drug TREATS with efficacy_rate.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.412",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "PharmacologyAgent",
+    "content": "Find drugs targeting HER2 and their disease indications",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease)\n            RETURN drug.name AS drug, drug.mechanism AS mechanism,\n                   drug.drug_type AS drug_type,\n                   drug.approval_status AS status,\n                   drug.approval_year AS year,\n                   t.binding_affinity AS affinity,\n                   t.mechanism_type AS target_mechanism,\n                   p.name AS protein_target,\n                   collect(DISTINCT {\n                       disease: dis.name,\n                       efficacy: tr.efficacy_rate,\n                       category: dis.category\n                   }) AS indications\n            ORDER BY t.binding_affinity DESC",
+    "result_count": 1,
+    "latency_ms": 171.04,
+    "timestamp": "09:27:18.583",
+    "traversal_path": "(Drug) --TARGETS--> (Protein:HER2) & (Drug) --TREATS--> (Disease)"
+  },
+  {
+    "iteration": 5,
+    "type": "OBSERVE",
+    "agent": "PharmacologyAgent",
+    "content": "Found 1 drug(s) targeting HER2: Trastuzumab (Very High affinity, Antagonist). Need clinical trial evidence and safety profiles next.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 171.04,
+    "timestamp": "09:27:18.583",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "THINK",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Now I need clinical trial evidence for these drugs: ['Trastuzumab']. Trials carry phase, enrollment, status, and NCT IDs. Higher enrollment in Phase 3 = stronger evidence. This validates the drug-disease link.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.584",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Find clinical trials for drugs targeting HER2",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            OPTIONAL MATCH (t)-[:STUDIES]->(dis:Disease)\n            RETURN drug.name AS drug, t.title AS trial_title,\n                   t.phase AS phase, t.status AS status,\n                   t.enrollment AS enrollment, t.nct_id AS nct_id,\n                   t.sponsor AS sponsor, t.start_date AS start_date,\n                   dis.name AS disease\n            ORDER BY t.enrollment DESC",
+    "result_count": 1,
+    "latency_ms": 169.19,
+    "timestamp": "09:27:18.753",
+    "traversal_path": "(ClinicalTrial) --INVESTIGATES--> (Drug) --TARGETS--> (Protein:HER2)"
+  },
+  {
+    "iteration": 6,
+    "type": "OBSERVE",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Found 1 clinical trials. 1 are Phase 3 with total enrollment of 808 patients. Sponsors include Roche. Next: adverse event profiles.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 169.19,
+    "timestamp": "09:27:18.753",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "THINK",
+    "agent": "SafetyProfileAgent",
+    "content": "Safety is paramount. I need to check adverse events reported across trials for drugs targeting HER2. The REPORTS_AE relationships link trials to adverse events with incidence_rate and grade. Severe events (grade 3+) are potential treatment-limiting toxicities.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.753",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "SafetyProfileAgent",
+    "content": "Find adverse events for HER2-targeting drugs",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            MATCH (t)-[r:REPORTS_AE]->(ae:AdverseEvent)\n            RETURN drug.name AS drug, ae.name AS event,\n                   ae.severity AS severity, ae.category AS category,\n                   ae.frequency AS frequency,\n                   r.incidence_rate AS incidence_rate, r.grade AS grade,\n                   t.title AS trial\n            ORDER BY\n                CASE ae.severity\n                    WHEN 'Severe' THEN 1 WHEN 'Moderate' THEN 2\n                    WHEN 'Mild' THEN 3 ELSE 4\n                END,\n                r.incidence_rate DESC",
+    "result_count": 2,
+    "latency_ms": 169.78,
+    "timestamp": "09:27:18.923",
+    "traversal_path": "(ClinicalTrial) --REPORTS_AE--> (AdverseEvent)"
+  },
+  {
+    "iteration": 7,
+    "type": "OBSERVE",
+    "agent": "SafetyProfileAgent",
+    "content": "Found 2 adverse event reports, 0 severe. Key events: Nausea (Mild); Hyperthyroidism (Moderate). Final step: pathway analysis and drug interactions.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 169.78,
+    "timestamp": "09:27:18.923",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "THINK",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Final iteration. I need two things: (1) signaling pathways involving HER2 \u2014 these explain WHY the gene causes disease, and (2) other drugs that target the same protein \u2014 potential combination therapies or contraindications.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:18.923",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "ACT",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Find pathways and co-targeting drugs for HER2",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[:INHIBITS_PATHWAY]->(pw:Pathway)\n            WITH drug, p, collect(DISTINCT {pathway: pw.name, category: pw.category}) AS pathways\n            OPTIONAL MATCH (other:Drug)-[:TARGETS]->(p)\n            WHERE other <> drug\n            RETURN drug.name AS drug, p.name AS protein,\n                   pathways,\n                   collect(DISTINCT {\n                       co_drug: other.name,\n                       mechanism: other.mechanism\n                   }) AS co_targeting_drugs",
+    "result_count": 1,
+    "latency_ms": 183.06,
+    "timestamp": "09:27:19.106",
+    "traversal_path": "(Drug) --INHIBITS_PATHWAY--> (Pathway) & (OtherDrug) --TARGETS--> (Protein:HER2)"
+  },
+  {
+    "iteration": 8,
+    "type": "OBSERVE",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Pathways: HER2/ERBB Signaling. Co-targeting drugs (same protein target): none. Investigation complete \u2014 all 8 iterations done. Building risk profile.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 183.06,
+    "timestamp": "09:27:19.106",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Starting investigation of BRAF. First, I need to confirm this gene exists in the knowledge graph and retrieve its genomic properties \u2014 chromosome location, biological function, and full name.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:19.107",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Query gene node for BRAF",
+    "query": "MATCH (g:Gene {symbol: $sym})\n            RETURN g.symbol AS symbol, g.name AS name,\n                   g.chromosome AS chromosome, g.function AS function,\n                   g.node_id AS gene_id",
+    "result_count": 1,
+    "latency_ms": 1764.89,
+    "timestamp": "09:27:20.872",
+    "traversal_path": "(Gene:BRAF)"
+  },
+  {
+    "iteration": 1,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found BRAF: B-Raf Proto-Oncogene on chromosome 7. Function: Serine/threonine kinase in MAPK/ERK signaling. Proceeding to check the corresponding protein.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 1764.89,
+    "timestamp": "09:27:20.872",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "THINK",
+    "agent": "MolecularBiologyAgent",
+    "content": "Gene BRAF confirmed. Since many gene symbols also name their protein product (e.g., EGFR gene encodes EGFR protein), I need to find the protein node \u2014 checking both exact name match and the gene's known protein target.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:20.872",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "MolecularBiologyAgent",
+    "content": "Find protein encoded by / named after BRAF",
+    "query": "MATCH (p:Protein)\n            WHERE p.name = $sym OR p.name CONTAINS $sym\n            RETURN p.name AS name, p.protein_class AS protein_class,\n                   p.cellular_location AS cellular_location,\n                   p.uniprot_id AS uniprot_id, p.node_id AS protein_id",
+    "result_count": 1,
+    "latency_ms": 172.96,
+    "timestamp": "09:27:21.045",
+    "traversal_path": "(Gene:BRAF) ~~symbol match~~> (Protein:BRAF)"
+  },
+  {
+    "iteration": 2,
+    "type": "OBSERVE",
+    "agent": "MolecularBiologyAgent",
+    "content": "Found protein BRAF \u2014 Serine/threonine kinase located at Cytoplasm. UniProt: P15056. The gene symbol IS the protein name \u2014 confirming dual nomenclature.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 172.96,
+    "timestamp": "09:27:21.045",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Now I need to check for known pathogenic variants in BRAF. Variants like EGFR L858R or KRAS G12C are clinically actionable \u2014 they determine which drugs will be effective and which patients should receive them.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.046",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find pathogenic variants of BRAF",
+    "query": "MATCH (v:Variant)\n            WHERE v.gene_symbol = $sym\n            RETURN v.rsid AS rsid, v.consequence AS consequence,\n                   v.clinical_significance AS significance,\n                   v.chromosome AS chromosome, v.position AS position,\n                   v.ref_allele AS ref, v.alt_allele AS alt",
+    "result_count": 1,
+    "latency_ms": 170.16,
+    "timestamp": "09:27:21.216",
+    "traversal_path": "(Gene:BRAF) --has--> (Variant)"
+  },
+  {
+    "iteration": 3,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 variant(s): rs113488022 (Missense (V600E - oncogenic, most common BRAF mutation)). These are clinically significant mutations that affect drug response.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 170.16,
+    "timestamp": "09:27:21.216",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "With gene identity and variants confirmed, I need to map which diseases BRAF is associated with. The ASSOCIATED_WITH relationships carry association_strength and evidence_level \u2014 critical for clinical decision-making.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.216",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find diseases associated with BRAF",
+    "query": "MATCH (g:Gene {symbol: $sym})-[a:ASSOCIATED_WITH]->(d:Disease)\n            RETURN d.name AS disease, d.category AS category,\n                   d.icd10_code AS icd10, d.prevalence AS prevalence,\n                   a.association_strength AS strength,\n                   a.evidence_level AS evidence_level\n            ORDER BY\n                CASE a.association_strength\n                    WHEN 'Very Strong' THEN 1 WHEN 'Strong' THEN 2\n                    WHEN 'Moderate' THEN 3 ELSE 4\n                END",
+    "result_count": 3,
+    "latency_ms": 170.61,
+    "timestamp": "09:27:21.387",
+    "traversal_path": "(Gene:BRAF) --ASSOCIATED_WITH--> (Disease)"
+  },
+  {
+    "iteration": 4,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 3 disease associations: Melanoma (Very Strong), Colorectal Cancer (Strong), Non-Small Cell Lung Cancer (Moderate). Now I need to find drugs that target the BRAF protein AND treat these diseases \u2014 the therapeutic bridge.",
+    "query": "",
+    "result_count": 3,
+    "latency_ms": 170.61,
+    "timestamp": "09:27:21.387",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "THINK",
+    "agent": "PharmacologyAgent",
+    "content": "Critical step: find all drugs that TARGET the BRAF protein. The TARGETS relationship has binding_affinity and mechanism_type properties. Then cross-reference which diseases each drug TREATS with efficacy_rate.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.387",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "PharmacologyAgent",
+    "content": "Find drugs targeting BRAF and their disease indications",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease)\n            RETURN drug.name AS drug, drug.mechanism AS mechanism,\n                   drug.drug_type AS drug_type,\n                   drug.approval_status AS status,\n                   drug.approval_year AS year,\n                   t.binding_affinity AS affinity,\n                   t.mechanism_type AS target_mechanism,\n                   p.name AS protein_target,\n                   collect(DISTINCT {\n                       disease: dis.name,\n                       efficacy: tr.efficacy_rate,\n                       category: dis.category\n                   }) AS indications\n            ORDER BY t.binding_affinity DESC",
+    "result_count": 1,
+    "latency_ms": 170.54,
+    "timestamp": "09:27:21.558",
+    "traversal_path": "(Drug) --TARGETS--> (Protein:BRAF) & (Drug) --TREATS--> (Disease)"
+  },
+  {
+    "iteration": 5,
+    "type": "OBSERVE",
+    "agent": "PharmacologyAgent",
+    "content": "Found 1 drug(s) targeting BRAF: Dabrafenib (Very High affinity, Inhibitor). Need clinical trial evidence and safety profiles next.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 170.54,
+    "timestamp": "09:27:21.558",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "THINK",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Now I need clinical trial evidence for these drugs: ['Dabrafenib']. Trials carry phase, enrollment, status, and NCT IDs. Higher enrollment in Phase 3 = stronger evidence. This validates the drug-disease link.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.558",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Find clinical trials for drugs targeting BRAF",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            OPTIONAL MATCH (t)-[:STUDIES]->(dis:Disease)\n            RETURN drug.name AS drug, t.title AS trial_title,\n                   t.phase AS phase, t.status AS status,\n                   t.enrollment AS enrollment, t.nct_id AS nct_id,\n                   t.sponsor AS sponsor, t.start_date AS start_date,\n                   dis.name AS disease\n            ORDER BY t.enrollment DESC",
+    "result_count": 1,
+    "latency_ms": 170.91,
+    "timestamp": "09:27:21.729",
+    "traversal_path": "(ClinicalTrial) --INVESTIGATES--> (Drug) --TARGETS--> (Protein:BRAF)"
+  },
+  {
+    "iteration": 6,
+    "type": "OBSERVE",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Found 1 clinical trials. 1 are Phase 3 with total enrollment of 870 patients. Sponsors include Novartis. Next: adverse event profiles.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 170.91,
+    "timestamp": "09:27:21.729",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "THINK",
+    "agent": "SafetyProfileAgent",
+    "content": "Safety is paramount. I need to check adverse events reported across trials for drugs targeting BRAF. The REPORTS_AE relationships link trials to adverse events with incidence_rate and grade. Severe events (grade 3+) are potential treatment-limiting toxicities.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.729",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "SafetyProfileAgent",
+    "content": "Find adverse events for BRAF-targeting drugs",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            MATCH (t)-[r:REPORTS_AE]->(ae:AdverseEvent)\n            RETURN drug.name AS drug, ae.name AS event,\n                   ae.severity AS severity, ae.category AS category,\n                   ae.frequency AS frequency,\n                   r.incidence_rate AS incidence_rate, r.grade AS grade,\n                   t.title AS trial\n            ORDER BY\n                CASE ae.severity\n                    WHEN 'Severe' THEN 1 WHEN 'Moderate' THEN 2\n                    WHEN 'Mild' THEN 3 ELSE 4\n                END,\n                r.incidence_rate DESC",
+    "result_count": 2,
+    "latency_ms": 171.12,
+    "timestamp": "09:27:21.900",
+    "traversal_path": "(ClinicalTrial) --REPORTS_AE--> (AdverseEvent)"
+  },
+  {
+    "iteration": 7,
+    "type": "OBSERVE",
+    "agent": "SafetyProfileAgent",
+    "content": "Found 2 adverse event reports, 1 severe. Key events: Amyloid-related imaging abnormalities (Severe); Nausea (Mild). Final step: pathway analysis and drug interactions.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 171.12,
+    "timestamp": "09:27:21.900",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "THINK",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Final iteration. I need two things: (1) signaling pathways involving BRAF \u2014 these explain WHY the gene causes disease, and (2) other drugs that target the same protein \u2014 potential combination therapies or contraindications.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:21.900",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "ACT",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Find pathways and co-targeting drugs for BRAF",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[:INHIBITS_PATHWAY]->(pw:Pathway)\n            WITH drug, p, collect(DISTINCT {pathway: pw.name, category: pw.category}) AS pathways\n            OPTIONAL MATCH (other:Drug)-[:TARGETS]->(p)\n            WHERE other <> drug\n            RETURN drug.name AS drug, p.name AS protein,\n                   pathways,\n                   collect(DISTINCT {\n                       co_drug: other.name,\n                       mechanism: other.mechanism\n                   }) AS co_targeting_drugs",
+    "result_count": 1,
+    "latency_ms": 170.62,
+    "timestamp": "09:27:22.071",
+    "traversal_path": "(Drug) --INHIBITS_PATHWAY--> (Pathway) & (OtherDrug) --TARGETS--> (Protein:BRAF)"
+  },
+  {
+    "iteration": 8,
+    "type": "OBSERVE",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Pathways: none found in graph. Co-targeting drugs (same protein target): none. Investigation complete \u2014 all 8 iterations done. Building risk profile.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 170.62,
+    "timestamp": "09:27:22.071",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Starting investigation of BRCA1. First, I need to confirm this gene exists in the knowledge graph and retrieve its genomic properties \u2014 chromosome location, biological function, and full name.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:22.072",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 1,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Query gene node for BRCA1",
+    "query": "MATCH (g:Gene {symbol: $sym})\n            RETURN g.symbol AS symbol, g.name AS name,\n                   g.chromosome AS chromosome, g.function AS function,\n                   g.node_id AS gene_id",
+    "result_count": 1,
+    "latency_ms": 1793.9,
+    "timestamp": "09:27:23.866",
+    "traversal_path": "(Gene:BRCA1)"
+  },
+  {
+    "iteration": 1,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found BRCA1: Breast Cancer Gene 1 on chromosome 17. Function: DNA repair. Proceeding to check the corresponding protein.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 1793.9,
+    "timestamp": "09:27:23.866",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "THINK",
+    "agent": "MolecularBiologyAgent",
+    "content": "Gene BRCA1 confirmed. Since many gene symbols also name their protein product (e.g., EGFR gene encodes EGFR protein), I need to find the protein node \u2014 checking both exact name match and the gene's known protein target.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:23.866",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 2,
+    "type": "ACT",
+    "agent": "MolecularBiologyAgent",
+    "content": "Find protein encoded by / named after BRCA1",
+    "query": "MATCH (p:Protein)\n            WHERE p.name = $sym OR p.name CONTAINS $sym\n            RETURN p.name AS name, p.protein_class AS protein_class,\n                   p.cellular_location AS cellular_location,\n                   p.uniprot_id AS uniprot_id, p.node_id AS protein_id",
+    "result_count": 1,
+    "latency_ms": 183.05,
+    "timestamp": "09:27:24.049",
+    "traversal_path": "(Gene:BRCA1) ~~symbol match~~> (Protein:BRCA1)"
+  },
+  {
+    "iteration": 2,
+    "type": "OBSERVE",
+    "agent": "MolecularBiologyAgent",
+    "content": "Found protein BRCA1 \u2014 DNA repair located at Nucleus. UniProt: P38398. The gene symbol IS the protein name \u2014 confirming dual nomenclature.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 183.05,
+    "timestamp": "09:27:24.049",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "Now I need to check for known pathogenic variants in BRCA1. Variants like EGFR L858R or KRAS G12C are clinically actionable \u2014 they determine which drugs will be effective and which patients should receive them.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.050",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 3,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find pathogenic variants of BRCA1",
+    "query": "MATCH (v:Variant)\n            WHERE v.gene_symbol = $sym\n            RETURN v.rsid AS rsid, v.consequence AS consequence,\n                   v.clinical_significance AS significance,\n                   v.chromosome AS chromosome, v.position AS position,\n                   v.ref_allele AS ref, v.alt_allele AS alt",
+    "result_count": 1,
+    "latency_ms": 184.77,
+    "timestamp": "09:27:24.234",
+    "traversal_path": "(Gene:BRCA1) --has--> (Variant)"
+  },
+  {
+    "iteration": 3,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 variant(s): rs80357713 (Nonsense (premature stop)). These are clinically significant mutations that affect drug response.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 184.77,
+    "timestamp": "09:27:24.235",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "THINK",
+    "agent": "GenomicsAgent",
+    "content": "With gene identity and variants confirmed, I need to map which diseases BRCA1 is associated with. The ASSOCIATED_WITH relationships carry association_strength and evidence_level \u2014 critical for clinical decision-making.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.235",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 4,
+    "type": "ACT",
+    "agent": "GenomicsAgent",
+    "content": "Find diseases associated with BRCA1",
+    "query": "MATCH (g:Gene {symbol: $sym})-[a:ASSOCIATED_WITH]->(d:Disease)\n            RETURN d.name AS disease, d.category AS category,\n                   d.icd10_code AS icd10, d.prevalence AS prevalence,\n                   a.association_strength AS strength,\n                   a.evidence_level AS evidence_level\n            ORDER BY\n                CASE a.association_strength\n                    WHEN 'Very Strong' THEN 1 WHEN 'Strong' THEN 2\n                    WHEN 'Moderate' THEN 3 ELSE 4\n                END",
+    "result_count": 1,
+    "latency_ms": 187.93,
+    "timestamp": "09:27:24.423",
+    "traversal_path": "(Gene:BRCA1) --ASSOCIATED_WITH--> (Disease)"
+  },
+  {
+    "iteration": 4,
+    "type": "OBSERVE",
+    "agent": "GenomicsAgent",
+    "content": "Found 1 disease associations: Breast Cancer (Very Strong). Now I need to find drugs that target the BRCA1 protein AND treat these diseases \u2014 the therapeutic bridge.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 187.93,
+    "timestamp": "09:27:24.423",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "THINK",
+    "agent": "PharmacologyAgent",
+    "content": "Critical step: find all drugs that TARGET the BRCA1 protein. The TARGETS relationship has binding_affinity and mechanism_type properties. Then cross-reference which diseases each drug TREATS with efficacy_rate.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.423",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 5,
+    "type": "ACT",
+    "agent": "PharmacologyAgent",
+    "content": "Find drugs targeting BRCA1 and their disease indications",
+    "query": "MATCH (drug:Drug)-[t:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[tr:TREATS]->(dis:Disease)\n            RETURN drug.name AS drug, drug.mechanism AS mechanism,\n                   drug.drug_type AS drug_type,\n                   drug.approval_status AS status,\n                   drug.approval_year AS year,\n                   t.binding_affinity AS affinity,\n                   t.mechanism_type AS target_mechanism,\n                   p.name AS protein_target,\n                   collect(DISTINCT {\n                       disease: dis.name,\n                       efficacy: tr.efficacy_rate,\n                       category: dis.category\n                   }) AS indications\n            ORDER BY t.binding_affinity DESC",
+    "result_count": 1,
+    "latency_ms": 183.31,
+    "timestamp": "09:27:24.606",
+    "traversal_path": "(Drug) --TARGETS--> (Protein:BRCA1) & (Drug) --TREATS--> (Disease)"
+  },
+  {
+    "iteration": 5,
+    "type": "OBSERVE",
+    "agent": "PharmacologyAgent",
+    "content": "Found 1 drug(s) targeting BRCA1: Olaparib (High affinity, Synthetic Lethality). Need clinical trial evidence and safety profiles next.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 183.31,
+    "timestamp": "09:27:24.607",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "THINK",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Now I need clinical trial evidence for these drugs: ['Olaparib']. Trials carry phase, enrollment, status, and NCT IDs. Higher enrollment in Phase 3 = stronger evidence. This validates the drug-disease link.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.607",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 6,
+    "type": "ACT",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Find clinical trials for drugs targeting BRCA1",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            OPTIONAL MATCH (t)-[:STUDIES]->(dis:Disease)\n            RETURN drug.name AS drug, t.title AS trial_title,\n                   t.phase AS phase, t.status AS status,\n                   t.enrollment AS enrollment, t.nct_id AS nct_id,\n                   t.sponsor AS sponsor, t.start_date AS start_date,\n                   dis.name AS disease\n            ORDER BY t.enrollment DESC",
+    "result_count": 1,
+    "latency_ms": 182.39,
+    "timestamp": "09:27:24.789",
+    "traversal_path": "(ClinicalTrial) --INVESTIGATES--> (Drug) --TARGETS--> (Protein:BRCA1)"
+  },
+  {
+    "iteration": 6,
+    "type": "OBSERVE",
+    "agent": "ClinicalEvidenceAgent",
+    "content": "Found 1 clinical trials. 1 are Phase 3 with total enrollment of 302 patients. Sponsors include AstraZeneca. Next: adverse event profiles.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 182.39,
+    "timestamp": "09:27:24.789",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "THINK",
+    "agent": "SafetyProfileAgent",
+    "content": "Safety is paramount. I need to check adverse events reported across trials for drugs targeting BRCA1. The REPORTS_AE relationships link trials to adverse events with incidence_rate and grade. Severe events (grade 3+) are potential treatment-limiting toxicities.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.789",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 7,
+    "type": "ACT",
+    "agent": "SafetyProfileAgent",
+    "content": "Find adverse events for BRCA1-targeting drugs",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            MATCH (t:ClinicalTrial)-[:INVESTIGATES]->(drug)\n            MATCH (t)-[r:REPORTS_AE]->(ae:AdverseEvent)\n            RETURN drug.name AS drug, ae.name AS event,\n                   ae.severity AS severity, ae.category AS category,\n                   ae.frequency AS frequency,\n                   r.incidence_rate AS incidence_rate, r.grade AS grade,\n                   t.title AS trial\n            ORDER BY\n                CASE ae.severity\n                    WHEN 'Severe' THEN 1 WHEN 'Moderate' THEN 2\n                    WHEN 'Mild' THEN 3 ELSE 4\n                END,\n                r.incidence_rate DESC",
+    "result_count": 2,
+    "latency_ms": 183.11,
+    "timestamp": "09:27:24.973",
+    "traversal_path": "(ClinicalTrial) --REPORTS_AE--> (AdverseEvent)"
+  },
+  {
+    "iteration": 7,
+    "type": "OBSERVE",
+    "agent": "SafetyProfileAgent",
+    "content": "Found 2 adverse event reports, 0 severe. Key events: Infusion reaction (Moderate); Diarrhea (Mild). Final step: pathway analysis and drug interactions.",
+    "query": "",
+    "result_count": 2,
+    "latency_ms": 183.11,
+    "timestamp": "09:27:24.973",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "THINK",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Final iteration. I need two things: (1) signaling pathways involving BRCA1 \u2014 these explain WHY the gene causes disease, and (2) other drugs that target the same protein \u2014 potential combination therapies or contraindications.",
+    "query": "",
+    "result_count": 0,
+    "latency_ms": 0.0,
+    "timestamp": "09:27:24.973",
+    "traversal_path": ""
+  },
+  {
+    "iteration": 8,
+    "type": "ACT",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Find pathways and co-targeting drugs for BRCA1",
+    "query": "MATCH (drug:Drug)-[:TARGETS]->(p:Protein)\n            WHERE p.name = $protein OR p.name CONTAINS $sym\n            OPTIONAL MATCH (drug)-[:INHIBITS_PATHWAY]->(pw:Pathway)\n            WITH drug, p, collect(DISTINCT {pathway: pw.name, category: pw.category}) AS pathways\n            OPTIONAL MATCH (other:Drug)-[:TARGETS]->(p)\n            WHERE other <> drug\n            RETURN drug.name AS drug, p.name AS protein,\n                   pathways,\n                   collect(DISTINCT {\n                       co_drug: other.name,\n                       mechanism: other.mechanism\n                   }) AS co_targeting_drugs",
+    "result_count": 1,
+    "latency_ms": 183.15,
+    "timestamp": "09:27:25.156",
+    "traversal_path": "(Drug) --INHIBITS_PATHWAY--> (Pathway) & (OtherDrug) --TARGETS--> (Protein:BRCA1)"
+  },
+  {
+    "iteration": 8,
+    "type": "OBSERVE",
+    "agent": "PathwayAnalysisAgent",
+    "content": "Pathways: none found in graph. Co-targeting drugs (same protein target): none. Investigation complete \u2014 all 8 iterations done. Building risk profile.",
+    "query": "",
+    "result_count": 1,
+    "latency_ms": 183.15,
+    "timestamp": "09:27:25.156",
+    "traversal_path": ""
+  }
+];
+const EDGES = [
+  {
+    "source_type": "Gene",
+    "source_name": "EGFR",
+    "rel_type": "ENCODES",
+    "target_type": "Protein",
+    "target_name": "EGFR",
+    "properties": {
+      "match_type": "symbol_identity"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "EGFR",
+    "rel_type": "HAS_VARIANT",
+    "target_type": "Variant",
+    "target_name": "rs121434568",
+    "properties": {
+      "consequence": "Missense (L858R - activating mutation)"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "EGFR",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "strength": "Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Osimertinib",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "EGFR",
+    "properties": {
+      "affinity": "Very High",
+      "mechanism": "Inhibitor"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Osimertinib",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "efficacy": 0.71
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Cetuximab",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "EGFR",
+    "properties": {
+      "affinity": "High",
+      "mechanism": "Antagonist"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Cetuximab",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "efficacy": 0.35
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Cetuximab",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Colorectal Cancer",
+    "properties": {
+      "efficacy": 0.42
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT01908426",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Cetuximab",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 687
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT02296125",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Osimertinib",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 419
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Osimertinib in EGFR T790M+ NSC",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Immune-related pneumonitis",
+    "properties": {
+      "severity": "Severe",
+      "grade": 3
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Cetuximab + Chemotherapy in Co",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Hypoglycemia",
+    "properties": {
+      "severity": "Moderate",
+      "grade": 1
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Cetuximab + Chemotherapy in Co",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Diarrhea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Osimertinib in EGFR T790M+ NSC",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Hypothyroidism",
+    "properties": {
+      "severity": "Mild",
+      "grade": 1
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Osimertinib in EGFR T790M+ NSC",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Nausea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "KRAS",
+    "rel_type": "ENCODES",
+    "target_type": "Protein",
+    "target_name": "KRAS",
+    "properties": {
+      "match_type": "symbol_identity"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "KRAS",
+    "rel_type": "HAS_VARIANT",
+    "target_type": "Variant",
+    "target_name": "rs28934578",
+    "properties": {
+      "consequence": "Missense (G12C - oncogenic)"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "KRAS",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "strength": "Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "KRAS",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Colorectal Cancer",
+    "properties": {
+      "strength": "Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Sotorasib",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "KRAS",
+    "properties": {
+      "affinity": "Very High",
+      "mechanism": "Inhibitor"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Sotorasib",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "efficacy": 0.37
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT03600883",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Sotorasib",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 345
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Sotorasib in KRAS G12C NSCLC (",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Diarrhea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Sotorasib in KRAS G12C NSCLC (",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Nausea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "HER2",
+    "rel_type": "ENCODES",
+    "target_type": "Protein",
+    "target_name": "HER2",
+    "properties": {
+      "match_type": "symbol_identity"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "HER2",
+    "rel_type": "HAS_VARIANT",
+    "target_type": "Variant",
+    "target_name": "rs11547328",
+    "properties": {
+      "consequence": "Amplification proxy (V842I)"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "HER2",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Breast Cancer",
+    "properties": {
+      "strength": "Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Trastuzumab",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "HER2",
+    "properties": {
+      "affinity": "Very High",
+      "mechanism": "Antagonist"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Trastuzumab",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Breast Cancer",
+    "properties": {
+      "efficacy": 0.52
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT01120184",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Trastuzumab",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 808
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Trastuzumab + Pertuzumab in HE",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Hyperthyroidism",
+    "properties": {
+      "severity": "Moderate",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Trastuzumab + Pertuzumab in HE",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Nausea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Trastuzumab",
+    "rel_type": "INHIBITS_PATHWAY",
+    "target_type": "Pathway",
+    "target_name": "HER2/ERBB Signaling",
+    "properties": {}
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRAF",
+    "rel_type": "ENCODES",
+    "target_type": "Protein",
+    "target_name": "BRAF",
+    "properties": {
+      "match_type": "symbol_identity"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRAF",
+    "rel_type": "HAS_VARIANT",
+    "target_type": "Variant",
+    "target_name": "rs113488022",
+    "properties": {
+      "consequence": "Missense (V600E - oncogenic, most common BRAF mutation)"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRAF",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Melanoma",
+    "properties": {
+      "strength": "Very Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRAF",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Colorectal Cancer",
+    "properties": {
+      "strength": "Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRAF",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "strength": "Moderate",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Dabrafenib",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "BRAF",
+    "properties": {
+      "affinity": "Very High",
+      "mechanism": "Inhibitor"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Dabrafenib",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Non-Small Cell Lung Cancer",
+    "properties": {
+      "efficacy": 0.36
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Dabrafenib",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Melanoma",
+    "properties": {
+      "efficacy": 0.5
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT01682083",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Dabrafenib",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 870
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Dabrafenib + Trametinib in BRA",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Amyloid-related imaging abnormalities",
+    "properties": {
+      "severity": "Severe",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Dabrafenib + Trametinib in BRA",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Nausea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRCA1",
+    "rel_type": "ENCODES",
+    "target_type": "Protein",
+    "target_name": "BRCA1",
+    "properties": {
+      "match_type": "symbol_identity"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRCA1",
+    "rel_type": "HAS_VARIANT",
+    "target_type": "Variant",
+    "target_name": "rs80357713",
+    "properties": {
+      "consequence": "Nonsense (premature stop)"
+    }
+  },
+  {
+    "source_type": "Gene",
+    "source_name": "BRCA1",
+    "rel_type": "ASSOCIATED_WITH",
+    "target_type": "Disease",
+    "target_name": "Breast Cancer",
+    "properties": {
+      "strength": "Very Strong",
+      "evidence": "High"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Olaparib",
+    "rel_type": "TARGETS",
+    "target_type": "Protein",
+    "target_name": "BRCA1",
+    "properties": {
+      "affinity": "High",
+      "mechanism": "Synthetic Lethality"
+    }
+  },
+  {
+    "source_type": "Drug",
+    "source_name": "Olaparib",
+    "rel_type": "TREATS",
+    "target_type": "Disease",
+    "target_name": "Breast Cancer",
+    "properties": {
+      "efficacy": 0.6
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "NCT02000622",
+    "rel_type": "INVESTIGATES",
+    "target_type": "Drug",
+    "target_name": "Olaparib",
+    "properties": {
+      "phase": "Phase 3",
+      "enrollment": 302
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Olaparib in BRCA-Mutated Breas",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Infusion reaction",
+    "properties": {
+      "severity": "Moderate",
+      "grade": 3
+    }
+  },
+  {
+    "source_type": "ClinicalTrial",
+    "source_name": "Olaparib in BRCA-Mutated Breas",
+    "rel_type": "REPORTS_AE",
+    "target_type": "AdverseEvent",
+    "target_name": "Diarrhea",
+    "properties": {
+      "severity": "Mild",
+      "grade": 2
+    }
+  }
+];
+
+// Compute stats
+const geneNames = Object.keys(GENES);
+const totalQueries = STEPS.filter(s => s.type === 'ACT').length;
+const totalEdges = EDGES.length;
+const totalLatency = STEPS.filter(s => s.type === 'ACT').reduce((a,b) => a + b.latency_ms, 0);
+
+// Header stats
+document.getElementById('headerStats').innerHTML = `
+  <div class="stat"><div class="stat-val">${geneNames.length}</div><div class="stat-label">Genes Investigated</div></div>
+  <div class="stat"><div class="stat-val">${totalQueries}</div><div class="stat-label">Cypher Queries</div></div>
+  <div class="stat"><div class="stat-val">${totalEdges}</div><div class="stat-label">Edges Traversed</div></div>
+  <div class="stat"><div class="stat-val">${totalLatency.toFixed(0)}ms</div><div class="stat-label">Total Latency</div></div>
+`;
+
+// Build tabs
+const tabBar = document.getElementById('tabBar');
+const tabContents = document.getElementById('tabContents');
+const allTabs = [];
+
+// Per-gene tabs
+geneNames.forEach((gene, idx) => {
+  allTabs.push({ id: 'gene-' + gene, label: gene + ' Profile', content: buildGeneTab(gene) });
+});
+allTabs.push({ id: 'react-loop', label: 'ReAct Loop', content: buildReActTab() });
+allTabs.push({ id: 'edges', label: 'Graph Edges', content: buildEdgesTab() });
+if (geneNames.length > 1) {
+  allTabs.push({ id: 'compare', label: 'Comparison', content: buildCompareTab() });
+}
+
+allTabs.forEach((t, idx) => {
+  const tab = document.createElement('div');
+  tab.className = 'tab' + (idx === 0 ? ' active' : '');
+  tab.textContent = t.label;
+  tab.onclick = () => switchTab(t.id);
+  tab.dataset.id = t.id;
+  tabBar.appendChild(tab);
+
+  const content = document.createElement('div');
+  content.className = 'tab-content' + (idx === 0 ? ' active' : '');
+  content.id = 'content-' + t.id;
+  content.innerHTML = t.content;
+  tabContents.appendChild(content);
+});
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.id === id));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'content-' + id));
+}
+
+function buildGeneTab(gene) {
+  const g = GENES[gene];
+  const gi = g.gene_info || {};
+  const pi = g.protein_info || {};
+  const rs = g.risk_scores || {};
+
+  let html = '<div class="gene-grid">';
+
+  // Gene + Protein card
+  html += `<div class="gene-card">
+    <h3>${gi.symbol || gene} &mdash; ${gi.name || ''}</h3>
+    <div class="info-row"><span class="info-label">Chromosome</span><span class="info-value">${gi.chromosome || 'N/A'}</span></div>
+    <div class="info-row"><span class="info-label">Function</span><span class="info-value">${gi.function || 'N/A'}</span></div>
+    ${pi.name ? `
+    <div style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
+      <div style="font-size:0.78em; color:#ce93d8; font-weight:600; margin-bottom:6px;">PROTEIN (same symbol)</div>
+      <div class="info-row"><span class="info-label">Name</span><span class="info-value">${pi.name}</span></div>
+      <div class="info-row"><span class="info-label">Class</span><span class="info-value">${pi.protein_class || 'N/A'}</span></div>
+      <div class="info-row"><span class="info-label">Location</span><span class="info-value">${pi.cellular_location || 'N/A'}</span></div>
+      <div class="info-row"><span class="info-label">UniProt</span><span class="info-value">${pi.uniprot_id || 'N/A'}</span></div>
+    </div>` : ''}
+  </div>`;
+
+  // Risk Scores card
+  html += `<div class="gene-card">
+    <h3>Risk Assessment &mdash; Grade ${rs.evidence_grade || '?'} (${rs.risk_level || '?'})</h3>
+    <div class="score-section">
+      ${scoreBar('Genetic Evidence', rs.genetic_evidence_score, 'score-green')}
+      ${scoreBar('Therapeutic Coverage', rs.therapeutic_coverage_score, 'score-blue')}
+      ${scoreBar('Clinical Evidence', rs.clinical_evidence_score, 'score-purple')}
+      ${scoreBar('Safety', rs.safety_score, 'score-amber')}
+      <div style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
+        ${scoreBar('OVERALL', rs.overall_score, 'score-green')}
+      </div>
+    </div>
+    <div style="margin-top:12px; font-size:0.78em; color:#8892b0;">
+      Phase 3 Trials: ${(rs.factors||{}).phase3_trials || 0} |
+      Enrollment: ${((rs.factors||{}).total_enrollment || 0).toLocaleString()} |
+      Severe AEs: ${(rs.factors||{}).severe_adverse_events || 0}
+    </div>
+  </div>`;
+
+  html += '</div>';
+
+  // Variants
+  if (g.variants && g.variants.length) {
+    html += `<div class="gene-card" style="margin-top:16px;">
+      <h3>Pathogenic Variants (${g.variants.length})</h3>`;
+    g.variants.forEach(v => {
+      html += `<div class="info-row">
+        <span class="info-label">${v.rsid || ''}</span>
+        <span class="info-value">${v.consequence || ''} [${v.significance || ''}]</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // Diseases
+  if (g.diseases && g.diseases.length) {
+    html += `<div class="gene-card" style="margin-top:16px;">
+      <h3>Disease Associations (${g.diseases.length})</h3>
+      <table class="edge-table"><tr><th>Disease</th><th>Strength</th><th>Evidence</th><th>Category</th></tr>`;
+    g.diseases.forEach(d => {
+      html += `<tr><td>${d.disease}</td><td>${d.strength||''}</td><td>${d.evidence_level||''}</td><td>${d.category||''}</td></tr>`;
+    });
+    html += '</table></div>';
+  }
+
+  // Drugs
+  if (g.drugs && g.drugs.length) {
+    html += `<div class="gene-card" style="margin-top:16px;">
+      <h3>Targeting Drugs (${g.drugs.length})</h3>
+      <table class="edge-table"><tr><th>Drug</th><th>Mechanism</th><th>Affinity</th><th>Type</th><th>Status</th></tr>`;
+    g.drugs.forEach(d => {
+      html += `<tr><td>${d.drug}</td><td>${d.mechanism||''}</td><td>${d.affinity||''}</td><td>${d.target_mechanism||''}</td><td>${d.status||''}</td></tr>`;
+      (d.indications||[]).forEach(ind => {
+        if (ind.disease) {
+          const eff = ind.efficacy ? (ind.efficacy*100).toFixed(0) + '%' : 'N/A';
+          html += `<tr><td colspan="5" style="padding-left:30px; color:#80cbc4; font-size:0.9em;">&#8627; Treats: ${ind.disease} (efficacy: ${eff})</td></tr>`;
+        }
+      });
+    });
+    html += '</table></div>';
+  }
+
+  // Trials
+  if (g.trials && g.trials.length) {
+    html += `<div class="gene-card" style="margin-top:16px;">
+      <h3>Clinical Trials (${g.trials.length})</h3>
+      <table class="edge-table"><tr><th>NCT ID</th><th>Drug</th><th>Phase</th><th>Enrollment</th><th>Status</th><th>Sponsor</th></tr>`;
+    g.trials.forEach(t => {
+      html += `<tr><td>${t.nct_id||''}</td><td>${t.drug}</td><td>${t.phase||''}</td><td>${(t.enrollment||'').toLocaleString()}</td><td>${t.status||''}</td><td>${t.sponsor||''}</td></tr>`;
+    });
+    html += '</table></div>';
+  }
+
+  // Adverse Events
+  if (g.adverse_events && g.adverse_events.length) {
+    const seen = new Set();
+    const unique = g.adverse_events.filter(ae => {
+      const key = ae.event + '|' + ae.drug;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    html += `<div class="gene-card" style="margin-top:16px;">
+      <h3>Adverse Events (${unique.length} unique)</h3>
+      <table class="edge-table"><tr><th>Event</th><th>Severity</th><th>Drug</th><th>Category</th><th>Grade</th></tr>`;
+    unique.forEach(ae => {
+      const sevColor = ae.severity === 'Severe' ? '#ef5350' : ae.severity === 'Moderate' ? '#ffb74d' : '#81c784';
+      html += `<tr><td>${ae.event}</td><td style="color:${sevColor}">${ae.severity||''}</td><td>${ae.drug}</td><td>${ae.category||''}</td><td>${ae.grade||''}</td></tr>`;
+    });
+    html += '</table></div>';
+  }
+
+  return html;
+}
+
+function scoreBar(label, value, cls) {
+  const v = value || 0;
+  return `<div class="score-row">
+    <span class="score-label">${label}</span>
+    <div class="score-bar-bg"><div class="score-bar ${cls}" style="width:${v}%">${v}</div></div>
+  </div>`;
+}
+
+function buildReActTab() {
+  let html = '<div class="react-timeline">';
+  let prevIter = 0;
+  STEPS.forEach(s => {
+    if (s.iteration !== prevIter) {
+      html += `<div class="iter-divider">&mdash; Iteration ${s.iteration} &mdash;</div>`;
+      prevIter = s.iteration;
+    }
+    const cls = s.type === 'THINK' ? 'step-think' : s.type === 'ACT' ? 'step-act' : 'step-observe';
+    html += `<div class="react-step ${cls}">
+      <div class="step-header">
+        <span class="step-badge">${s.type}</span>
+        <span class="step-agent">${s.agent}</span>
+        ${s.latency_ms > 0 ? `<span class="step-metrics">${s.result_count} results | ${s.latency_ms.toFixed(1)}ms</span>` : ''}
+      </div>
+      <div class="step-content">${s.content}</div>
+      ${s.traversal_path ? `<div class="step-traversal">Path: ${s.traversal_path}</div>` : ''}
+      ${s.query ? `<div class="step-query">${s.query}</div>` : ''}
+    </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function buildEdgesTab() {
+  let html = `<table class="edge-table">
+    <tr><th>#</th><th>Source</th><th></th><th>Relationship</th><th></th><th>Target</th><th>Properties</th></tr>`;
+  EDGES.forEach((e, idx) => {
+    const relClass = 'rel-' + e.rel_type;
+    const props = Object.entries(e.properties||{}).map(([k,v]) => k+': '+v).join(', ');
+    html += `<tr>
+      <td style="color:#4a5568">${idx+1}</td>
+      <td>(${e.source_type}:<strong>${e.source_name}</strong>)</td>
+      <td style="color:#64ffda">&rarr;</td>
+      <td><span class="rel-badge ${relClass}">${e.rel_type}</span></td>
+      <td style="color:#64ffda">&rarr;</td>
+      <td>(${e.target_type}:<strong>${e.target_name}</strong>)</td>
+      <td style="font-size:0.85em; color:#8892b0">${props}</td>
+    </tr>`;
+  });
+  html += '</table>';
+  return html;
+}
+
+function buildCompareTab() {
+  const genes = Object.keys(GENES);
+  let html = `<table class="compare-table"><tr><th>Metric</th>`;
+  genes.forEach(g => html += `<th>${g}</th>`);
+  html += '</tr>';
+
+  const metrics = [
+    ['Chromosome', g => (GENES[g].gene_info||{}).chromosome || 'N/A'],
+    ['Protein Class', g => (GENES[g].protein_info||{}).protein_class || 'N/A'],
+    ['Variants', g => (GENES[g].variants||[]).length],
+    ['Disease Associations', g => (GENES[g].diseases||[]).length],
+    ['Targeting Drugs', g => (GENES[g].drugs||[]).length],
+    ['Clinical Trials', g => (GENES[g].trials||[]).length],
+    ['Adverse Events', g => (GENES[g].adverse_events||[]).length],
+    ['Overall Score', g => (GENES[g].risk_scores||{}).overall_score || 0],
+    ['Evidence Grade', g => {
+      const grade = (GENES[g].risk_scores||{}).evidence_grade || '?';
+      return `<span class="grade-${grade}">${grade}</span>`;
+    }],
+    ['Genetic Evidence', g => (GENES[g].risk_scores||{}).genetic_evidence_score || 0],
+    ['Therapeutic Coverage', g => (GENES[g].risk_scores||{}).therapeutic_coverage_score || 0],
+    ['Clinical Evidence', g => (GENES[g].risk_scores||{}).clinical_evidence_score || 0],
+    ['Safety Score', g => (GENES[g].risk_scores||{}).safety_score || 0],
+    ['Risk Level', g => (GENES[g].risk_scores||{}).risk_level || '?'],
+  ];
+
+  metrics.forEach(([label, fn]) => {
+    html += `<tr><td>${label}</td>`;
+    genes.forEach(g => html += `<td>${fn(g)}</td>`);
+    html += '</tr>';
+  });
+
+  html += '</table>';
+  return html;
+}
+</script>
+</body>
+</html>
