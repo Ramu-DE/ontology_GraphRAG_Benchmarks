@@ -22,7 +22,7 @@ Domain:    graphrag-opensearch
 Instance:  t3.small.search
 Status:    AVAILABLE
 Endpoint:  search-graphrag-opensearch-cjs5ycirmg65pqvaj2q3w76oy4.us-west-2.es.amazonaws.com
-Auth:      admin / GraphRAG2024!
+Auth:      admin / <your-opensearch-password>
 ```
 
 ### Cost

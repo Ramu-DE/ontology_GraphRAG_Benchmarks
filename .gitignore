@@ -51,6 +51,10 @@ lambda_function.zip
 output/
 strands_output.txt
 
+# ── Virtual environments ─────────────────────────────────────
+venv_neo4j/
+lib/
+
 # ── Sub-project repos (have their own git) ───────────────────
 FDE/ade-academy/
 googlewebsite/

@@ -41,7 +41,7 @@ cat .env
 
 Should show:
 ```
-NEO4J_URI=neo4j+s://cad612f1.databases.neo4j.io
+NEO4J_URI=neo4j+s://<your-instance>.databases.neo4j.io
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=<your-password>
 ```
@@ -424,7 +424,7 @@ python3 real_benchmark_implementation.py --iterations 100
 # Test Neo4j connection
 from neo4j import GraphDatabase
 driver = GraphDatabase.driver(
-    "neo4j+s://cad612f1.databases.neo4j.io",
+    "neo4j+s://<your-instance>.databases.neo4j.io",
     auth=("neo4j", "your-password")
 )
 with driver.session() as session:

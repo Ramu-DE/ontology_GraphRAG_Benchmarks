@@ -1,0 +1,174 @@
+{
+  "timestamp": "2026-05-16T05:05:22",
+  "type": "REAL_MEASUREMENTS",
+  "config": {
+    "vector_dim": 384,
+    "top_k": 5,
+    "iterations": 10,
+    "drugs": 10,
+    "diseases": 7
+  },
+  "results": {
+    "Neo4j Aura": [
+      {
+        "architecture": "Neo4j Aura",
+        "query_label": "Immuno",
+        "latency_ms": 249.62198849534616,
+        "result_count": 5,
+        "top_drug": "Nivolumab",
+        "top_score": 0.5287,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neo4j Aura",
+        "query_label": "HER2",
+        "latency_ms": 175.11437039647717,
+        "result_count": 5,
+        "top_drug": "Tirzepatide",
+        "top_score": 0.5295,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neo4j Aura",
+        "query_label": "TKI",
+        "latency_ms": 175.2224388968898,
+        "result_count": 5,
+        "top_drug": "Pembrolizumab",
+        "top_score": 0.5653,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neo4j Aura",
+        "query_label": "GLP1",
+        "latency_ms": 179.29493709816597,
+        "result_count": 5,
+        "top_drug": "Imatinib",
+        "top_score": 0.54,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neo4j Aura",
+        "query_label": "Amyloid",
+        "latency_ms": 261.22494090232067,
+        "result_count": 5,
+        "top_drug": "Trastuzumab",
+        "top_score": 0.5629,
+        "friction_ms": 0.0
+      }
+    ],
+    "Neptune Analytics": [
+      {
+        "architecture": "Neptune Analytics",
+        "query_label": "Immuno",
+        "latency_ms": 34.39768159587402,
+        "result_count": 5,
+        "top_drug": "Nivolumab",
+        "top_score": 2.0261,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neptune Analytics",
+        "query_label": "HER2",
+        "latency_ms": 37.070762101211585,
+        "result_count": 5,
+        "top_drug": "Semaglutide",
+        "top_score": 2.0792,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neptune Analytics",
+        "query_label": "TKI",
+        "latency_ms": 32.56540310103446,
+        "result_count": 5,
+        "top_drug": "Tirzepatide",
+        "top_score": 1.9596,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neptune Analytics",
+        "query_label": "GLP1",
+        "latency_ms": 37.04175180173479,
+        "result_count": 5,
+        "top_drug": "Aducanumab",
+        "top_score": 1.9559,
+        "friction_ms": 0.0
+      },
+      {
+        "architecture": "Neptune Analytics",
+        "query_label": "Amyloid",
+        "latency_ms": 32.95482040848583,
+        "result_count": 5,
+        "top_drug": "Imatinib",
+        "top_score": 1.9901,
+        "friction_ms": 0.0
+      }
+    ],
+    "Neptune DB + OpenSearch": [
+      {
+        "architecture": "Neptune DB + OpenSearch",
+        "query_label": "Immuno",
+        "latency_ms": 180.5338109988952,
+        "result_count": 5,
+        "top_drug": "Semaglutide",
+        "top_score": 0.5062,
+        "friction_ms": 0.03557050367817283
+      },
+      {
+        "architecture": "Neptune DB + OpenSearch",
+        "query_label": "HER2",
+        "latency_ms": 39.23866640543565,
+        "result_count": 5,
+        "top_drug": "Imatinib",
+        "top_score": 0.517,
+        "friction_ms": 0.03944399650208652
+      },
+      {
+        "architecture": "Neptune DB + OpenSearch",
+        "query_label": "TKI",
+        "latency_ms": 32.25906389707234,
+        "result_count": 5,
+        "top_drug": "Pembrolizumab",
+        "top_score": 0.5208,
+        "friction_ms": 0.03626789839472622
+      },
+      {
+        "architecture": "Neptune DB + OpenSearch",
+        "query_label": "GLP1",
+        "latency_ms": 56.92288770223968,
+        "result_count": 5,
+        "top_drug": "Atezolizumab",
+        "top_score": 0.5177,
+        "friction_ms": 0.038740094169043005
+      },
+      {
+        "architecture": "Neptune DB + OpenSearch",
+        "query_label": "Amyloid",
+        "latency_ms": 36.49069830426015,
+        "result_count": 5,
+        "top_drug": "Metformin",
+        "top_score": 0.5189,
+        "friction_ms": 0.03891059604939073
+      }
+    ]
+  },
+  "summaries": {
+    "Neo4j Aura": {
+      "mean": 208.09573515783995,
+      "min": 175.11437039647717,
+      "max": 261.22494090232067,
+      "friction": 0.0
+    },
+    "Neptune Analytics": {
+      "mean": 34.80608380166814,
+      "min": 32.56540310103446,
+      "max": 37.070762101211585,
+      "friction": 0.0
+    },
+    "Neptune DB + OpenSearch": {
+      "mean": 69.0890254615806,
+      "min": 32.25906389707234,
+      "max": 180.5338109988952,
+      "friction": 0.03778661775868386
+    }
+  }
+}

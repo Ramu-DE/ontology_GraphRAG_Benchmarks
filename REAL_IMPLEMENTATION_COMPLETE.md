@@ -181,7 +181,7 @@ ORDER BY score DESC
 ### ✅ Ready NOW (No Setup Required)
 
 1. **Neo4j Aura Account**
-   - URI: `neo4j+s://cad612f1.databases.neo4j.io`
+   - URI: `neo4j+s://<your-instance>.databases.neo4j.io`
    - Credentials in `.env` file
    - Free tier: 200K nodes, 400K relationships
    - Perfect for testing and validation
@@ -299,7 +299,7 @@ from neo4j import GraphDatabase
 
 # ACTUAL connection to Neo4j Aura
 driver = GraphDatabase.driver(
-    uri="neo4j+s://cad612f1.databases.neo4j.io",
+    uri="neo4j+s://<your-instance>.databases.neo4j.io",
     auth=(user, password)
 )
 

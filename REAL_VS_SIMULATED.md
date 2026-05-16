@@ -98,7 +98,7 @@ def benchmark_unified_query(query_vector, k=10):
 ### ✅ We Already Have
 
 1. **Neo4j Aura Credentials**
-   - URI: `neo4j+s://cad612f1.databases.neo4j.io`
+   - URI: `neo4j+s://<your-instance>.databases.neo4j.io`
    - User: `neo4j`
    - Password: In `.env` file
 
@@ -143,7 +143,7 @@ cat .env | grep NEO4J
 
 Should show:
 ```
-NEO4J_URI=neo4j+s://cad612f1.databases.neo4j.io
+NEO4J_URI=neo4j+s://<your-instance>.databases.neo4j.io
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=<password>
 ```
@@ -174,7 +174,7 @@ python3 real_benchmark_implementation.py
 Output:
 ```
 🚀 Running REAL Neo4j Aura Benchmarks
-✅ Connected to Neo4j: neo4j+s://cad612f1.databases.neo4j.io
+✅ Connected to Neo4j: neo4j+s://<your-instance>.databases.neo4j.io
 📊 Current node count: 25
 
 🔍 Benchmarking vector search...

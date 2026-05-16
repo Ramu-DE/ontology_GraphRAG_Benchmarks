@@ -3,7 +3,7 @@
 ## Executive Summary
 
 ✅ **REAL benchmarks executed on YOUR Neo4j Aura instance**  
-✅ **Actual database:** cad612f1.databases.neo4j.io  
+✅ **Actual database:** <your-instance>.databases.neo4j.io  
 ✅ **Real queries:** Cypher executed on production database  
 ✅ **Timestamp:** 2026-05-12T17:41:00  
 
@@ -13,7 +13,7 @@
 
 | Property | Value |
 |----------|-------|
-| **URI** | neo4j+s://cad612f1.databases.neo4j.io |
+| **URI** | neo4j+s://<your-instance>.databases.neo4j.io |
 | **Instance** | graphpoc (cad612f1) |
 | **Total Nodes** | 162 |
 | **Total Relationships** | 286 |
@@ -341,7 +341,7 @@ python3 demo_real_benchmark_connection.py
 {
     "timestamp": "2026-05-12T17:41:00.882250",
     "database": {
-        "uri": "neo4j+s://cad612f1.databases.neo4j.io",
+        "uri": "neo4j+s://<your-instance>.databases.neo4j.io",
         "node_count": 162,
         "relationship_count": 286,
         "drug_count": 10

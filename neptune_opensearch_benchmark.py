@@ -148,7 +148,7 @@ try:
 
     # Connect to OpenSearch
     print("🔌 Connecting to OpenSearch...")
-    auth = ('admin', 'GraphRAG2024!')
+    auth = ('admin', os.getenv('OPENSEARCH_PASS', ''))
     opensearch = OpenSearch(
         hosts=[{'host': endpoint, 'port': 443}],
         http_auth=auth,

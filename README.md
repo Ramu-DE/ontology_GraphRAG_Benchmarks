@@ -1,616 +1,306 @@
-# Biomedical Knowledge Graph — W3C Semantic Stack + AWS Neptune + GraphRAG
+# Ontology GraphRAG Benchmarks
 
-> A production-grade biomedical knowledge graph demonstrating the full W3C semantic web stack, AWS Neptune graph database, GraphRAG architecture benchmarks, and multi-agent clinical risk assessment using AWS Strands.
+**Biomedical Knowledge Graph with Real Neptune vs Neo4j Benchmarks**
 
----
-
-## Table of Contents
-
-1. [Project Overview](#project-overview)
-2. [Architecture](#architecture)
-3. [Repository Structure](#repository-structure)
-4. [Quick Start](#quick-start)
-5. [Modules](#modules)
-   - [Ontology (RDF/OWL)](#1-ontology--rdfs--owl)
-   - [Data Layer (CSV → RDF)](#2-data-layer-csv--rdf)
-   - [SHACL Validation](#3-shacl-validation)
-   - [SPARQL Queries](#4-sparql-queries)
-   - [AWS Neptune Setup](#5-aws-neptune-setup)
-   - [GraphRAG Benchmarks](#6-graphrag-benchmarks)
-   - [AWS Strands Agents](#7-aws-strands-agents)
-6. [Benchmark Results](#benchmark-results)
-7. [Jupyter Notebook](#jupyter-notebook)
-8. [Excel Reference](#excel-reference)
-9. [Setup & Installation](#setup--installation)
-10. [Environment Variables](#environment-variables)
+A production-grade biomedical knowledge graph demonstrating the W3C semantic web stack, GraphRAG architectures, HNSW vector indexing, and multi-agent clinical risk assessment. Includes real benchmarks against live AWS Neptune and Neo4j Aura infrastructure.
 
 ---
 
-## Project Overview
+## W3C Semantic Web Stack
 
-This project demonstrates how to build a **semantically rich biomedical knowledge graph** that enables AI systems to reason over pharmaceutical data without hallucinating.
+The foundation of this project is the W3C RDF stack -- a layered architecture that turns raw data into machine-understandable knowledge:
 
-### What's Covered
+```
++--------------+
+|    SHACL     |  Validate -- enforce shapes and structural constraints
++--------------+
+|    OWL       |  Reason -- define ontologies, enable inference of new knowledge
++--------------+
+|   SPARQL     |  Query -- traversal, pattern matching, federation
++--------------+
+|    RDFS      |  Schema -- classes, properties, domains, ranges, hierarchies
++--------------+
+|    RDF       |  Model -- Subject -> Predicate -> Object triples
++--------------+
+```
 
-| Domain | Technology | Purpose |
-|--------|-----------|---------|
-| Knowledge Representation | RDF (Turtle) | Subject-Predicate-Object triples |
-| Schema / Vocabulary | RDFS | Classes, subclasses, property domains & ranges |
-| Logic & Reasoning | OWL 2 | Auto-classification inference rules |
-| Graph Queries | SPARQL | Multi-hop traversal, aggregation |
-| Data Validation | SHACL | Constraints enforced at write time |
-| Graph Database | AWS Neptune | Production graph store (Gremlin + SPARQL) |
-| Vector Search | OpenSearch | Semantic similarity via kNN embeddings |
-| Unified GraphRAG | Neo4j / Neptune Analytics | Native vectors + graph in one query |
-| Multi-Agent AI | AWS Strands | 5 specialized clinical risk agents |
+RDF represents information as triples: `Subject -> Predicate -> Object`. Chain enough triples and you get a directed labeled graph that machines can traverse, reason over, and use as grounded context for AI.
 
-### Domain
+> RDF doesn't replace your warehouse or lake. It's the context layer on top. The W3C stack turns data into knowledge.
 
-Pharmaceutical research, clinical trials, drug discovery:
-- **10 Drugs** — Pembrolizumab, Nivolumab, Atezolizumab, Erlotinib, Tirzepatide, and more
-- **10 Diseases** — NSCLC, Melanoma, Breast Cancer, Type 2 Diabetes, Alzheimer's, and more
-- **10 Clinical Trials** — KEYNOTE-024, CheckMate-214, FLAURA, LEADER, CLARITY AD, and more
-- **10 Genes** — EGFR, KRAS, TP53, BRCA1, BRAF, HER2, ALK, RET, MET, PTEN
-- **10 Proteins** — PD-1, PD-L1, HER2, EGFR protein, VEGFR, mTOR, CDK4/6
-- **10 Biomarkers**, **10 Researchers**, **10+ Institutions**, **10 Adverse Events**
-- **~500+ RDF triples**, **13 relationship types**
+![W3C RDF Stack](Graph/Graph.png)
 
 ---
 
-## Architecture
+## Architecture Comparison: Neptune vs Neo4j
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      DATA SOURCES                                   │
-│  CSV Files (drugs, diseases, trials, genes, proteins, biomarkers)  │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │ scripts/csv_to_rdf.py
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                   W3C SEMANTIC STACK                                 │
-│                                                                     │
-│  ┌──────────┐  ┌──────────┐  ┌────────┐  ┌─────────┐  ┌────────┐ │
-│  │  SHACL   │  │  SPARQL  │  │  OWL   │  │  RDFS   │  │  RDF   │ │
-│  │Validation│  │ Queries  │  │Reasoning│  │ Schema  │  │ Triples│ │
-│  └──────────┘  └──────────┘  └────────┘  └─────────┘  └────────┘ │
-│                                                                     │
-│  output/biomedical_data.ttl   ontology/biomedical_ontology.ttl     │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │
-              ┌────────────┴────────────┐
-              ▼                         ▼
-┌─────────────────────┐    ┌────────────────────────┐
-│    AWS NEPTUNE      │    │       NEO4J             │
-│   (Graph Store)     │    │  (Unified GraphRAG)     │
-│                     │    │                         │
-│  Neptune DB         │    │  Native Vector Index    │
-│    + OpenSearch     │    │  (HNSW M=32)            │
-│  (Two-Layer)        │    │  + Cypher queries       │
-│                     │    │  One query, no friction │
-│  Gremlin / SPARQL   │    │                         │
-└──────────┬──────────┘    └───────────┬─────────────┘
-           │                           │
-           └──────────┬────────────────┘
-                      ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    GRAPHRAG QUERY LAYER                              │
-│                                                                     │
-│  Two-Layer (Neptune+OpenSearch):  31.5ms @ 1B nodes  ❌ 11.8% friction│
-│  Unified (Neo4j/FalkorDB):        23.6ms @ 1B nodes  ✅ 0% friction │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  AWS STRANDS MULTI-AGENT SYSTEM                      │
-│                                                                     │
-│  PharmacologyAgent ──→ ClinicalSafetyAgent ──→ GeneticsAgent       │
-│       │                                               │             │
-│       └───→ DrugInteractionAgent ←──→ PatientProfileAgent          │
-│                                                                     │
-│  7 Risk Factors → Weighted Score → Clinical Decision                │
-│  Simple: 0.250 (LOW)  →  Production: 0.485 (MODERATE)  [+94%]     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+This project benchmarks **three GraphRAG architectures** for combining vector similarity search with graph traversal:
 
-See [`architecture_diagram.ipynb`](architecture_diagram.ipynb) for the full interactive notebook.
+### Architecture 1: Neo4j Aura (Unified)
+```
++------------------------------+
+|        Neo4j Aura            |
+|  +--------+  +------------+ |
+|  |  HNSW  |  |   Cypher   | |
+|  | Vector |--|   Graph    | |
+|  | Index  |  | Traversal  | |
+|  +--------+  +------------+ |
+|     ONE query, ZERO friction |
++------------------------------+
+```
+- Native HNSW vector index + Cypher graph traversal in a **single query**
+- `CALL db.index.vector.queryNodes()` then `MATCH (drug)-[:TREATS]->(disease)`
+- Zero serialization overhead between vector and graph layers
+
+### Architecture 2: Neptune Analytics (Unified)
+```
++------------------------------+
+|    Neptune Analytics         |
+|  +--------+  +------------+ |
+|  | Native |  | openCypher | |
+|  | Vector |--|   Graph    | |
+|  | Search |  | Traversal  | |
+|  +--------+  +------------+ |
+|     ONE query, ZERO friction |
++------------------------------+
+```
+- Native vector search via `neptune.algo.vectors.topKByEmbedding()` + openCypher
+- Vector embeddings stored as node properties via `neptune.algo.vectors.upsert()`
+- Same-query unified architecture -- no external vector DB needed
+
+### Architecture 3: Neptune DB + OpenSearch (Two-Layer)
+```
++--------------+    serialize    +--------------+
+|  OpenSearch   |----- IDs ----->|  Neptune DB   |
+|  (kNN HNSW)  |    (friction)   |  (Gremlin)   |
+|              |                 |              |
+| Vector Search|                 |Graph Traversal|
++--------------+                 +--------------+
+     Step 1            Step 2          Step 3
+```
+- Step 1: OpenSearch kNN returns candidate drug IDs
+- Step 2: Serialize IDs for cross-service transfer (friction)
+- Step 3: Neptune DB Gremlin traverses graph for those candidates
+- Two network hops, two query languages, serialization overhead
 
 ---
 
-## Repository Structure
+## Real Benchmark Results
+
+Every number below is a **real measurement** against live infrastructure. No simulations, no math models.
+
+| Architecture | Mean Latency | Min | Max | Friction |
+|---|---|---|---|---|
+| **Neptune Analytics** (unified) | **34.8 ms** | 32.6 ms | 37.1 ms | 0 ms |
+| **Neptune DB + OpenSearch** (two-layer) | **69.1 ms** | 32.3 ms | 180.5 ms | ~0.04 ms |
+| **Neo4j Aura** (unified) | **208.1 ms** | 175.1 ms | 261.2 ms | 0 ms |
+
+### Per-Query Breakdown
+
+| Query | Neo4j Aura | Neptune Analytics | Neptune DB + OpenSearch |
+|---|---|---|---|
+| PD-1 inhibitor (Immuno) | 249.6 ms | 34.4 ms | 180.5 ms |
+| HER2 antibody (HER2) | 175.1 ms | 37.1 ms | 39.2 ms |
+| Kinase inhibitor (TKI) | 175.2 ms | 32.6 ms | 32.3 ms |
+| GLP-1 peptide (GLP1) | 179.3 ms | 37.0 ms | 56.9 ms |
+| Amyloid-beta Ab (Amyloid) | 261.2 ms | 33.0 ms | 36.5 ms |
+
+### Key Findings
+
+1. **Neptune Analytics is ~6x faster than Neo4j Aura** -- same-region AWS infrastructure vs cross-region Aura cloud
+2. **Unified architectures eliminate friction** -- both Neo4j and Neptune Analytics execute vector search + graph traversal in a single query
+3. **Two-layer overhead is real** -- Neptune DB + OpenSearch has high variance (32-180ms) from cold starts and cross-service network hops
+4. **Neo4j's latency is geographic, not architectural** -- the ~175ms baseline is dominated by network round-trip to Aura cloud, not query execution
+
+### Benchmark Configuration
+- Vector dimensions: 384
+- Top-K: 5
+- Iterations per query: 10
+- Dataset: 10 drugs, 7 diseases, 14 TREATS relationships
+- Neo4j: Aura cloud instance
+- Neptune Analytics: us-west-2
+- Neptune DB: us-west-2
+- OpenSearch: us-west-2 (HNSW kNN engine)
+
+---
+
+## HNSW Tuning and Sparse Matrix Analysis
+
+The project includes a dedicated HNSW parameter tuning demo against live Neo4j, testing three configurations:
+
+| Config | M (connectivity) | efConstruction | efRuntime | Use Case |
+|---|---|---|---|---|
+| Fast/Low Memory | 4 | 32 | 32 | Prototyping, small datasets |
+| Balanced | 16 | 100 | 100 | Production default |
+| Max Recall | 48 | 256 | 256 | Clinical-grade accuracy |
+
+The sparse matrix analysis shows how graph adjacency + vector similarity combine into a unified structure, demonstrating why native vector support (Neo4j HNSW or Neptune Analytics) eliminates the need for a separate vector database.
+
+---
+
+## Project Structure
 
 ```
-Ontology/
-│
-├── 📓 architecture_diagram.ipynb    ← JUPYTER NOTEBOOK (start here)
-├── 📊 Biomedical_KG_Workshop_Reference.xlsx  ← Full Excel reference
-├── 📄 README.md                     ← This file
-├── 🔑 .env.example                  ← Copy to .env and fill credentials
-│
-├── ontology/
-│   ├── biomedical_ontology.ttl      ← OWL ontology (classes, properties, rules)
-│   ├── biomedical_ontology.dot      ← Graphviz source for relationship diagram
-│   └── biomedical_ontology_diagram.html  ← Interactive HTML diagram (open in browser)
-│
-├── validation/
-│   └── shacl_shapes.ttl             ← SHACL constraint shapes per entity
-│
-├── queries/
-│   └── sparql_queries.sparql        ← 29 SPARQL query examples
-│
-├── data/sample/
-│   ├── drugs.csv
-│   ├── diseases.csv
-│   ├── clinical_trials.csv
-│   ├── genes.csv
-│   ├── proteins.csv
-│   ├── biomarkers.csv
-│   ├── researchers.csv
-│   ├── institutions.csv
-│   ├── research_papers.csv
-│   ├── adverse_events.csv
-│   └── relationships/               ← 13 relationship CSV files
-│       ├── drug_treats_disease.csv
-│       ├── drug_targets_protein.csv
-│       ├── gene_associated_with_disease.csv
-│       └── ...
-│
-├── scripts/
-│   ├── csv_to_rdf.py                ← Converts CSVs → RDF Turtle triples
-│   └── csv_to_neo4j.py              ← Converts CSVs → Neo4j Cypher import
-│
-├── main.py                          ← Demo: load → validate → query → show AI
-├── requirements.txt                 ← Python dependencies
-├── create_excel.py                  ← Generates the Excel reference workbook
-│
-│   ── AWS Neptune ──
-├── neptune_data_loader.py           ← Loads data into Neptune via Gremlin
-├── neptune_opensearch_benchmark.py  ← Two-layer benchmark (Neptune + OpenSearch)
-├── neptune_analytics_unified_benchmark.py  ← Neptune Analytics unified queries
-├── neptune_analytics_simple_benchmark.py
-├── neptune_graphrag_comparison.py   ← Neptune vs Neo4j comparison
-├── test_neptune_connection.py       ← Test Neptune / OpenSearch connectivity
-├── opensearch_data_loader.py        ← Load embeddings into OpenSearch kNN index
-├── neptune_infrastructure_status.sh ← Check AWS resource status
-│
-│   ── GraphRAG & Neo4j ──
-├── graphrag_benchmark.py            ← Full 3-arch × 7-scale HNSW benchmark
-├── graphrag_native_vectors.py       ← Neo4j native vector index + unified queries
-├── graphrag_benchmark_results.json  ← Raw benchmark output
-├── real_benchmark_implementation.py ← Live benchmark vs simulated
-├── real_benchmark_results.json
-├── neo4j_data_generator.py          ← Generates synthetic biomedical data
-├── neo4j_data_loader.py             ← Loads into Neo4j via Bolt
-├── lambda_benchmark.py              ← AWS Lambda-based benchmark runner
-├── demo_real_benchmark_connection.py
-│
-│   ── AWS Strands Agents ──
-├── strands_production_grade.py      ← Main: 5 agents + 7 risk factors
-├── strands_official_implementation.py ← Official Strands SDK patterns
-├── strands_official_simple.py
-├── strands_demo_standalone.py       ← Standalone demo (no dependencies)
-├── strands_agent_implementation.py  ← Agent framework base
-├── strands_visual_demo.py           ← HTML generator for workflow viz
-├── strands_with_visualization.py
-├── strands_visualizer.py
-├── react_agent_framework.py         ← ReAct (Reason+Act) agent base
-├── aws_agent_neo4j.py               ← AWS agent connecting to Neo4j
-├── generate_production_visualization.py  ← HTML risk comparison generator
-├── show_production_comparison.py    ← ASCII comparison display
-├── show_visualization.py            ← ASCII workflow display
-├── production_risk_assessment.json  ← Sample output from production agents
-│
-│   ── Visualizations ──
-├── production_visualization.html    ← Side-by-side risk comparison (open in browser)
-├── strands_visualization.html       ← Agent workflow visualization
-├── graphrag_benchmark_visualization.html  ← Benchmark dashboard
-├── web_visualizer.html              ← Knowledge graph web visualizer
-│
-│   ── Documentation (Markdown) ──
-├── AWS_NEPTUNE_SETUP_PLAN.md
-├── BENCHMARK_SUMMARY.md
-├── COMPLETE_BENCHMARK_SUMMARY.md
-├── GRAPHRAG_BENCHMARK_RESULTS.md
-├── GRAPHRAG_UNIFIED_ARCHITECTURE.md
-├── IMPLEMENTATION_GUIDE.md
-├── NEPTUNE_CONNECTION_INFO.md        ← ⚠️  Contains placeholder endpoints only
-├── NEPTUNE_VECTOR_SEARCH_ANALYSIS.md
-├── PRODUCTION_IMPLEMENTATION_SUMMARY.md
-├── QUICK_START.md
-├── RDF_Team_Presentation.md
-├── RISK_CALCULATION_EXPLAINED.md
-├── STRANDS_README.md
-└── USE_CASES_QUICK_REFERENCE.md
+.
+|-- README.md
+|-- Graph/
+|   |-- Graph.png                         # W3C RDF Stack diagram
+|   |-- Knowledge_Graph_POC_BioMedical.pptx
+|
+|-- ontology/
+|   |-- biomedical_ontology.ttl           # OWL ontology (19 classes, 17 object props, 22 datatype props)
+|   |-- biomedical_ontology.dot           # GraphViz DOT format
+|   |-- biomedical_ontology_diagram.html  # Interactive ontology viewer
+|
+|-- data/sample/
+|   |-- drugs.csv                         # 10 drugs with mechanisms, types, approval status
+|   |-- diseases.csv                      # 10 diseases with ICD-10 codes, categories
+|   |-- clinical_trials.csv              # 10 clinical trials (phases, enrollment, NCT IDs)
+|   |-- genes.csv                         # 10 genes with symbols, chromosomes
+|   |-- proteins.csv                      # 10 proteins with UniProt IDs, cellular locations
+|   |-- biomarkers.csv                    # 10 biomarkers
+|   |-- researchers.csv                   # 10 researchers with h-index, publications
+|   |-- research_papers.csv              # Research papers
+|   |-- institutions.csv                  # Research institutions
+|   |-- adverse_events.csv               # Adverse event reports
+|   |-- relationships/                    # 12 relationship CSVs (TREATS, TARGETS, etc.)
+|
+|-- validation/
+|   |-- shacl_shapes.ttl                  # SHACL constraint shapes for all entity types
+|
+|-- queries/
+|   |-- sparql_queries.sparql             # 29 SPARQL query examples
+|
+|-- scripts/
+|   |-- csv_to_rdf.py                     # CSV -> RDF Turtle conversion
+|   |-- csv_to_neo4j.py                   # CSV -> Neo4j Cypher import
+|
+|-- main.py                               # W3C demo: load ontology, SHACL validation, SPARQL queries
+|-- real_neptune_vs_neo4j_benchmark.py    # Real 3-architecture benchmark
+|-- hnsw_sparse_matrix_demo.py            # HNSW tuning + sparse matrix analysis on Neo4j
+|-- graphrag_benchmark.py                 # GraphRAG benchmark suite (scale models)
+|-- strands_production_grade.py           # AWS Strands multi-agent clinical risk assessment
+|
+|-- neptune_graph_full.html               # Interactive viz: Drug -> Disease graph
+|-- neptune_graph_coindication.html       # Interactive viz: Co-indication network
+|-- neptune_graph_mechanisms.html         # Interactive viz: Mechanism clusters
+|-- neptune_vector_search_graph.html      # Interactive viz: Vector search + graph
+|-- neptune_graph_visualization.ipynb     # Jupyter notebook with graph-notebook magic commands
+|
+|-- real_benchmark_comparison.json        # Raw benchmark results (all 3 architectures)
+|-- .env.example                          # Environment variable template
+|-- .gitignore
 ```
+
+---
+
+## Ontology Model
+
+The biomedical ontology defines 19 classes across the pharmaceutical domain:
+
+```
+Drug --treats--> Disease
+  |                 |
+  |--targets--> Protein <--encodedBy-- Gene
+  |                                      |
+  |--investigatedIn--> ClinicalTrial     |--associatedWith--> Disease
+  |                        |
+  |--hasAdverseEvent--> AdverseEvent
+
+Researcher --conducts--> ClinicalTrial
+    |
+    |--authorOf--> ResearchPaper
+    |--affiliatedWith--> Institution
+
+Biomarker --predictsResponseTo--> Drug
+```
+
+### SHACL Validation Rules
+- Drug IDs match pattern `D###`, approval status in {Approved, Experimental, Withdrawn}
+- Disease IDs match `DIS###`, categories in {Oncology, Metabolic, Neurology, Cardiovascular, Infectious}
+- Clinical trial NCT IDs match `NCT########`, phases 1-4, enrollment > 0
+- Gene symbols are uppercase alphanumeric, proteins have valid UniProt IDs
+- Cross-entity rules: Phase 3 trials must have enrollment >= 100, immune checkpoint drugs must be classified as Immunotherapy
+
+---
+
+## Multi-Agent Clinical Risk Assessment
+
+The AWS Strands agent framework implements 5 specialized agents that compute 7-factor risk scores:
+
+| Agent | Role |
+|---|---|
+| **PharmacologyAgent** | Drug mechanism analysis, efficacy scoring |
+| **ClinicalSafetyAgent** | Adverse event assessment, safety profiling |
+| **GeneticsAgent** | Genomic marker analysis, mutation impact |
+| **DrugInteractionAgent** | Multi-drug interaction checking |
+| **PatientProfileAgent** | Patient-specific risk factor integration |
+
+Risk score factors: drug efficacy, adverse event severity, genetic compatibility, drug interactions, trial evidence strength, biomarker predictiveness, patient comorbidities.
 
 ---
 
 ## Quick Start
 
-### 1. Clone & Install
-
+### W3C Semantic Stack Demo
 ```bash
-git clone https://github.com/Ramu-DE/Ontology.git
-cd Ontology
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
-
-### 3. Convert CSV Data to RDF
-
-```bash
-python scripts/csv_to_rdf.py
-# → output/biomedical_data.ttl (~500 triples)
-```
-
-### 4. Run the Main Demo
-
-```bash
+pip install rdflib pyshacl
 python main.py
-# Loads ontology → validates SHACL → executes SPARQL → shows AI examples
 ```
 
-### 5. Open the Jupyter Notebook
-
+### Neo4j + HNSW Tuning
 ```bash
-pip install jupyter
-jupyter notebook architecture_diagram.ipynb
+pip install neo4j numpy
+# Set NEO4J_URI, NEO4J_USER, NEO4J_PASS in .env
+python hnsw_sparse_matrix_demo.py
 ```
 
-### 6. Open the Interactive HTML Diagram
-
-```
-ontology/biomedical_ontology_diagram.html  ← open in any browser
-production_visualization.html              ← agent risk comparison
-graphrag_benchmark_visualization.html      ← benchmark dashboard
-```
-
----
-
-## Modules
-
-### 1. Ontology — RDFS + OWL
-
-**File:** `ontology/biomedical_ontology.ttl`
-
-Defines the schema and reasoning rules for the entire knowledge graph.
-
-**Classes (19 total):**
-
-| Type | Classes |
-|------|---------|
-| Core | Drug, Disease, ClinicalTrial, Gene, Protein, Biomarker, Researcher, Institution, ResearchPaper, AdverseEvent |
-| Drug subtypes | MonoclonalAntibody, SmallMolecule, Peptide |
-| Disease subtypes | OncologyDisease, MetabolicDisease, NeurologicalDisease |
-| Biomarker subtypes | ProteinBiomarker, GeneticBiomarker, MetabolicBiomarker |
-| Protein subtype | ImmuneCheckpointProtein |
-
-**OWL Inference Rules:**
-
-```turtle
-# Auto-classify drugs targeting immune checkpoints as Immunotherapy
-:Immunotherapy owl:equivalentClass [
-    owl:intersectionOf (
-        :Drug
-        [ owl:onProperty :targets ;
-          owl:someValuesFrom :ImmuneCheckpointProtein ]
-    )
-] .
-```
-
-| Rule | Condition | Result |
-|------|-----------|--------|
-| ApprovedTreatment | Drug + treats Disease + status="Approved" | Auto-labeled |
-| Immunotherapy | Drug + targets ImmuneCheckpointProtein | Auto-labeled |
-| HighImpactResearcher | Researcher + hIndex ≥ 70 | Auto-labeled |
-| DefinitiveEvidence | Trial + Phase 3 + Completed | Auto-labeled |
-| EpidemicDisease | Disease + prevalence="Very High" | Auto-labeled |
-
----
-
-### 2. Data Layer (CSV → RDF)
-
-**File:** `scripts/csv_to_rdf.py`
-
-Converts all CSV source files into RDF Turtle triples.
-
+### Real Neptune vs Neo4j Benchmark
 ```bash
-python scripts/csv_to_rdf.py
-# Output: output/biomedical_data.ttl, .rdf, .nt
+pip install neo4j numpy boto3 gremlinpython opensearch-py requests-aws4auth
+# Requires: Neptune Analytics graph, Neptune DB cluster, OpenSearch domain
+python real_neptune_vs_neo4j_benchmark.py
 ```
 
-**W3C Stack Layers:**
-
-```
-SHACL (Validation)     ← data/quality constraints
-SPARQL (Query)         ← graph traversal & pattern matching
-OWL (Reasoning)        ← logical inference
-RDFS (Schema)          ← classes, properties, hierarchy
-RDF (Data Model)       ← Subject → Predicate → Object
-```
+### Graph Visualization
+Open the interactive HTML files directly in a browser:
+- `neptune_graph_full.html`
+- `neptune_graph_coindication.html`
+- `neptune_graph_mechanisms.html`
+- `neptune_vector_search_graph.html`
 
 ---
 
-### 3. SHACL Validation
+## Interactive Graph Visualizations
 
-**File:** `validation/shacl_shapes.ttl`
+Four interactive HTML visualizations are included (open in any browser):
 
-Enforces data quality before any data reaches the graph:
+| File | Description |
+|---|---|
+| `neptune_graph_full.html` | Full Drug -> Disease graph with mechanism coloring |
+| `neptune_graph_coindication.html` | Drug-Drug co-indication network (shared disease targets) |
+| `neptune_graph_mechanisms.html` | Drugs clustered by mechanism of action |
+| `neptune_vector_search_graph.html` | Neptune Analytics vector search results overlaid on graph |
 
-```turtle
-:DrugShape a sh:NodeShape ;
-    sh:targetClass :Drug ;
-    sh:property [
-        sh:path :drugId ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:pattern "^D[0-9]{3}$" ;        # Must be D001, D002, etc.
-    ] ;
-    sh:property [
-        sh:path :approvalStatus ;
-        sh:in ("Approved" "Experimental" "Withdrawn") ;
-    ] .
-```
+All graphs feature drag-and-drop nodes, zoom, hover tooltips with properties, and physics-based layouts.
 
 ---
 
-### 4. SPARQL Queries
+## Technologies
 
-**File:** `queries/sparql_queries.sparql`  — 29 examples
-
-```sparql
-# Multi-hop: Gene → Disease → Drug pathway
-SELECT ?geneSymbol ?diseaseName ?drugName ?efficacy
-WHERE {
-    ?gene bio:geneSymbol ?geneSymbol .
-    ?disease bio:associatedWithGene ?gene ;
-             bio:diseaseName ?diseaseName .
-    ?drug bio:treats ?disease ;
-          bio:drugName ?drugName .
-    FILTER(?efficacy > 0.50)
-}
-```
-
----
-
-### 5. AWS Neptune Setup
-
-**Cluster:** `graphrag-neptune-cluster.cluster-cracicy0ect3.us-west-2.neptune.amazonaws.com:8182`  
-**Region:** `us-west-2`
-
-```bash
-# Create Neptune cluster
-aws neptune create-db-cluster \
-    --db-cluster-identifier graphrag-neptune \
-    --engine neptune \
-    --db-subnet-group-name graphrag-subnet \
-    --region us-west-2
-
-# Load data
-python neptune_data_loader.py
-
-# Run two-layer benchmark (Neptune + OpenSearch)
-python neptune_opensearch_benchmark.py
-```
-
-Key files:
-- `neptune_data_loader.py` — Gremlin bulk loader
-- `opensearch_data_loader.py` — Vector index loader
-- `neptune_opensearch_benchmark.py` — Two-layer latency benchmark
-- `neptune_analytics_unified_benchmark.py` — Unified query benchmark
-
----
-
-### 6. GraphRAG Benchmarks
-
-**File:** `graphrag_benchmark.py`
-
-Tests three architectures at 7 scales (1K → 1B nodes):
-
-```
-Architecture                Latency @ 1B nodes   Friction
-─────────────────────────────────────────────────────────
-Neptune DB + OpenSearch     31.5ms               11.8% (3.7ms)
-Neptune Analytics           31.9ms               0% (unified)
-Neo4j / FalkorDB            23.6ms               0% (unified + optimized)
-```
-
-**The Holy Grail — Unified Query:**
-
-```cypher
-// Vector search + graph traversal in ONE query — zero context switching
-CALL db.index.vector.queryNodes('Drug_embedding_vector', 10, $query_vector)
-YIELD node AS drug, score
-MATCH (drug)-[:TREATS]->(disease:Disease)
-OPTIONAL MATCH (disease)<-[:ASSOCIATED_WITH]-(gene:Gene)
-RETURN drug.name, score, collect(disease.name), collect(gene.symbol)
-ORDER BY score DESC
-```
-
----
-
-### 7. AWS Strands Agents
-
-**File:** `strands_production_grade.py`
-
-Five specialized agents collaborate to compute a 7-factor clinical risk score:
-
-| Agent | Role | Risk Factor |
-|-------|------|------------|
-| PharmacologyAgent | Drug mechanisms | Severity, Frequency baseline |
-| ClinicalSafetyAgent | Adverse events | +15% (High severity) |
-| GeneticsAgent | Genetic validation | Confidence scoring |
-| DrugInteractionAgent ⭐ | Drug-drug interactions | +15% |
-| PatientProfileAgent ⭐ | Demographics | +20% age, +20% comorbidities |
-
-**Test case — 68-year-old, EGFR mutation, switching from Nivolumab:**
-
-| Algorithm | Score | Level | Factors |
-|-----------|-------|-------|---------|
-| Simple | 0.250 | LOW 🟢 | 1 |
-| **Production** | **0.485** | **MODERATE 🟡** | **7** |
-
-**Improvement: +94% more accurate** — clinical decision changed from standard to enhanced monitoring.
-
----
-
-## Benchmark Results
-
-### Performance at 1 Billion Nodes
-
-```
-Architecture             Vector Search  Graph Traversal  Overhead   Total
-──────────────────────────────────────────────────────────────────────────
-Neptune DB + OpenSearch  17.8ms         5.6ms            3.7ms      31.5ms
-Neptune Analytics        25.4ms         5.4ms            0ms        31.9ms
-Neo4j / FalkorDB         17.6ms         5.2ms            0ms        23.6ms  ✅ WINNER
-```
-
-**Key findings:**
-- Two-layer friction is real: 3.7ms (11.8%) overhead from serialization + network
-- Unified architecture eliminates this entirely (0ms handover)
-- Full HNSW tuning (M=32, efConstruction=128, efRuntime=100) gives 30% boost
-- Sparse matrix representation gives additional 20% graph traversal gain
-- All architectures scale logarithmically O(log n) — 1B nodes stays under 35ms
-
----
-
-## Jupyter Notebook
-
-**File:** [`architecture_diagram.ipynb`](architecture_diagram.ipynb)
-
-Covers everything in one interactive notebook:
-1. W3C Semantic Stack visual explanation
-2. Ontology class hierarchy diagram
-3. Entity relationship diagram (SVG)
-4. SPARQL query examples with live execution
-5. SHACL validation walkthrough
-6. AWS Neptune architecture comparison
-7. GraphRAG benchmark visualization
-8. Strands agent workflow diagram
-9. Risk factor calculation walkthrough
-10. End-to-end data flow
-
----
-
-## Excel Reference
-
-**File:** [`Biomedical_KG_Workshop_Reference.xlsx`](Biomedical_KG_Workshop_Reference.xlsx)
-
-14-sheet comprehensive reference workbook:
-
-| Sheet | Content |
-|-------|---------|
-| 📋 Overview | TOC + workshop summary |
-| 🏗️ W3C Stack | All 5 layers explained |
-| 🧬 Ontology Classes | 19 classes with attributes |
-| 🔗 Properties | 17 object + 22 datatype properties |
-| 🤖 OWL Rules | 5 reasoning rules |
-| ☁️ AWS Neptune | Setup, endpoints, commands |
-| 📊 Benchmarks | Results table 1K→1B |
-| 🚀 GraphRAG | Two-layer vs unified |
-| 🤖 Strands Agents | 5 agents, 7 factors, results |
-| 📁 Project Files | Every file explained |
-| 💡 SPARQL Queries | 12 key patterns |
-| 🔐 SHACL Validation | 17 constraint rules |
-| 📈 Data Summary | Entity/relationship counts |
-| 🗺️ Flow Diagram | 14-step end-to-end flow |
-
----
-
-## Setup & Installation
-
-### Prerequisites
-
-- Python 3.8+
-- AWS CLI configured (`aws configure`)
-- Neo4j (optional, for Neo4j benchmarks)
-- Jupyter (optional, for notebook)
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Core Dependencies (`requirements.txt`)
-
-```
-rdflib>=6.0.0          # RDF/SPARQL processing
-pyshacl>=0.20.0        # SHACL validation
-boto3>=1.26.0          # AWS SDK
-opensearch-py          # OpenSearch client
-gremlinpython          # Neptune Gremlin client
-neo4j                  # Neo4j driver
-sentence-transformers  # Embedding generation
-openpyxl               # Excel generation
-```
-
----
-
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in your credentials:
-
-```bash
-cp .env.example .env
-```
-
-| Variable | Description |
-|----------|-------------|
-| `NEO4J_URI` | Neo4j Aura connection URI |
-| `NEO4J_PASSWORD` | Neo4j password |
-| `AWS_REGION` | AWS region (default: us-west-2) |
-| `NEPTUNE_CLUSTER_ENDPOINT` | Neptune cluster hostname |
-| `OPENSEARCH_ENDPOINT` | OpenSearch HTTPS endpoint |
-| `OPENSEARCH_PASSWORD` | OpenSearch admin password |
-| `ANTHROPIC_API_KEY` | Anthropic Claude API key |
-
-> **Security:** Never commit `.env` — it is in `.gitignore`. Only `.env.example` is committed.
-
----
-
-## Key Concepts
-
-### RDF Triple
-The fundamental unit: **Subject → Predicate → Object**
-```
-Pembrolizumab  treats  Non-Small-Cell-Lung-Cancer
-Drug:D001      targets Protein:PD-1
-```
-
-### OWL Reasoning
-Logic rules that auto-classify instances:
-```
-IF Drug + targets ImmuneCheckpointProtein
-THEN → Drug is automatically an Immunotherapy
-```
-
-### HNSW (Hierarchical Navigable Small World)
-The vector index algorithm enabling O(log n) search at billion scale:
-- **M=32** — optimal connectivity for billion-scale
-- **efConstruction=128** — index build quality
-- **efRuntime=100** — search speed/accuracy trade-off
-
-### GraphRAG Holy Grail
-> "If we want to reach the holy grail of GraphRAG at scale, we have to stop thinking of vectors as a separate add-on to a graph engine. When vectors and edges share the same sparse matrix representation, there is no friction."
+| Layer | Technology |
+|---|---|
+| Ontology | RDF, RDFS, OWL (Turtle format) |
+| Validation | SHACL (W3C Shapes Constraint Language) |
+| Query | SPARQL 1.1, Cypher, openCypher, Gremlin |
+| Graph DB | Neo4j Aura, AWS Neptune DB, Neptune Analytics |
+| Vector Search | Neo4j HNSW, Neptune native vectors, OpenSearch kNN |
+| Agents | AWS Strands Agent Framework |
+| LLM | AWS Bedrock |
+| Visualization | PyVis, graph-notebook, Jupyter |
 
 ---
 
 ## License
 
-Educational and research use. See individual file headers.
-
----
-
-## Acknowledgements
-
-- W3C Semantic Web standards: RDF, RDFS, OWL, SPARQL, SHACL
-- AWS Neptune, OpenSearch, Strands, Bedrock
-- Neo4j native vector indices
-- FalkorDB sparse matrix architecture
-- Biomedical ontologies: SNOMED CT, Gene Ontology, UniProt
+This project is for educational and research purposes.

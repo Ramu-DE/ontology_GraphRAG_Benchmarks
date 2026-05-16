@@ -54,7 +54,7 @@ try:
     print("🔌 Connecting to OpenSearch...")
 
     # Using master user authentication
-    auth = ('admin', 'GraphRAG2024!')
+    auth = ('admin', os.getenv('OPENSEARCH_PASS', ''))
 
     client = OpenSearch(
         hosts=[{'host': endpoint, 'port': 443}],

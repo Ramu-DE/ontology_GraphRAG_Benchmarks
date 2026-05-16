@@ -14,7 +14,7 @@
 ### Complete Real Implementation (7 files)
 
 1. **`real_benchmark_implementation.py`** (26KB)
-   - Connects to Neo4j Aura: `neo4j+s://cad612f1.databases.neo4j.io`
+   - Connects to Neo4j Aura: `neo4j+s://<your-instance>.databases.neo4j.io`
    - User: `cad612f1`
    - Executes ACTUAL Cypher queries
    - Measures REAL latency
@@ -35,9 +35,9 @@
 
 5. **`.env`** - Updated with your credentials:
 ```bash
-NEO4J_URI=neo4j+s://cad612f1.databases.neo4j.io
+NEO4J_URI=neo4j+s://<your-instance>.databases.neo4j.io
 NEO4J_USER=cad612f1
-NEO4J_PASSWORD=e3gyan959A5GcTCaOBC3y7to2GI-MRYUOsESWT62esU
+NEO4J_PASSWORD=<your-neo4j-password>
 NEO4J_DATABASE=cad612f1
 AURA_INSTANCEID=cad612f1
 AURA_INSTANCENAME=graphpoc
@@ -72,7 +72,7 @@ python3 neo4j_data_loader.py
 
 **What this does:**
 ```
-✅ Connects to Neo4j Aura at cad612f1.databases.neo4j.io
+✅ Connects to Neo4j Aura at <your-instance>.databases.neo4j.io
 💊 Loading 10 drugs with 384-dim embeddings...
   ✓ Pembrolizumab
   ✓ Nivolumab
@@ -95,7 +95,7 @@ python3 real_benchmark_implementation.py
 **What this measures:**
 ```
 🚀 Running REAL Neo4j Aura Benchmarks
-✅ Connected to Neo4j: neo4j+s://cad612f1.databases.neo4j.io
+✅ Connected to Neo4j: neo4j+s://<your-instance>.databases.neo4j.io
 📊 Current node count: 25
 
 🔍 Benchmarking vector search...
@@ -201,7 +201,7 @@ LIMIT 10
 {
   "timestamp": "2026-05-12T17:30:00.000Z",
   "database": {
-    "uri": "neo4j+s://cad612f1.databases.neo4j.io",
+    "uri": "neo4j+s://<your-instance>.databases.neo4j.io",
     "node_count": 25,
     "relationship_count": 22,
     "drug_count": 10
@@ -416,7 +416,7 @@ The current workshop environment has:
 - ✅ All implementation code
 - ✅ Your Neo4j Aura credentials
 - ✅ Neo4j driver installed
-- ❌ No external network access (cannot reach cad612f1.databases.neo4j.io)
+- ❌ No external network access (cannot reach <your-instance>.databases.neo4j.io)
 
 **Solution:** Run on any machine with internet access
 

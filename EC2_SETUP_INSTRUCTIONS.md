@@ -216,7 +216,7 @@ try:
     print("🔌 Connecting to OpenSearch...")
     opensearch = OpenSearch(
         hosts=[{'host': OPENSEARCH_ENDPOINT, 'port': 443}],
-        http_auth=('admin', 'GraphRAG2024!'),
+        http_auth=('admin', '<your-opensearch-password>'),
         use_ssl=True,
         verify_certs=True,
         connection_class=RequestsHttpConnection

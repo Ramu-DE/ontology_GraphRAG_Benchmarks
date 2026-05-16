@@ -627,7 +627,7 @@ def print_setup_guide():
 1️⃣  NEO4J AURA SETUP (READY TO USE)
 
     We have credentials:
-    • URI: neo4j+s://cad612f1.databases.neo4j.io
+    • URI: <set-in-env>
     • User: neo4j
     • Password: (in .env file)
 

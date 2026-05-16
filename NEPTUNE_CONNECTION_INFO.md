@@ -37,7 +37,7 @@ wss://graphrag-neptune-cluster.cluster-cracicy0ect3.us-west-2.neptune.amazonaws.
 
 **Credentials:**
 - Username: `admin`
-- Password: `GraphRAG2024!`
+- Password: `<your-opensearch-password>`
 
 **Endpoint:**
 ```

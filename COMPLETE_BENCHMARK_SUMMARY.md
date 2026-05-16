@@ -42,7 +42,7 @@ Query → [OpenSearch: Vector Search] → Serialize → Network → [Neptune: Gr
 
 **Infrastructure:**
 - Database: Neo4j Aura
-- Instance: cad612f1.databases.neo4j.io
+- Instance: <your-instance>.databases.neo4j.io
 - Data: 10 drugs, 10 diseases, 10 genes + relationships
 - Embeddings: 384-dimensional vectors (all-MiniLM-L6-v2 compatible)
 - Vector Index: HNSW (cosine similarity)
@@ -112,7 +112,7 @@ Friction impact:                  ~30ms / 7% overhead
 ### Already Completed ✅
 
 1. **Neo4j Setup**
-   - Connected to Neo4j Aura (cad612f1.databases.neo4j.io)
+   - Connected to Neo4j Aura (<your-instance>.databases.neo4j.io)
    - Loaded 10 drugs, 10 diseases, 10 genes
    - Generated 384-dim embeddings for all drugs
    - Created vector index (HNSW, cosine similarity)

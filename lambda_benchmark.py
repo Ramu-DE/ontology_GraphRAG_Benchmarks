@@ -84,7 +84,7 @@ def run_benchmark():
     # Connect to OpenSearch
     opensearch = OpenSearch(
         hosts=[{'host': OPENSEARCH_ENDPOINT, 'port': 443}],
-        http_auth=('admin', 'GraphRAG2024!'),
+        http_auth=('admin', os.getenv('OPENSEARCH_PASS', '')),
         use_ssl=True,
         verify_certs=True,
         connection_class=RequestsHttpConnection

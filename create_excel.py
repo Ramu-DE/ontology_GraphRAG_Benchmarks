@@ -530,7 +530,7 @@ infra_data = [
     ("Neptune Cluster",    "graphrag-neptune-cluster",             "Neptune DB Engine",  "graphrag-neptune-cluster.cluster-cracicy0ect3.us-west-2.neptune.amazonaws.com","8182","✅ Available"),
     ("Neptune Instance",   "graphrag-neptune-instance",            "db.t3.medium",       "Gremlin: wss://...neptune.amazonaws.com:8182/gremlin",                       "8182","✅ Available"),
     ("OpenSearch Domain",  "graphrag-opensearch",                  "OpenSearch 2.11",    "search-graphrag-opensearch-cjs5...us-west-2.es.amazonaws.com",               "443", "✅ Available"),
-    ("OpenSearch Instance","t3.small.search",                      "1 node, 10GB gp3",  "Username: admin  /  Password: GraphRAG2024!",                                "443", "✅ Available"),
+    ("OpenSearch Instance","t3.small.search",                      "1 node, 10GB gp3",  "Username: admin  /  Password: <set-in-env>",                                "443", "✅ Available"),
     ("Subnet Group",       "graphrag-subnet-group",                "Neptune Subnet Grp","subnet-0611..., subnet-0511...",                                             "—",   "✅ Active"),
 ]
 for i, row_data in enumerate(infra_data, 4):

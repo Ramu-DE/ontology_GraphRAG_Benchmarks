@@ -70,9 +70,9 @@ This installs:
 The `.env` file is already configured with your Neo4j Aura credentials:
 
 ```env
-NEO4J_URI=neo4j+s://cad612f1.databases.neo4j.io
+NEO4J_URI=neo4j+s://<your-instance>.databases.neo4j.io
 NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=e3gyan959A5GcTCaOBC3y7to2GI-MRYUOsESWT62esU
+NEO4J_PASSWORD=<your-neo4j-password>
 NEO4J_DATABASE=neo4j
 AURA_INSTANCEID=cad612f1
 AURA_INSTANCENAME=graphpoc
@@ -98,7 +98,7 @@ BIOMEDICAL KNOWLEDGE GRAPH - Neo4j Loader
 ============================================================
 
 Connecting to Neo4j Aura...
-  URI: neo4j+s://cad612f1.databases.neo4j.io
+  URI: neo4j+s://<your-instance>.databases.neo4j.io
   Database: neo4j
 ✓ Connected successfully!
 

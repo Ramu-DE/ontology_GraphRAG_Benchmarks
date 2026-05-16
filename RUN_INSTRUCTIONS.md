@@ -7,7 +7,7 @@
 ✅ **Neo4j Driver:** Installed  
 ❌ **Network:** Sandbox has no external access  
 
-**Error:** `Failed to DNS resolve address cad612f1.databases.neo4j.io`
+**Error:** `Failed to DNS resolve address <your-instance>.databases.neo4j.io`
 
 ---
 
@@ -52,7 +52,7 @@ python3 demo_real_benchmark_connection.py
 **Expected output:**
 ```
 🔌 Connecting to Neo4j Aura...
-✅ Connected to neo4j+s://cad612f1.databases.neo4j.io
+✅ Connected to neo4j+s://<your-instance>.databases.neo4j.io
 📊 Database Statistics:
   Total nodes: 0
   Total relationships: 0
@@ -239,8 +239,8 @@ python3 demo_real_benchmark_connection.py
 from neo4j import GraphDatabase
 
 driver = GraphDatabase.driver(
-    "neo4j+s://cad612f1.databases.neo4j.io",
-    auth=("cad612f1", "e3gyan959A5GcTCaOBC3y7to2GI-MRYUOsESWT62esU")
+    "neo4j+s://<your-instance>.databases.neo4j.io",
+    auth=("cad612f1", "<your-neo4j-password>")
 )
 
 with driver.session() as session:
@@ -264,8 +264,8 @@ pip install neo4j
 # Check Neo4j version (vector search requires 5.11+)
 python3 -c "
 from neo4j import GraphDatabase
-driver = GraphDatabase.driver('neo4j+s://cad612f1.databases.neo4j.io', 
-                              auth=('cad612f1', 'e3gyan959A5GcTCaOBC3y7to2GI-MRYUOsESWT62esU'))
+driver = GraphDatabase.driver('neo4j+s://<your-instance>.databases.neo4j.io', 
+                              auth=('cad612f1', '<your-neo4j-password>'))
 with driver.session() as s:
     result = s.run('CALL dbms.components() YIELD name, versions RETURN name, versions')
     for record in result:
