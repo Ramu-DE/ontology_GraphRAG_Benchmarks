@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Graph Modeling Choice: LPG vs RDF</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f8f9fb;
+    padding: 30px;
+    color: #1a1a2e;
+  }
+  .canvas {
+    max-width: 1500px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e8ecf1;
+  }
+  .header h1 { font-size: 2em; font-weight: 800; color: #1a1a2e; }
+  .header p { font-size: 1em; color: #6b7280; margin-top: 6px; }
+
+  /* Two columns */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  /* Each side */
+  .side {
+    border-radius: 16px;
+    padding: 28px;
+    border: 2px solid;
+  }
+  .lpg-side { border-color: #3b82f6; background: #f0f7ff; }
+  .rdf-side { border-color: #8b5cf6; background: #f5f3ff; }
+
+  .side-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid;
+  }
+  .lpg-side .side-header { border-color: #bfdbfe; }
+  .rdf-side .side-header { border-color: #ddd6fe; }
+
+  .side-badge {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85em;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+  .lpg-side .side-badge { background: #3b82f6; }
+  .rdf-side .side-badge { background: #8b5cf6; }
+
+  .side-title { font-size: 1.35em; font-weight: 700; }
+  .lpg-side .side-title { color: #1e40af; }
+  .rdf-side .side-title { color: #5b21b6; }
+
+  /* Component cards */
+  .comp {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .comp-label {
+    flex: 0 0 200px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+  }
+  .lpg-side .comp-label { background: #2563eb; }
+  .rdf-side .comp-label { background: #7c3aed; }
+
+  .comp-detail {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85em;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .lpg-side .comp-detail { background: #dbeafe; color: #1e3a5f; }
+  .rdf-side .comp-detail { background: #ede9fe; color: #3b1f6e; }
+
+  .comp-example {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78em;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    max-width: 320px;
+  }
+  .lpg-side .comp-example { background: #1e3a5f; color: #93c5fd; }
+  .rdf-side .comp-example { background: #3b1f6e; color: #c4b5fd; }
+
+  /* Use cases box */
+  .usecases {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 12px;
+    border: 2px dashed;
+  }
+  .lpg-side .usecases { border-color: #93c5fd; background: #eff6ff; }
+  .rdf-side .usecases { border-color: #c4b5fd; background: #faf5ff; }
+
+  .usecases h4 {
+    font-size: 0.85em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .lpg-side .usecases h4 { color: #2563eb; }
+  .rdf-side .usecases h4 { color: #7c3aed; }
+
+  .usecases ul { list-style: none; padding: 0; }
+  .usecases li {
+    font-size: 0.88em;
+    padding: 4px 0;
+    color: #374151;
+  }
+  .usecases li::before {
+    content: "→ ";
+    font-weight: 600;
+  }
+  .lpg-side .usecases li::before { color: #3b82f6; }
+  .rdf-side .usecases li::before { color: #8b5cf6; }
+
+  /* DB Support */
+  .db-support {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 0.82em;
+  }
+  .lpg-side .db-support { background: #1e40af; color: #dbeafe; }
+  .rdf-side .db-support { background: #5b21b6; color: #ede9fe; }
+  .db-support strong { display: block; margin-bottom: 4px; font-size: 0.9em; letter-spacing: 0.04em; }
+
+  /* Warning/note callout */
+  .callout {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.82em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .callout-warn { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+  .callout-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+
+  /* Center connector */
+  .center-label {
+    text-align: center;
+    margin: 30px 0 20px;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #6b7280;
+    position: relative;
+  }
+  .center-label::before, .center-label::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 2px;
+    background: #e5e7eb;
+  }
+  .center-label::before { left: 0; }
+  .center-label::after { right: 0; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 2px solid #e8ecf1;
+    font-size: 0.8em;
+    color: #9ca3af;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="header">
+    <h1>Graph Modeling Choice</h1>
+    <p>Labeled Property Graph (LPG) vs Resource Description Framework (RDF)</p>
+  </div>
+
+  <div class="columns">
+
+    <!-- ═══════════ LPG SIDE ═══════════ -->
+    <div class="side lpg-side">
+      <div class="side-header">
+        <span class="side-badge">LPG</span>
+        <span class="side-title">Neo4j / openCypher Style</span>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Nodes with Labels</div>
+        <div class="comp-detail">Labels categorize what a node <em>is</em>. A node can have multiple labels.</div>
+        <div class="comp-example">(:Drug {name: "Pembrolizumab"})</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Relationship Types</div>
+        <div class="comp-detail">Types describe what the connection <em>means</em>. Each relationship has exactly one type.</div>
+        <div class="comp-example">-[:TREATS]-&gt;</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Properties on Nodes</div>
+        <div class="comp-detail">Key-value pairs stored directly on any node.</div>
+        <div class="comp-example">{mechanism: "PD-1 inhibitor", year: 2014}</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Properties on Relationships</div>
+        <div class="comp-detail">Key-value pairs stored directly on any relationship — a major LPG advantage.</div>
+        <div class="comp-example">-[:TREATS {efficacy: 0.85, source: "Phase 3"}]-&gt;</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Query Language</div>
+        <div class="comp-detail">Cypher (Neo4j) / openCypher (Neptune) / Gremlin (TinkerPop)</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Vector Search</div>
+        <div class="comp-detail">Native HNSW index on node properties. Vectors are first-class properties.</div>
+        <div class="comp-example">CALL db.index.vector.queryNodes()</div>
+      </div>
+
+      <div class="usecases">
+        <h4>Best For</h4>
+        <ul>
+          <li>GraphRAG (vector + graph in one query)</li>
+          <li>Path traversal and recommendations</li>
+          <li>Operational / real-time applications</li>
+          <li>Edge-weighted analytics (properties on relationships)</li>
+          <li>Developer-friendly data modeling</li>
+        </ul>
+      </div>
+
+      <div class="db-support">
+        <strong>SUPPORTED BY</strong>
+        Neo4j Aura &bull; Neptune Analytics (openCypher) &bull; Neptune DB (Gremlin / openCypher)
+      </div>
+    </div>
+
+    <!-- ═══════════ RDF SIDE ═══════════ -->
+    <div class="side rdf-side">
+      <div class="side-header">
+        <span class="side-badge">RDF</span>
+        <span class="side-title">W3C / SPARQL Style</span>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Triples</div>
+        <div class="comp-detail">Everything is Subject &rarr; Predicate &rarr; Object. One fact = one triple.</div>
+        <div class="comp-example">:Drug123 :treats :Disease456 .</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Classes via rdf:type</div>
+        <div class="comp-detail">No labels. Typing is done through <code>rdf:type</code> triples linking to ontology classes.</div>
+        <div class="comp-example">:Drug123 rdf:type :Drug .</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Properties as Triples</div>
+        <div class="comp-detail">Each property is a separate triple. No key-value pairs on nodes.</div>
+        <div class="comp-example">:Drug123 :drugName "Pembrolizumab" .</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">No Native Edge Properties</div>
+        <div class="comp-detail">Requires reification, named graphs, or RDF-star to attach metadata to a relationship.</div>
+        <div class="comp-example">:Treatment001 :efficacy "0.85" .<br>(extra modeling required)</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Query Language</div>
+        <div class="comp-detail">SPARQL 1.1 with federation (SERVICE clause queries remote endpoints).</div>
+      </div>
+
+      <div class="comp">
+        <div class="comp-label">Schema &amp; Reasoning</div>
+        <div class="comp-detail">RDFS/OWL ontologies enable inference. SHACL validates graph structure.</div>
+        <div class="comp-example">OWL infers: targets ImmuneCheckpoint &rArr; isImmunotherapy</div>
+      </div>
+
+      <div class="usecases">
+        <h4>Best For</h4>
+        <ul>
+          <li>OWL / RDFS formal ontology and reasoning</li>
+          <li>W3C semantic standards compliance</li>
+          <li>Cross-organization interoperability (global URIs)</li>
+          <li>SPARQL federation across endpoints</li>
+          <li>SHACL validation and data governance</li>
+        </ul>
+      </div>
+
+      <div class="db-support">
+        <strong>SUPPORTED BY</strong>
+        Neptune DB (SPARQL) &bull; Apache Jena &bull; Blazegraph &bull; GraphDB &bull; Stardog
+      </div>
+
+      <div class="callout callout-warn">
+        &#9888; No native vector search in RDF — requires a separate vector layer (e.g., OpenSearch kNN)
+      </div>
+    </div>
+
+  </div>
+
+  <div class="center-label">Key Difference</div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+    <div class="callout callout-info" style="text-align:center; justify-content:center; font-size:0.95em;">
+      <strong>LPG:&nbsp;</strong> Labels on nodes, Types on relationships, Properties on both
+    </div>
+    <div class="callout callout-info" style="text-align:center; justify-content:center; font-size:0.95em; background:#f3e8ff; border-color:#d8b4fe; color:#581c87;">
+      <strong>RDF:&nbsp;</strong> No labels, no types, no edge properties — just triples
+    </div>
+  </div>
+
+  <div class="footer">
+    Ontology GraphRAG Benchmarks &mdash; LPG vs RDF Comparison
+  </div>
+
+</div>
+</body>
+</html>
